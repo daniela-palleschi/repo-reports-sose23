@@ -1,0 +1,66 @@
+---
+title: "Reproducible analysis reports with eye-tracking reading time data"
+format: html
+editor: source
+bibliography: references.json
+---
+
+```{r, eval = T, cache = F}
+# Create references.json file based on the citations in this script
+rbbt::bbt_update_bib("syllabus_repro_sose23.qmd")
+```
+
+
+# Course description Quarto
+
+This course will provide students with the skills and know-how needed to create reproducible reports and presentations of eye-tracking reading data. A brief introduction will be given into common measures in eye-tracking reading and the importance of developing a reproducible workflow, followed by hands-on exercises in RStudio with the R programming language. The main skills developed include data wrangling (with the tidyverse package), data visualisation (with the ggplot2 package), and running and communicating descriptive and inferential statistics. By the end of the course, students will be able to apply what they learned to a variety of data types in both academic and professional settings. This course is aimed at students who have some practical experience with R and RStudio, although this is not a strict requirement. Students who cannot bring their own laptop to class should contact the instructor as early as possible, so an alternative laptop can be organised. The language of instruction is English.
+
+At the end of the course, you will:
+
+-   have an understanding of common eye-tracking reading measures
+-   be able to visualise reading times
+-   be able to run linear mixed models on reading times
+-   be able to set-up and maintain a reproducible workflow in RStudio
+
+# Schedule
+
++---------+-----------------------+------------------------------------------+
+| Session | Date                  | Topic(s)                                 |
++=========+=======================+==========================================+
+| 1       | Wed. April 12, 2023   | Eye-tracking during reading              |
+|         |                       |                                          |
+|         | 10:15 - 11:45         | Reading: @vasishth_what_2013             |
++---------+-----------------------+------------------------------------------+
+| 2       | Wed. April 12, 2023   | Reproducible workflow with RStudio       |
+|         |                       |                                          |
+|         | 12:15 - 1:45          | Reading:                                 |
++---------+-----------------------+------------------------------------------+
+| 3       | Wed. April 12, 2023   | Working with a dataset                   |
+|         |                       |                                          |
+|         | 2:15 - 3:45           | Reading: @biondo_yesterday_2022          |
++---------+-----------------------+------------------------------------------+
+| 4       | Thurs. April 13, 2023 | Data Wrangling and summary statistics    |
++---------+-----------------------+------------------------------------------+
+| 5       | Thurs. April 13, 2023 | Data Visualisation                       |
++---------+-----------------------+------------------------------------------+
+| 6       | Thurs. April 13, 2023 | Communicating your results               |
++---------+-----------------------+------------------------------------------+
+| 7       | Fri. April 14, 2023   | (Generalised) linear mixed models        |
++---------+-----------------------+------------------------------------------+
+| 8       | Fri. April 14, 2023   | (Generalised) linear mixed models        |
++---------+-----------------------+------------------------------------------+
+| 9       | Fri. April 14, 2023   | Independent work / Q&A                   |
++---------+-----------------------+------------------------------------------+
+|                                                                            |
++---------+-----------------------+------------------------------------------+
+| 10      | Fri. June 30, 2023    |                                          |
++---------+-----------------------+------------------------------------------+
+| 11      | Fri. June 30, 2023    |                                          |
++---------+-----------------------+------------------------------------------+
+| 12      | Sat. July 1, 2023     |                                          |
++---------+-----------------------+------------------------------------------+
+| 13      | Sat. July 1, 2023     |                                          |
++---------+-----------------------+------------------------------------------+
+| 14      | Sat. July 1, 2023     |                                          |
++---------+-----------------------+------------------------------------------+
+
