@@ -1,0 +1,459 @@
+---
+title: "Reproducible Analyses"
+subtitle: "What is it and why should I care?"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+lang: en
+date: 2023-04-12
+format:
+  revealjs: 
+    footer: "Daniela Palleschi - SS23: Reproducibility"
+    output-file: slides-reproducibility.html
+    theme: [dark]
+    width: 1600
+    height: 900
+    progress: true
+    # smaller: true
+    scrollable: true
+    slide-number: c/t
+    code-link: true
+    code-overflow: wrap
+    link-external-icon: true
+    # logo: logos/hu_logo.png
+    # css: logo.css
+    incremental: true
+    # number-sections: true
+    toc: true
+    toc-depth: 1
+    toc-title: 'Overview'
+    navigation-mode: linear
+    controls-layout: bottom-right
+    fig-cap-location: top
+    font-size: 0.6em
+    slide-level: 4
+    chalkboard: true
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+  html:
+    output-file: sheet-reproducibility.html
+    number-sections: true
+    toc: true
+    code-overflow: wrap
+  pdf:
+    output-file: pdf-reproducibility.pdf
+    toc: true
+    number-sections: false
+    colorlinks: true
+    code-overflow: wrap
+editor_options: 
+  chunk_output_type: console
+bibliography: references/references.json
+# csl: apa.csl
+---
+
+```{r, eval = T, cache = F, echo = F, message=FALSE}
+# Create references.json file based on the citations in this script
+# make sure you have 'bibliography: references.json' in the YAML
+rbbt::bbt_update_bib("_reproducibility.qmd")
+```
+
+```{r}
+knitr::opts_chunk$set(eval = T, # change this to 'eval = T' to reproduce the analyses; make sure to comment out
+                      echo = T, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F,
+                      warning = F)
+```
+
+# Replication
+
+> "There is increasing concern that in modern research, false findings may be the majority or even the vast majority of published research claims"
+>
+> -- <cite>@ioannidis_why_2005</cite>
+
+- replication refers to the re-running a previous experiment with as few differences as possible
+  + aim: determine whether the original results were *robust* and are *replicable*
+  + if yes, great! the original findings are reliable
+  + if no, hmm, maybe the original findings were false positives? or due to some other factor?
+
+- in recent years, researchers have tried to *replicate* classic studies in their field
+  + but in many cases, they did not get the same effects the original study reported (and were famous for)
+- this began the ***replication crisis***
+
+## An example from language research
+
+- @nieuwland_large-scale_2018: a *direct* EEG^[electroencephalography] replication (versus *conceptual* replication)
+
+::: {style="font-size: 75%"}
+  + a multi-lab replication of @delong_probabilistic_2005's impactful paper
+    + @delong_probabilistic_2005: reported N400 effects elicted at unexpected nouns, but also on preceding determiners (English *a/an*) when it signalled an unexpected word, 
+      + e.g., *The day was breezy so the boy went outside to fly...a kite*/\**an airplane*
+      + taken as evidence of pre-activation of phonological form, graded by cloze probability
+    + @nieuwland_large-scale_2018: replicated N400 at noun, but not at adjective
+:::
+  
+
+# Reproducibility
+
+- reproducibility refers to the ability to *reproduce* somebody's analyses with their
+  + data
+  + *and* code
+
+## Replication vs. Reproducibility
+
+- **replication** of a study
+  + repeating an **experiment**
+  + getting *similar* results
+- **reproducibility** of analyses
+  + repeating **analyses** of the *same data*
+  + getting the *same* results
+  
+- e.g., when you submit a paper to a journal, they make ask for your data and code so reviewers can *reproduce* your analyses
+  + requires data and code
+- if you have interesting findings, other researchers (or future you) may want to *replicate* your study to see if they can *replicate* your findings
+  + (may require) stimuli, set-up and presentation information, participant demographics
+  
+# Open Science: Why should I care?
+
+1. It's good science
+    + Science is cumulative. We should ensure we're building on reliable, robust findings
+2. Because the field cares
+    + replication/reproducibility are beginning to be foregrounded by e.g., journals/job advertisements
+3. Helps future you
+    + pre-registration, reprodubible analyses, clean and sharable data all help *future you*
+    
+## What can I do?
+
+- there are aspects of open science that we can choose to implement
+- some suggestions from @kathawalla_easing_2021:
+
+:::: {.columns}
+
+::: {.column width="30%"}
+Level: Easy
+
+1. Journal Club
+2. Project workflow
+3. Pre-prints
+:::
+
+::: {.column width="40%"}
+Level: Medium
+
+4. Reproducible code
+5. Sharing data
+6. Transparent manuscripts
+7. Pre-registration
+:::
+
+::: {.column width="30%"}    
+Level: Difficult
+
+8. Registered reports
+:::
+
+::::
+
+# How to do better science
+
+- don't be afraid of making mistakes
+  + (most) researchers aren't statisticians or programmers
+  + do the best you can, and ***be transparent***
+- doing *some* of the steps is better than doing *none*
+
+# What will we learn here?
+
+
+
+:::: {.columns} 
+
+::: {.column width="50%"}
+
+Design and Reporting
+
+::: {style="font-size: 75%;"}
+- Preregistration/Registered Reports
+- Transparent writing
+:::
+
+Analysis
+
+::: {style="font-size: 75%;"}
+- Reproducible code
+  + with open source software (R, RStudio, packages)
+  + dynamic reports with Quarto/Rmarkdown
+  
+- Project workflow
+  + folder structure
+      + how to sensibly set up your folders
+   + contained environments
+      + using RProjects and the `here` package
+:::
+
+:::
+
+::: {.column width="50%"}
+
+```{r echo = F, fig.env = "figure",out.height="100%", fig.align = "center", set.cap.width=T, fig.cap="Image source: @kathawalla_easing_2021 (all rights reserved)"}
+knitr::include_graphics(here::here("media/Kathawalla_research_cycle.png"))
+```
+
+:::  
+
+::::
+
+
+# R is for Reproducibility
+
+- we will be working with R, RStudio, Quarto, and RProjects
+  + R: a programming language for statistical computing and graphics
+  + RStudio: an integrated development environment (IDE)
+    - RStudio Desktop
+    - RStudio Server
+  + Quarto (similar to Rmarkdown): dynamic reports
+    - combining text, code, and printed tables and figures
+  + RProjects: a workflow tool
+    - contains all files necessary for a project
+    - works with *relative* file paths
+
+::: {.notes}
+Students: open R, then RStudio, then create an RProject
+Me: show them each on my computer
+- R can run code and save a script
+- RStudio has so many more options (cheatsheet)
+- RProjects keep everything tidy and together
+:::
+
+# Exercises
+
+## R {.smaller}
+
+- R scripts can be written/run in R and RStudio
+
+1. Open R
+    - write `3*32` and hit Enter
+    - write `print("Hello World!")`
+    - write `x <- 3*32`
+    - write `y <- "Hello World!"`
+    - write `x`
+    - write `y`
+  
+## RStudio {.smaller}
+
+2. Open RStudio
+    - locate the Environment, Files, and Console panes
+    - File > New File > R script
+    - write `[your birth-month number]*[the your birth day]` and hit Enter
+    - write `print("Hello World!")`
+    - write `number <- 3*32`; this will create an object/variable 'number'
+    - write `string <- "Hello World!"`; this will create an object/variable 'string'
+    - write `number`
+    - write `string`
+    - add comments describing each step using `#`
+    - File > Save As
+
+## {-}
+
+```{r, eval = T}
+#| output-location: column-fragment
+```
+```{r, eval = T}
+#| output-location: column-fragment
+# multiply 5 by 7
+5*7
+```
+```{r, eval = T}
+#| output-location: column-fragment
+# print some text
+print("Hello World!")
+```
+```{r, eval = T}
+#| output-location: column-fragment
+# save an object 'number' with 5*7
+number <- 5*7
+```
+```{r, eval = T}
+#| output-location: column-fragment
+# save an object 'string' with text
+string <- "Hello World!"
+```
+```{r, eval = T}
+#| output-location: column-fragment
+# print number
+number
+```
+```{r, eval = T}
+#| output-location: column-fragment
+# print string
+string
+```
+```{r, eval = T}
+#| output-location: column-fragment
+# do math with objects
+number+number
+```
+```{r, eval = T}
+#| output-location: column-fragment
+number*number
+```
+```{r, eval = T}
+#| output-location: column-fragment
+number*2
+```
+```{r, eval = T}
+#| output-location: column-fragment
+month <- 5
+```
+```{r, eval = T}
+#| output-location: column-fragment
+day <- 7
+```
+```{r, eval = T}
+#| output-location: column-fragment
+month*day
+```
+
+## Quarto^[https://r4ds.hadley.nz/quarto.html#workflow] {.smaller}
+
+- R scripts are a great way to keep track of what you did
+  + however, the output is not saved, and adding comments with `#` gets kind of chunky
+  + enter: dynamic reports!
+- dynamic reports are those that combine text, code, and output
+  + they are a great tool for communicating, collaborating, and documenting
+  + they are also fantastic for note-taking
+- Rmarkdown vs. Quarto
+  + both can combine text with code, outputting PDFs, Word Documents, html, or slides
+  + main difference: Quarto has native support of a wider range of programming languages (e.g., Python and Julia)
+
+- Want to know more? Check out [Hadley Wickham's intro](https://r4ds.hadley.nz/quarto.html) [@wickham_r_nodate]
+
+### YAML
+
+- YAML is a human-readable programming language used to configure documents
+- formatting is important: but be sandwiched between `---` and `---`
+- in Quarto the output type must at least be given (with R: pdf, html, revealjs)
+
+```{r, eval = F}
+#| code-line-numbers: false
+---
+title: "My title"
+author: "My name"
+output: html
+---
+```
+
+### Headings and text
+
+- headings are indicated by `#`
+  + the number of `#`'s indicates the heading level
+
+```{r, eval = F}
+# This is a heading
+
+This is text.
+
+## This is a sub-heading
+
+This is more text.
+```
+
+### Code snippets
+
+- sandwiched between ````{r}` and `\````
+  + shortcut: Ctrl/Cmd+Alt+I
+
+```{r}
+#| results: asis
+
+# do some math
+year <- 1989
+dog <- "Lola"
+```
+
+### In-line code
+
+- code output that was run *above* text can be called in-line using \``r` \`
+
+```{r, eval = F}
+I was born on `r month`/`r day`/`r year`. My dog's name is `r dog`.
+```
+
+
+
+I was born on `r month`/`r day`/`r year`. My dog's name is `r dog`.
+
+### Altogether
+
+````markdown
+---
+title: "My title"
+author: "My name"
+output: html
+---
+
+# This is a heading
+
+This is text.
+
+## This is a sub-heading
+
+This is more text.
+# do some math
+year <- 1989
+dog <- "Lola"
+
+
+`r ''````{r}
+# do some math
+year <- 1989
+dog <- "Lola"
+```
+
+`I was born on `r month`/`r day`/`r year`. My dog's name is `r dog`.`
+
+````
+
+### Quarto Exercises
+:::: {.columns}
+
+::: {.column width="50%"}
+
+3. Create a new Quarto document
+    - File > New File > Quarto Document
+    - Read the instructions
+    - Practice running the chunks individually
+    - render the document
+    - verify that you can modify the code, re-run it, and see modified output
+:::
+
+::: {.column width="50%"}
+
+4. Create one new Quarto document for each of the three built-in formats: HTML, PDF and Word. 
+    - Render each of the three documents
+    - How do the outputs differ? 
+    - How do the inputs differ?^[You may need to install LaTeX in order to build the PDF output — RStudio will prompt you if this is necessary.]
+:::
+
+::::
+
+### Quarto cont'd {.smaller}
+
+- Choose a Quarto document:
+  + give it a title, your name (author), and unclick 'Use visual markdown editor'
+- Render
+- YAML:
+```{r, eval = FALSE}
+title: "Eye-tracking during reading"
+subtitle: "Lecture 2 notes"
+author: "[YOUR NAME HERE]"
+lang: en
+date: `r Sys.Date()`
+```
+  + Render
+
+# References {.unlisted .unnumbered visibility="uncounted"}
+
+::: {#refs}
+:::

@@ -1,0 +1,543 @@
+---
+title: "Working with eye-tracking reading data in R"
+subtitle: "Biondo et al. (2021)"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+lang: en
+date: 2023-04-12
+format:
+  revealjs: 
+  # all docs:
+    output-file: slide-et_dataset.html
+  # revealjs and html:
+    # toc
+    # code
+    toc: true
+    toc-depth: 2
+    toc-title: 'Overview'
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    css: styles.css
+  # revealjs specific:
+    theme: [dark]
+    width: 1600
+    height: 900
+    progress: true
+    font-size: 0.6em
+    slide-level: 4
+    slide-number: c/t
+    navigation-mode: linear
+    # smaller: true
+    incremental: true
+    scrollable: true
+    controls-layout: bottom-right
+    fig-cap-location: top
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+    # to add drawings:
+    chalkboard:
+      src: drawings/day1-drawings.json
+    # logo: logos/hu_logo.png
+    # css: logo.css
+    # number-sections: true
+  html:
+    output-file: sheet-et_dataset.html
+    toc: true
+    toc-depth: 2
+    toc-title: 'Overview'
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    number-sections: false
+  pdf:
+    output-file: pdf-et_dataset.pdf
+    toc: true
+    number-sections: false
+    colorlinks: true
+    code-overflow: wrap
+editor_options: 
+  chunk_output_type: console
+bibliography: references/references.json
+biblio-style: apalike
+---
+
+# Set-up {.unlisted .unnumbered visibility="uncounted"}
+
+```{r}
+knitr::opts_chunk$set(eval = T, # evaluate = T for REPRODUCIBLE analyses
+                      echo = T, # 'print code chunk?'
+                      message = F, # print messages?
+                      error = T, # render even if errors encountered?
+                      warning = F) # print warnings?
+```
+
+```{r}
+library(rbbt) # zotero plugin
+library(here) # relative path
+library(tidyverse) # tidy/transform
+library(beepr) # beeps when code runs or fails
+```
+
+```{r}
+## play sound if error encountered
+### from: https://sejohnston.com/2015/02/24/make-r-beep-when-r-markdown-finishes-or-when-it-fails/
+options(error = function(){    # Beep on error
+  beepr::beep(sound = "wilhelm")
+  Sys.sleep(2) # 
+  }
+ )
+## and when knitting is complete
+.Last <- function() {          # Beep on exiting session
+  beepr::beep(sound = "ping")
+  Sys.sleep(6) # allow to play for 6 seconds
+  }
+```
+
+```{r, eval = T, cache = F}
+# Create references.json file based on the citations in this script:
+# 1. make sure you have 'bibliography: references/references.json' in the YAML
+# 2. create a new folder called 'references'
+# 3. run:
+rbbt::bbt_update_bib("_et_dataset.qmd")
+```
+
+# The Perfect Lifetime Effect {.smaller}
+
+-   the English Present Perfect (e.g., *has done*) [e.g., @comrie_aspect_1976]
+    -   must be used in temporal contexts that *include the present*
+        -   *I have been sick* [***since last week***]{.underline}
+        -   \**I have been sick* [***last year***]{.underline}
+-   The Lifetime Effect
+    -   a referent's lifetime (dead/alive) constrains verb tense in certain circumstances [e.g., @mittwoch_tenses_2008]
+        -   \**Queen Elizabeth II* [***is***]{.underline} *the British monarch.*
+        -   \**King Charles III* [***was***]{.underline} *the British monarch.*
+-   the Perfect Lifetime Effect
+    -   the (English) Present Perfect cannot be used to describe events of a dead person [e.g., @mittwoch_english_2008]
+        -   \**Queen Elizabeth II* [***has met***]{.underline} *many politicians.*
+        -   *King Charles III* [***has met***]{.underline} *many politicians.*
+
+## Our first dataset
+
+-   eye-tracking during reading
+    -   participants read a referent-lifetime context, followed by a critical sentence
+        -   button-press when done reading
+    -   critical sentences contained the Present Perfect or Simple Future
+        -   button-press when done reading
+-   each trial ended with a 7-point naturalness Likert scale
+
+## Design description
+
+:::: {.columns}
+
+::: {.column width="100%"}
+
+-   2x2 mixed design
+    -   two 2-level factors (2x2 = 2-level x 2-level)
+        -   factor 1: lifetime (levels: dead, alive)
+        -   factor 2: tense (levels: PP, SF)
+    - four conditions:
+        - dead-PP, living-PP, dead-SF, living-SF
+:::
+
+::::
+
+:::: {.columns}
+
+::: {.column width="50%"}
+-   predictors/independent variables
+    -   lifetime
+    -   tense
+:::
+
+::: {.column width="50%"}
+-   measure/dependent variable(s)
+    -   first-fixation time (milliseconds)
+    -   first-pass reading time (ms)
+    -   regression path duration (ms)
+    -   tt (ms)
+:::
+
+::::
+
+## Repeated measures design
+
+- repeated measures design
+  - observations are repeated e.g., multiple data points per participant, and per item within and across participants
+  - essentially, data are not independent
+
+- relevant terms
+  - counterbalancing: each condition presented equally across participants, across experimental lists, 
+  - Latin-square design
+
+# Working with the data
+
+::: columns
+::: {.column width="30%"}
+Day 1
+
+1.  load the data
+2.  inspect data
+    -   eyeball data structure
+    -   print summaries
+    -   plot the data
+:::
+
+::: {.column width="30%"}
+Day 2
+
+3.  tidy data
+4.  transform data
+5.  visualise data
+:::
+
+::: {.column width="30%"}
+Day 3
+
+6.  analyse data
+    -   confirmatory (a priori)
+    -   exploratory (post-hoc)
+7.  report analyses
+:::
+:::
+
+## 1. Load/install packages
+
+- install
+  + only do once
+  + ...or when you working on a new computer
+  + ...or after updating R
+- might be a wise idea to create a script just for installing packages
+  + can save time/energy when updating R
+  
+```{r}
+install.packages("tidyverse")
+install.packages("here")
+```
+
+- load packages
+  + needed at the start of each session
+  
+```{r}
+library(tidyverse)
+library(here)
+```
+
+## 2. Load dataset
+
+```{r}
+df_lifetime <- readr::read_csv(here::here("data/data_lifetime_pilot.csv"))
+```
+
+- N.B., `readr::read_csv` can be read as "`read_csv()` function in the `readr` package"
+  + i.e., `package::function`
+  + you only need to use this syntax if you haven't loaded the specific package yet (maybe because you only need it once), or if a function name is included in multiple packages (i.e., there's a discrepancy in what `read_csv` could be referring to)
+  + why did I use it here?
+
+::: {.callout-tip collapse="true"}
+### `here` package
+
+Using the `here` package, we can access files *relative* to where our .RProj is stored.
+
+In 'olden times', we had to specify the file path with something like:
+
+```{r, eval = F}
+# load in data from an *absolute* file path
+df_lifetime <- read_csv("Users/yournamehere/Documents/SoSe2023/ET_reading/data/data_lifetime_pilot.csv")
+```
+
+Or, we'd set an *absolute* path as our working directory, to which all other file paths were *relative*
+
+```{r, eval = F}
+# set *absolute* path as working directory
+setwd("Users/username/Documents/SoSe2023/ET_reading")
+
+# load in data *relative* to our wd
+df_lifetime <- read_csv("data/data_lifetime_pilot.csv")
+```
+
+This meant that if I sent my project folder to somebody else, they wouldn't be able to run my code because they would have to change the *absolute* file path to match their machine.
+:::
+
+## 2. Inspect dataset
+
+-   there are several different things you can inspect
+    -   and different ways to accomplish those things
+
+### Data structure
+
+-   datasets typically contain a lot of *rows*
+    -   so we want to get a feel for how the data is structured
+
+::: panel-tabset
+#### with base R
+
+```{r}
+#| output-location: fragment
+head(df_lifetime)
+```
+
+#### with the tidyverse pipe
+
+```{r}
+#| code-line-numbers: "|1|2"
+
+library(tidyverse)
+df_lifetime %>%
+  head()
+```
+
+#### with the native R pipe (Ctrl/Cmd+Shift+M)
+
+```{r}
+#| code-line-numbers: "|1|2"
+
+df_lifetime |> 
+  head()
+```
+
+::::
+
+### `head()` function
+
+-   *prints* the first 6 rows of your data
+    -   you can also specify the number of rows
+
+```{r}
+#| code-fold: true
+#| output-location: fragment
+df_lifetime %>%
+  head(n = 2)
+```
+
+### `head()` function task {.unlisted .unnumbered visibility="uncounted"}
+
+::: {.callout-tip collapse="true"}
+#### Task: `head()`
+
+1.  print only 2 rows, but using the syntax for a single line of code
+2.  change `n = 2` to some other number and print
+3.  run `?head` in the `Console`
+
+-   find the opposite function (i.e., prints last rows) in the function description?
+-   run this function with `df_lifetime` as argument; how many rows does it print as default?
+-   play with `n =` in this function to print some other number of rows
+:::
+
+### `tail()` function
+
+-   prints the last rows of a dataframe (or matrix, vector, table, or function)
+
+```{r}
+df_lifetime %>%
+  tail()
+```
+
+### `names()`
+
+-   prints the column/variable names
+
+```{r}
+df_lifetime %>%
+  names()
+```
+
+### `summary()`
+
+-   prints a summary of each variable (column)
+
+```{r}
+df_lifetime %>%
+  summary()
+```
+
+## class types
+
+-   there are difference classes of data that R can read
+    -   the function `class()` takes as its argument an object or number
+
+```{r}
+#| code-line-numbers: "|1|2"
+df_lifetime$RT_value %>%
+  class()
+```
+
+::: {.callout-tip collapse="true"}
+# Selecting a column
+
+```{r}
+# with column index
+df_lifetime[2] %>% summary()
+```
+
+```{r}
+# with column name
+df_lifetime[,"TRIAL_INDEX"] %>% summary()
+```
+
+```{r}
+# with data$column_name
+df_lifetime$TRIAL_INDEX %>% summary()
+```
+
+```{r}
+# with the tidyverse: select()
+df_lifetime %>% 
+  select(TRIAL_INDEX) %>%
+  summary()
+```
+
+:::
+
+### `numeric` class
+
+### `integer` class
+
+### `factor` class
+
+-   we typically want things *grouping* variables to be `factor` class
+    -   factor class is ***categorical*** data
+    -   any number that could be replaced and maintain its value should be a factor
+-   region of interest (ROI) = 1:7
+    -   but we want to know how many observations per region, the number is not informative
+    -   ROI could alternatively be coded as, e.g., "adverb", "pronoun", "verb", "spillover"
+
+### `factor` class {.unlisted .unnumbered visibility="uncounted"}
+
+-   let's change `df_lifetime$ROI` to `factor`
+    -   using `mutate()` from dplyr
+    -   and `as_factor()` from forcats
+
+```{r}
+#| code-line-numbers: "|"
+#| output-location: fragment
+# change ROI & label to factor
+df_lifetime %>%
+  mutate(TRIAL_INDEX = as_factor(TRIAL_INDEX)) %>%
+  summary()
+```
+
+### `character` class
+
+-   we usually aren't interested in character class variables
+    -   unless e.g., we have unique values per row (e.g., if a participant gave a free-text answer)
+    -   or perhaps we have stored some stimuli sentences
+        -   although this would arguably be better as a factor
+
+### Pop quiz
+
+1.  of the classes `numeric`, `factor`, and `character`:
+    -   participant ID
+    -   trial number
+    -   first-pass reading time
+    -   regression path duration
+    -   regressions in
+    -   verb type
+    -   adverb type
+
+2.  change them to these class types, and print a summary
+
+3.  save render the document
+
+4.  upload the source file (day1-nachname_vorname.qmd) to XYZ
+
+5.  download the source file below yours in the list to the same folder, and try to run it
+
+-   does it run?
+
+## 3. Plot the data
+
+::: columns
+::: {.column width="50%"}
+-   at this stage we want to explore the data
+    -   distribution
+        -   peaks, spread
+    -   boundaries
+:::
+::::
+
+::: columns
+::: {.column width="40%"}
+Histogram
+
+```{r}
+#| output-location: fragment
+hist(df_lifetime$gaze)
+```
+:::
+
+::: {.column width="40%"}
+Boxplot
+
+```{r}
+#| output-location: fragment
+boxplot(df_lifetime$gaze)
+```
+:::
+
+::: {.column width="40%"}
+Scatterplot
+
+```{r}
+#| output-location: fragment
+plot(df_lifetime$IA_FIRST_FIXATION_DURATION)
+```
+:::
+
+::: {.column width="40%"}
+Scatterplot
+
+```{r}
+#| output-location: fragment
+plot(df_lifetime$IA_FIRST_FIXATION_DURATION, df_lifetime$IA_FIRST_RUN_DWELL_TIME)
+```
+:::
+:::::
+
+### Exercise
+
+In your Quarto document:
+
+  1. create a heading 'Data exploration'
+    + briefly describe the data
+  2. For each of our depenent variables:
+    + create a subheading
+    + calculate the mean and standard deviation of the variable (`mean()`, `sd()`)
+    + create a boxplot of the variable
+  3. Render the document often to make sure it runs
+  
+::: callout-tip
+#### print options
+
+- each code chunk can have different print options:
+  + `eval = FALSE`: do not evaluate this chunk
+  + `include = FALSE` evaluate this chunk but don't show it or its results
+  + `echo = FALSE` print this chunk code
+  + `message = FALSE`/`warning = false` don't print warnings or messages
+  + `error = TRUE` continue rendering document even if there's an error
+    + do not use `error = TRUE` for final versions! You want to make sure things work as they should
+    
+`````markdown
+`r ''````{r, eval = T, echo = T, results = "asis", warning}
+```
+or
+`r ''````{r}
+#| eval: false
+```
+`````
+
+:::
+
+# Session Info {.unlisted .unnumbered visibility="uncounted"}
+
+```{r}
+#| code-fold: true
+sessionInfo()
+```
+
+# References {.unlisted .unnumbered visibility="uncounted"}
+
+::: {#refs custom-style="Bibliography"}
+:::

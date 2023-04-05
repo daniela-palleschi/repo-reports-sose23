@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.335">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="author" content="Daniela Palleschi">
+<meta name="dcterms.date" content="2023-04-12">
+<title>Working with eye-tracking reading data in R</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<script src="_et_dataset_files/libs/clipboard/clipboard.min.js"></script>
+<script src="_et_dataset_files/libs/quarto-html/quarto.js"></script>
+<script src="_et_dataset_files/libs/quarto-html/popper.min.js"></script>
+<script src="_et_dataset_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="_et_dataset_files/libs/quarto-html/anchor.min.js"></script>
+<link href="_et_dataset_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="_et_dataset_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="_et_dataset_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="_et_dataset_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="_et_dataset_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+</head>
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active"><h2 id="toc-title">Overview</h2>
+   
+  <ul class="collapse">
+<li>
+<a href="#the-perfect-lifetime-effect" id="toc-the-perfect-lifetime-effect" class="nav-link active" data-scroll-target="#the-perfect-lifetime-effect">The Perfect Lifetime Effect</a>
+  <ul class="collapse">
+<li><a href="#our-first-dataset" id="toc-our-first-dataset" class="nav-link" data-scroll-target="#our-first-dataset">Our first dataset</a></li>
+  <li><a href="#design-description" id="toc-design-description" class="nav-link" data-scroll-target="#design-description">Design description</a></li>
+  </ul>
+</li>
+  <li>
+<a href="#working-with-the-data" id="toc-working-with-the-data" class="nav-link" data-scroll-target="#working-with-the-data">Working with the data</a>
+  <ul class="collapse">
+<li><a href="#loadinstall-packages" id="toc-loadinstall-packages" class="nav-link" data-scroll-target="#loadinstall-packages">1. Load/install packages</a></li>
+  <li><a href="#load-dataset" id="toc-load-dataset" class="nav-link" data-scroll-target="#load-dataset">2. Load dataset</a></li>
+  <li><a href="#inspect-dataset" id="toc-inspect-dataset" class="nav-link" data-scroll-target="#inspect-dataset">2. Inspect dataset</a></li>
+  <li><a href="#class-types" id="toc-class-types" class="nav-link" data-scroll-target="#class-types">class types</a></li>
+  <li><a href="#plot-the-data" id="toc-plot-the-data" class="nav-link" data-scroll-target="#plot-the-data">3. Plot the data</a></li>
+  </ul>
+</li>
+  </ul></nav>
+</div>
+<main class="content" id="quarto-document-content"><header id="title-block-header" class="quarto-title-block default"><div class="quarto-title">
+<div class="quarto-title-block"><div><h1 class="title">Working with eye-tracking reading data in R</h1><button type="button" class="btn code-tools-button dropdown-toggle" id="quarto-code-tools-menu" data-bs-toggle="dropdown" aria-expanded="false"><i class="bi"></i> Code</button><ul class="dropdown-menu dropdown-menu-end" aria-labelelledby="quarto-code-tools-menu"><li><a id="quarto-show-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Show All Code</a></li><li><a id="quarto-hide-all-code" class="dropdown-item" href="javascript:void(0)" role="button">Hide All Code</a></li><li><hr class="dropdown-divider"></li><li><a id="quarto-view-source" class="dropdown-item" href="javascript:void(0)" role="button">View Source</a></li></ul></div></div>
+<p class="subtitle lead">Biondo et al.&nbsp;(2021)</p>
+</div>
+
+
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Author</div>
+  <div class="quarto-title-meta-heading">Affiliation</div>
+  
+    <div class="quarto-title-meta-contents">
+    Daniela Palleschi 
+  </div>
+    <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Humboldt-Universität zu Berlin
+          </p>
+      </div>
+    </div>
+
+<div class="quarto-title-meta">
+
+      
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">April 12, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header><section id="set-up" class="level1 unlisted unnumbered" data-visibility="uncounted"><h1 class="unlisted unnumbered" data-visibility="uncounted">Set-up</h1>
+<div class="cell">
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/knitr/man/opts_chunk.html">opts_chunk</a></span><span class="op">$</span><span class="fu">set</span><span class="op">(</span>eval <span class="op">=</span> <span class="cn">T</span>, <span class="co"># evaluate = T for REPRODUCIBLE analyses</span></span>
+<span>                      echo <span class="op">=</span> <span class="cn">T</span>, <span class="co"># 'print code chunk?'</span></span>
+<span>                      message <span class="op">=</span> <span class="cn">F</span>, <span class="co"># print messages?</span></span>
+<span>                      error <span class="op">=</span> <span class="cn">T</span>, <span class="co"># render even if errors encountered?</span></span>
+<span>                      warning <span class="op">=</span> <span class="cn">F</span><span class="op">)</span> <span class="co"># print warnings?</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/paleolimbot/rbbt">rbbt</a></span><span class="op">)</span> <span class="co"># zotero plugin</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://here.r-lib.org/">here</a></span><span class="op">)</span> <span class="co"># relative path</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span> <span class="co"># tidy/transform</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va">beepr</span><span class="op">)</span> <span class="co"># beeps when code runs or fails</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co">## play sound if error encountered</span></span>
+<span><span class="co">### from: https://sejohnston.com/2015/02/24/make-r-beep-when-r-markdown-finishes-or-when-it-fails/</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/options.html">options</a></span><span class="op">(</span>error <span class="op">=</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span>    <span class="co"># Beep on error</span></span>
+<span>  <span class="fu">beepr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/beepr/man/beep.html">beep</a></span><span class="op">(</span>sound <span class="op">=</span> <span class="st">"wilhelm"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/Sys.sleep.html">Sys.sleep</a></span><span class="op">(</span><span class="fl">2</span><span class="op">)</span> <span class="co"># </span></span>
+<span>  <span class="op">}</span></span>
+<span> <span class="op">)</span></span>
+<span><span class="co">## and when knitting is complete</span></span>
+<span><span class="va">.Last</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span> <span class="op">{</span>          <span class="co"># Beep on exiting session</span></span>
+<span>  <span class="fu">beepr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/beepr/man/beep.html">beep</a></span><span class="op">(</span>sound <span class="op">=</span> <span class="st">"ping"</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/Sys.sleep.html">Sys.sleep</a></span><span class="op">(</span><span class="fl">6</span><span class="op">)</span> <span class="co"># allow to play for 6 seconds</span></span>
+<span>  <span class="op">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># Create references.json file based on the citations in this script:</span></span>
+<span><span class="co"># 1. make sure you have 'bibliography: references/references.json' in the YAML</span></span>
+<span><span class="co"># 2. create a new folder called 'references'</span></span>
+<span><span class="co"># 3. run:</span></span>
+<span><span class="fu">rbbt</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/rbbt/man/bbt_update_bib.html">bbt_update_bib</a></span><span class="op">(</span><span class="st">"_et_dataset.qmd"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="the-perfect-lifetime-effect" class="level1 smaller"><h1 class="smaller">The Perfect Lifetime Effect</h1>
+<ul>
+<li>the English Present Perfect (e.g., <em>has done</em>) <span class="citation" data-cites="comrie_aspect_1976">(e.g., <a href="#ref-comrie_aspect_1976" role="doc-biblioref">Comrie 1976</a>)</span>
+<ul>
+<li>must be used in temporal contexts that <em>include the present</em>
+<ul>
+<li>
+<em>I have been sick</em> <u><strong><em>since last week</em></strong></u>
+</li>
+<li>*<em>I have been sick</em> <u><strong><em>last year</em></strong></u>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>The Lifetime Effect
+<ul>
+<li>a referent’s lifetime (dead/alive) constrains verb tense in certain circumstances <span class="citation" data-cites="mittwoch_tenses_2008">(e.g., <a href="#ref-mittwoch_tenses_2008" role="doc-biblioref">Mittwoch 2008a</a>)</span>
+<ul>
+<li>*<em>Queen Elizabeth II</em> <u><strong><em>is</em></strong></u> <em>the British monarch.</em>
+</li>
+<li>*<em>King Charles III</em> <u><strong><em>was</em></strong></u> <em>the British monarch.</em>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>the Perfect Lifetime Effect
+<ul>
+<li>the (English) Present Perfect cannot be used to describe events of a dead person <span class="citation" data-cites="mittwoch_english_2008">(e.g., <a href="#ref-mittwoch_english_2008" role="doc-biblioref">Mittwoch 2008b</a>)</span>
+<ul>
+<li>*<em>Queen Elizabeth II</em> <u><strong><em>has met</em></strong></u> <em>many politicians.</em>
+</li>
+<li>
+<em>King Charles III</em> <u><strong><em>has met</em></strong></u> <em>many politicians.</em>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<section id="our-first-dataset" class="level2"><h2 class="anchored" data-anchor-id="our-first-dataset">Our first dataset</h2>
+<ul>
+<li>eye-tracking during reading
+<ul>
+<li>participants read a referent-lifetime context, followed by a critical sentence
+<ul>
+<li>button-press when done reading</li>
+</ul>
+</li>
+<li>critical sentences contained the Present Perfect or Simple Future
+<ul>
+<li>button-press when done reading</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>each trial ended with a 7-point naturalness Likert scale</li>
+</ul></section><section id="design-description" class="level2"><h2 class="anchored" data-anchor-id="design-description">Design description</h2>
+<div class="columns">
+<div class="column" style="width:100%;">
+<ul>
+<li>2x2 design
+<ul>
+<li>two 2-level factors (2x2 = 2-level x 2-level)
+<ul>
+<li>factor 1: lifetime (levels: dead, alive)</li>
+<li>factor 2: tense (levels: PP, SF)</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>predictors/independent variables
+<ul>
+<li>lifetime</li>
+<li>tense</li>
+</ul>
+</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<ul>
+<li>measure/dependent variable(s)
+<ul>
+<li>first-fixation time (milliseconds)</li>
+<li>first-pass reading time (ms)</li>
+<li>regression path duration (ms)</li>
+<li>tt (ms)</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+</section></section><section id="working-with-the-data" class="level1"><h1>Working with the data</h1>
+<div class="columns">
+<div class="column" style="width:30%;">
+<p>Day 1</p>
+<ol type="1">
+<li>load the data</li>
+<li>inspect data
+<ul>
+<li>eyeball data structure</li>
+<li>print summaries</li>
+<li>plot the data</li>
+</ul>
+</li>
+</ol>
+</div><div class="column" style="width:30%;">
+<p>Day 2</p>
+<ol start="3" type="1">
+<li>tidy data</li>
+<li>transform data</li>
+<li>visualise data</li>
+</ol>
+</div><div class="column" style="width:30%;">
+<p>Day 3</p>
+<ol start="6" type="1">
+<li>analyse data
+<ul>
+<li>confirmatory (a priori)</li>
+<li>exploratory (post-hoc)</li>
+</ul>
+</li>
+<li>report analyses</li>
+</ol>
+</div>
+</div>
+<section id="loadinstall-packages" class="level2"><h2 class="anchored" data-anchor-id="loadinstall-packages">1. Load/install packages</h2>
+<ul>
+<li>install
+<ul>
+<li>only do once (or when you working on a new computer, etc.)</li>
+</ul>
+</li>
+</ul>
+<div class="cell">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"tidyverse"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>Error in contrib.url(repos, "source"): trying to use CRAN without setting a mirror</code></pre>
+</div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"here"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-error">
+<pre><code>Error in contrib.url(repos, "source"): trying to use CRAN without setting a mirror</code></pre>
+</div>
+</div>
+<ul>
+<li>load
+<ul>
+<li>needed at the start of each session</li>
+</ul>
+</li>
+</ul>
+<div class="cell">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org">tidyverse</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://here.r-lib.org/">here</a></span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section id="load-dataset" class="level2"><h2 class="anchored" data-anchor-id="load-dataset">2. Load dataset</h2>
+<div class="cell">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">df_lifetime</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html">here</a></span><span class="op">(</span><span class="st">"data/data_lifetime_pilot.csv"</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+<code>here</code> package
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Using the <code>here</code> package, we can access files <em>relative</em> to where our .RProj is stored.</p>
+<p>In ‘olden times’, we had to specify the file path with something like:</p>
+<div class="cell">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># load in data from an *absolute* file path</span></span>
+<span><span class="va">df_lifetime</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"Users/yournamehere/Documents/SoSe2023/ET_reading/data/data6reg_cleaned_fixed_Oct2020.csv"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Or, we’d set an <em>absolute</em> path as our working directory, to which all other file paths were <em>relative</em></p>
+<div class="cell">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># set *absolute* path as working directory</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/getwd.html">setwd</a></span><span class="op">(</span><span class="st">"Users/username/Documents/SoSe2023/ET_reading"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># load in data *relative* to our wd</span></span>
+<span><span class="va">df_lifetime</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"data/data_biondo_2021.csv"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This meant that if I sent my project folder to somebody else, they wouldn’t be able to run my code because they would have to change the <em>absolute</em> file path to match their machine.</p>
+</div>
+</div>
+</section><section id="inspect-dataset" class="level2"><h2 class="anchored" data-anchor-id="inspect-dataset">2. Inspect dataset</h2>
+<ul>
+<li>there are several different things you can inspect
+<ul>
+<li>and different ways to accomplish those things</li>
+</ul>
+</li>
+</ul>
+<section id="data-structure" class="level3"><h3 class="anchored" data-anchor-id="data-structure">Data structure</h3>
+<ul>
+<li>datasets typically contain a lot of <em>rows</em>
+<ul>
+<li>so we want to get a feel for how the data is structured</li>
+</ul>
+</li>
+</ul>
+<div class="columns">
+<div class="column" style="width:60%;">
+<div class="panel-tabset">
+<ul class="nav nav-tabs" role="tablist">
+<li class="nav-item" role="presentation"><a class="nav-link active" id="tabset-1-1-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-1" role="tab" aria-controls="tabset-1-1" aria-selected="true" href="">with base R</a></li>
+<li class="nav-item" role="presentation"><a class="nav-link" id="tabset-1-2-tab" data-bs-toggle="tab" data-bs-target="#tabset-1-2" role="tab" aria-controls="tabset-1-2" aria-selected="false" href="">with a pipe</a></li>
+</ul>
+<div class="tab-content">
+<div id="tabset-1-1" class="tab-pane active" role="tabpanel" aria-labelledby="tabset-1-1-tab">
+<div class="cell" data-output-location="fragment">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">df_lifetime</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 44
+   ...1     X    px TRIAL_INDEX    tt  gaze   rpd region Accuracy 
+  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;    
+1     1     1     1           1   933   933   933      1 Correct  
+2     2     2     1           2  1792  1792  1792      1 Incorrect
+3     4     4     1           3   541   249   249      2 Correct  
+4     5     5     1           3  1247   131   679      3 Correct  
+5     6     6     1           3   271   124   124      4 Correct  
+6     7     7     1           3   561   170   278      5 Correct  
+# ℹ 35 more variables: Critical_Display_Time &lt;dbl&gt;, KeyPress &lt;dbl&gt;,
+#   KeyPress_Time &lt;dbl&gt;, RT_value &lt;dbl&gt;, X__TRIAL_INDEX__1 &lt;dbl&gt;, bio &lt;chr&gt;,
+#   correct_response &lt;dbl&gt;, critical &lt;chr&gt;, gender &lt;chr&gt;, gender_code &lt;dbl&gt;,
+#   item_id &lt;dbl&gt;, list &lt;dbl&gt;, match &lt;chr&gt;, mm &lt;chr&gt;, mm_code &lt;dbl&gt;,
+#   name &lt;chr&gt;, name_vital_status &lt;chr&gt;, order &lt;dbl&gt;, tense &lt;chr&gt;,
+#   tense_code &lt;dbl&gt;, type &lt;chr&gt;, type_code &lt;dbl&gt;, unique_id &lt;dbl&gt;,
+#   vital_code &lt;dbl&gt;, x &lt;dbl&gt;, yes_press &lt;dbl&gt;, half &lt;dbl&gt;, Accept &lt;chr&gt;, …</code></pre>
+</div>
+</div>
+</div>
+<div id="tabset-1-2" class="tab-pane" role="tabpanel" aria-labelledby="tabset-1-2-tab">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb15-2"><a href="#cb15-2"></a>df_lifetime <span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3"></a>  head</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 44
+   ...1     X    px TRIAL_INDEX    tt  gaze   rpd region Accuracy 
+  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;    
+1     1     1     1           1   933   933   933      1 Correct  
+2     2     2     1           2  1792  1792  1792      1 Incorrect
+3     4     4     1           3   541   249   249      2 Correct  
+4     5     5     1           3  1247   131   679      3 Correct  
+5     6     6     1           3   271   124   124      4 Correct  
+6     7     7     1           3   561   170   278      5 Correct  
+# ℹ 35 more variables: Critical_Display_Time &lt;dbl&gt;, KeyPress &lt;dbl&gt;,
+#   KeyPress_Time &lt;dbl&gt;, RT_value &lt;dbl&gt;, X__TRIAL_INDEX__1 &lt;dbl&gt;, bio &lt;chr&gt;,
+#   correct_response &lt;dbl&gt;, critical &lt;chr&gt;, gender &lt;chr&gt;, gender_code &lt;dbl&gt;,
+#   item_id &lt;dbl&gt;, list &lt;dbl&gt;, match &lt;chr&gt;, mm &lt;chr&gt;, mm_code &lt;dbl&gt;,
+#   name &lt;chr&gt;, name_vital_status &lt;chr&gt;, order &lt;dbl&gt;, tense &lt;chr&gt;,
+#   tense_code &lt;dbl&gt;, type &lt;chr&gt;, type_code &lt;dbl&gt;, unique_id &lt;dbl&gt;,
+#   vital_code &lt;dbl&gt;, x &lt;dbl&gt;, yes_press &lt;dbl&gt;, half &lt;dbl&gt;, Accept &lt;chr&gt;, …</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:40%;">
+<div class="cell" data-layout-align="center" data-set.cap.width="true">
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/include_graphics.html">include_graphics</a></span><span class="op">(</span><span class="fu">here</span><span class="fu">::</span><span class="fu"><a href="https://here.r-lib.org//reference/here.html">here</a></span><span class="op">(</span><span class="st">"mats/media/magrittr_badge.png"</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure"><p><img src="../../media/magrittr_badge.png" style="height:100.0%" width="120" class="figure-img"></p>
+<p></p><figcaption class="figure-caption">Image source: <span class="citation" data-cites="kathawalla_easing_2021">(<a href="#ref-kathawalla_easing_2021" role="doc-biblioref"><strong>kathawalla_easing_2021?</strong></a>)</span> (all rights reserved)</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section><section id="head-function" class="level3"><h3 class="anchored" data-anchor-id="head-function">
+<code>head()</code> function</h3>
+<ul>
+<li>
+<em>prints</em> the first 6 rows of your data
+<ul>
+<li>you can also specify the number of rows</li>
+</ul>
+</li>
+</ul>
+<div class="cell" data-output-location="fragment">
+<details><summary>Code</summary><div class="sourceCode" id="cb18"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">df_lifetime</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span>n <span class="op">=</span> <span class="fl">2</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 44
+   ...1     X    px TRIAL_INDEX    tt  gaze   rpd region Accuracy 
+  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;    
+1     1     1     1           1   933   933   933      1 Correct  
+2     2     2     1           2  1792  1792  1792      1 Incorrect
+# ℹ 35 more variables: Critical_Display_Time &lt;dbl&gt;, KeyPress &lt;dbl&gt;,
+#   KeyPress_Time &lt;dbl&gt;, RT_value &lt;dbl&gt;, X__TRIAL_INDEX__1 &lt;dbl&gt;, bio &lt;chr&gt;,
+#   correct_response &lt;dbl&gt;, critical &lt;chr&gt;, gender &lt;chr&gt;, gender_code &lt;dbl&gt;,
+#   item_id &lt;dbl&gt;, list &lt;dbl&gt;, match &lt;chr&gt;, mm &lt;chr&gt;, mm_code &lt;dbl&gt;,
+#   name &lt;chr&gt;, name_vital_status &lt;chr&gt;, order &lt;dbl&gt;, tense &lt;chr&gt;,
+#   tense_code &lt;dbl&gt;, type &lt;chr&gt;, type_code &lt;dbl&gt;, unique_id &lt;dbl&gt;,
+#   vital_code &lt;dbl&gt;, x &lt;dbl&gt;, yes_press &lt;dbl&gt;, half &lt;dbl&gt;, Accept &lt;chr&gt;, …</code></pre>
+</div>
+</div>
+</section><section id="head-function-task" class="level3 unlisted unnumbered" data-visibility="uncounted"><h3 class="unlisted unnumbered anchored" data-visibility="uncounted" data-anchor-id="head-function-task">
+<code>head()</code> function task</h3>
+<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Task: <code><a href="https://rdrr.io/r/utils/head.html">head()</a></code>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>print only 2 rows, but using the syntax for a single line of code</li>
+<li>change <code>n = 2</code> to some other number and print</li>
+<li>run <code><a href="https://rdrr.io/r/utils/head.html">?head</a></code> in the <code>Console</code>
+</li>
+</ol>
+<ul>
+<li>find the opposite function (i.e., prints last rows) in the function description?</li>
+<li>run this function with <code>df_lifetime</code> as argument; how many rows does it print as default?</li>
+<li>play with <code>n =</code> in this function to print some other number of rows</li>
+</ul>
+</div>
+</div>
+</section><section id="tail-function" class="level3"><h3 class="anchored" data-anchor-id="tail-function">
+<code>tail()</code> function</h3>
+<ul>
+<li>prints the last rows of a dataframe (or matrix, vector, table, or function)</li>
+</ul>
+<div class="cell">
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">df_lifetime</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html">tail</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 44
+   ...1     X    px TRIAL_INDEX    tt  gaze   rpd region Accuracy 
+  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;       &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;chr&gt;    
+1  4417  4417     8         203   142   142   142      5 Incorrect
+2  4420  4420     8         205   866   323   323      2 Incorrect
+3  4425  4425     8         206   882   882   882      1 Correct  
+4  4428  4428     8         208   317   317   317      2 Incorrect
+5  4429  4429     8         208   162   162   162      3 Incorrect
+6  4430  4430     8         208   139   139   139      4 Incorrect
+# ℹ 35 more variables: Critical_Display_Time &lt;dbl&gt;, KeyPress &lt;dbl&gt;,
+#   KeyPress_Time &lt;dbl&gt;, RT_value &lt;dbl&gt;, X__TRIAL_INDEX__1 &lt;dbl&gt;, bio &lt;chr&gt;,
+#   correct_response &lt;dbl&gt;, critical &lt;chr&gt;, gender &lt;chr&gt;, gender_code &lt;dbl&gt;,
+#   item_id &lt;dbl&gt;, list &lt;dbl&gt;, match &lt;chr&gt;, mm &lt;chr&gt;, mm_code &lt;dbl&gt;,
+#   name &lt;chr&gt;, name_vital_status &lt;chr&gt;, order &lt;dbl&gt;, tense &lt;chr&gt;,
+#   tense_code &lt;dbl&gt;, type &lt;chr&gt;, type_code &lt;dbl&gt;, unique_id &lt;dbl&gt;,
+#   vital_code &lt;dbl&gt;, x &lt;dbl&gt;, yes_press &lt;dbl&gt;, half &lt;dbl&gt;, Accept &lt;chr&gt;, …</code></pre>
+</div>
+</div>
+</section><section id="names" class="level3"><h3 class="anchored" data-anchor-id="names"><code>names()</code></h3>
+<ul>
+<li>prints the column/variable names</li>
+</ul>
+<div class="cell">
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">df_lifetime</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "...1"                  "X"                     "px"                   
+ [4] "TRIAL_INDEX"           "tt"                    "gaze"                 
+ [7] "rpd"                   "region"                "Accuracy"             
+[10] "Critical_Display_Time" "KeyPress"              "KeyPress_Time"        
+[13] "RT_value"              "X__TRIAL_INDEX__1"     "bio"                  
+[16] "correct_response"      "critical"              "gender"               
+[19] "gender_code"           "item_id"               "list"                 
+[22] "match"                 "mm"                    "mm_code"              
+[25] "name"                  "name_vital_status"     "order"                
+[28] "tense"                 "tense_code"            "type"                 
+[31] "type_code"             "unique_id"             "vital_code"           
+[34] "x"                     "yes_press"             "half"                 
+[37] "Accept"                "accuracy"              "accept"               
+[40] "log.gaze"              "log.tt"                "log.rpd"              
+[43] "log.sentence"          "log.rt"               </code></pre>
+</div>
+</div>
+</section><section id="summary" class="level3"><h3 class="anchored" data-anchor-id="summary"><code>summary()</code></h3>
+<ul>
+<li>prints a summary of each variable (column)</li>
+</ul>
+<div class="cell">
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">df_lifetime</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      ...1            X              px        TRIAL_INDEX          tt        
+ Min.   :   1   Min.   :   1   Min.   :1.00   Min.   :  1.0   Min.   :  81.0  
+ 1st Qu.:1056   1st Qu.:1056   1st Qu.:2.00   1st Qu.: 51.0   1st Qu.: 267.0  
+ Median :2122   Median :2122   Median :4.00   Median :101.0   Median : 482.0  
+ Mean   :2171   Mean   :2171   Mean   :4.43   Mean   :102.8   Mean   : 790.7  
+ 3rd Qu.:3304   3rd Qu.:3304   3rd Qu.:6.00   3rd Qu.:153.0   3rd Qu.: 957.8  
+ Max.   :4430   Max.   :4430   Max.   :8.00   Max.   :208.0   Max.   :7311.0  
+      gaze             rpd             region        Accuracy        
+ Min.   :  81.0   Min.   :  81.0   Min.   :1.000   Length:2786       
+ 1st Qu.: 215.0   1st Qu.: 248.0   1st Qu.:1.000   Class :character  
+ Median : 356.5   Median : 448.5   Median :3.000   Mode  :character  
+ Mean   : 684.6   Mean   : 807.4   Mean   :2.733                     
+ 3rd Qu.: 796.0   3rd Qu.: 974.8   3rd Qu.:4.000                     
+ Max.   :7311.0   Max.   :7311.0   Max.   :6.000                     
+ Critical_Display_Time    KeyPress     KeyPress_Time          RT_value    
+ Min.   : 438840       Min.   :4.000   Min.   :8.881e+05   Min.   :  533  
+ 1st Qu.:1861012       1st Qu.:4.000   1st Qu.:1.630e+09   1st Qu.: 1377  
+ Median :2705981       Median :5.000   Median :2.580e+09   Median : 1944  
+ Mean   :2798714       Mean   :4.502   Mean   :2.590e+09   Mean   : 2494  
+ 3rd Qu.:3691107       3rd Qu.:5.000   3rd Qu.:3.546e+09   3rd Qu.: 2961  
+ Max.   :5572519       Max.   :5.000   Max.   :5.575e+09   Max.   :15654  
+ X__TRIAL_INDEX__1     bio            correct_response   critical        
+ Min.   :  6.0     Length:2786        Min.   :4.000    Length:2786       
+ 1st Qu.: 56.0     Class :character   1st Qu.:4.000    Class :character  
+ Median :106.0     Mode  :character   Median :5.000    Mode  :character  
+ Mean   :107.8                        Mean   :4.511                      
+ 3rd Qu.:158.0                        3rd Qu.:5.000                      
+ Max.   :213.0                        Max.   :5.000                      
+    gender           gender_code        item_id            list      
+ Length:2786        Min.   :0.0000   Min.   :  1.00   Min.   :14.00  
+ Class :character   1st Qu.:0.0000   1st Qu.: 27.00   1st Qu.:15.00  
+ Mode  :character   Median :1.0000   Median : 55.00   Median :25.00  
+                    Mean   :0.5054   Mean   : 67.61   Mean   :29.14  
+                    3rd Qu.:1.0000   3rd Qu.: 87.00   3rd Qu.:35.00  
+                    Max.   :1.0000   Max.   :208.00   Max.   :45.00  
+    match                mm               mm_code          name          
+ Length:2786        Length:2786        Min.   :11.00   Length:2786       
+ Class :character   Class :character   1st Qu.:12.00   Class :character  
+ Mode  :character   Mode  :character   Median :21.00   Mode  :character  
+                                       Mean   :29.37                     
+                                       3rd Qu.:30.00                     
+                                       Max.   :90.00                     
+ name_vital_status      order          tense             tense_code   
+ Length:2786        Min.   :  1.0   Length:2786        Min.   :1.000  
+ Class :character   1st Qu.: 51.0   Class :character   1st Qu.:1.000  
+ Mode  :character   Median :101.0   Mode  :character   Median :2.000  
+                    Mean   :102.8                      Mean   :3.466  
+                    3rd Qu.:153.0                      3rd Qu.:9.000  
+                    Max.   :208.0                      Max.   :9.000  
+     type             type_code       unique_id         vital_code  
+ Length:2786        Min.   :1.000   Min.   : 101011   Min.   :1.00  
+ Class :character   1st Qu.:1.000   1st Qu.: 127021   1st Qu.:1.00  
+ Mode  :character   Median :1.000   Median : 155114   Median :2.00  
+                    Mean   :3.105   Mean   :2183670   Mean   :1.63  
+                    3rd Qu.:9.000   3rd Qu.: 987093   3rd Qu.:2.00  
+                    Max.   :9.000   Max.   :9208093   Max.   :3.00  
+       x            yes_press          half          Accept         
+ Min.   :   1.0   Min.   :4.000   Min.   :1.000   Length:2786       
+ 1st Qu.: 374.2   1st Qu.:4.000   1st Qu.:1.000   Class :character  
+ Median : 787.5   Median :4.000   Median :1.000   Mode  :character  
+ Mean   : 795.8   Mean   :4.487   Mean   :1.487                     
+ 3rd Qu.:1258.8   3rd Qu.:5.000   3rd Qu.:2.000                     
+ Max.   :1697.0   Max.   :5.000   Max.   :2.000                     
+    accuracy          accept          log.gaze         log.tt     
+ Min.   :0.0000   Min.   :0.0000   Min.   :4.394   Min.   :4.394  
+ 1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:5.371   1st Qu.:5.587  
+ Median :1.0000   Median :1.0000   Median :5.876   Median :6.178  
+ Mean   :0.6249   Mean   :0.6213   Mean   :6.075   Mean   :6.263  
+ 3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:6.680   3rd Qu.:6.865  
+ Max.   :1.0000   Max.   :1.0000   Max.   :8.897   Max.   :8.897  
+    log.rpd       log.sentence       log.rt     
+ Min.   :4.394   Min.   :0.000   Min.   :6.279  
+ 1st Qu.:5.513   1st Qu.:3.296   1st Qu.:7.228  
+ Median :6.106   Median :4.007   Median :7.573  
+ Mean   :6.241   Mean   :3.816   Mean   :7.632  
+ 3rd Qu.:6.882   3rd Qu.:4.466   3rd Qu.:7.993  
+ Max.   :8.897   Max.   :5.338   Max.   :9.658  </code></pre>
+</div>
+</div>
+</section></section><section id="class-types" class="level2"><h2 class="anchored" data-anchor-id="class-types">class types</h2>
+<ul>
+<li>there are difference classes of data that R can read
+<ul>
+<li>the function <code><a href="https://rdrr.io/r/base/class.html">class()</a></code> takes as its argument an object or number</li>
+</ul>
+</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>df_lifetime<span class="sc">$</span>RT_value <span class="sc">%&gt;%</span></span>
+<span id="cb26-2"><a href="#cb26-2"></a>  <span class="fu">class</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "numeric"</code></pre>
+</div>
+</div>
+<section id="numeric-class" class="level3"><h3 class="anchored" data-anchor-id="numeric-class">
+<code>numeric</code> class</h3>
+</section><section id="integer-class" class="level3"><h3 class="anchored" data-anchor-id="integer-class">
+<code>integer</code> class</h3>
+</section><section id="factor-class" class="level3"><h3 class="anchored" data-anchor-id="factor-class">
+<code>factor</code> class</h3>
+<ul>
+<li>we typically want things <em>grouping</em> variables to be <code>factor</code> class
+<ul>
+<li>factor class is <strong><em>categorical</em></strong> data</li>
+<li>any number that could be replaced and maintain its value should be a factor</li>
+</ul>
+</li>
+<li>region of interest (ROI) = 1:7
+<ul>
+<li>but we want to know how many observations per region, the number is not informative</li>
+<li>ROI could alternatively be coded as, e.g., “adverb”, “pronoun”, “verb”, “spillover”</li>
+</ul>
+</li>
+</ul></section><section id="factor-class-1" class="level3 unlisted unnumbered" data-visibility="uncounted"><h3 class="unlisted unnumbered anchored" data-visibility="uncounted" data-anchor-id="factor-class-1">
+<code>factor</code> class</h3>
+<ul>
+<li>let’s change <code>df_lifetime$ROI</code> to <code>factor</code>
+<ul>
+<li>using <code><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate()</a></code> from dplyr</li>
+<li>and <code><a href="https://forcats.tidyverse.org/reference/as_factor.html">as_factor()</a></code> from forcats</li>
+</ul>
+</li>
+</ul>
+<div class="cell" data-output-location="fragment">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="co"># change ROI &amp; label to factor</span></span>
+<span id="cb28-2"><a href="#cb28-2"></a>df_lifetime <span class="sc">%&gt;%</span></span>
+<span id="cb28-3"><a href="#cb28-3"></a>  <span class="fu">mutate</span>(<span class="at">TRIAL_INDEX =</span> <span class="fu">as_factor</span>(TRIAL_INDEX)) <span class="sc">%&gt;%</span></span>
+<span id="cb28-4"><a href="#cb28-4"></a>  <span class="fu">summary</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>      ...1            X              px        TRIAL_INDEX         tt        
+ Min.   :   1   Min.   :   1   Min.   :1.00   49     :  34   Min.   :  81.0  
+ 1st Qu.:1056   1st Qu.:1056   1st Qu.:2.00   130    :  33   1st Qu.: 267.0  
+ Median :2122   Median :2122   Median :4.00   5      :  31   Median : 482.0  
+ Mean   :2171   Mean   :2171   Mean   :4.43   23     :  31   Mean   : 790.7  
+ 3rd Qu.:3304   3rd Qu.:3304   3rd Qu.:6.00   88     :  31   3rd Qu.: 957.8  
+ Max.   :4430   Max.   :4430   Max.   :8.00   96     :  31   Max.   :7311.0  
+                                              (Other):2595                   
+      gaze             rpd             region        Accuracy        
+ Min.   :  81.0   Min.   :  81.0   Min.   :1.000   Length:2786       
+ 1st Qu.: 215.0   1st Qu.: 248.0   1st Qu.:1.000   Class :character  
+ Median : 356.5   Median : 448.5   Median :3.000   Mode  :character  
+ Mean   : 684.6   Mean   : 807.4   Mean   :2.733                     
+ 3rd Qu.: 796.0   3rd Qu.: 974.8   3rd Qu.:4.000                     
+ Max.   :7311.0   Max.   :7311.0   Max.   :6.000                     
+                                                                     
+ Critical_Display_Time    KeyPress     KeyPress_Time          RT_value    
+ Min.   : 438840       Min.   :4.000   Min.   :8.881e+05   Min.   :  533  
+ 1st Qu.:1861012       1st Qu.:4.000   1st Qu.:1.630e+09   1st Qu.: 1377  
+ Median :2705981       Median :5.000   Median :2.580e+09   Median : 1944  
+ Mean   :2798714       Mean   :4.502   Mean   :2.590e+09   Mean   : 2494  
+ 3rd Qu.:3691107       3rd Qu.:5.000   3rd Qu.:3.546e+09   3rd Qu.: 2961  
+ Max.   :5572519       Max.   :5.000   Max.   :5.575e+09   Max.   :15654  
+                                                                          
+ X__TRIAL_INDEX__1     bio            correct_response   critical        
+ Min.   :  6.0     Length:2786        Min.   :4.000    Length:2786       
+ 1st Qu.: 56.0     Class :character   1st Qu.:4.000    Class :character  
+ Median :106.0     Mode  :character   Median :5.000    Mode  :character  
+ Mean   :107.8                        Mean   :4.511                      
+ 3rd Qu.:158.0                        3rd Qu.:5.000                      
+ Max.   :213.0                        Max.   :5.000                      
+                                                                         
+    gender           gender_code        item_id            list      
+ Length:2786        Min.   :0.0000   Min.   :  1.00   Min.   :14.00  
+ Class :character   1st Qu.:0.0000   1st Qu.: 27.00   1st Qu.:15.00  
+ Mode  :character   Median :1.0000   Median : 55.00   Median :25.00  
+                    Mean   :0.5054   Mean   : 67.61   Mean   :29.14  
+                    3rd Qu.:1.0000   3rd Qu.: 87.00   3rd Qu.:35.00  
+                    Max.   :1.0000   Max.   :208.00   Max.   :45.00  
+                                                                     
+    match                mm               mm_code          name          
+ Length:2786        Length:2786        Min.   :11.00   Length:2786       
+ Class :character   Class :character   1st Qu.:12.00   Class :character  
+ Mode  :character   Mode  :character   Median :21.00   Mode  :character  
+                                       Mean   :29.37                     
+                                       3rd Qu.:30.00                     
+                                       Max.   :90.00                     
+                                                                         
+ name_vital_status      order          tense             tense_code   
+ Length:2786        Min.   :  1.0   Length:2786        Min.   :1.000  
+ Class :character   1st Qu.: 51.0   Class :character   1st Qu.:1.000  
+ Mode  :character   Median :101.0   Mode  :character   Median :2.000  
+                    Mean   :102.8                      Mean   :3.466  
+                    3rd Qu.:153.0                      3rd Qu.:9.000  
+                    Max.   :208.0                      Max.   :9.000  
+                                                                      
+     type             type_code       unique_id         vital_code  
+ Length:2786        Min.   :1.000   Min.   : 101011   Min.   :1.00  
+ Class :character   1st Qu.:1.000   1st Qu.: 127021   1st Qu.:1.00  
+ Mode  :character   Median :1.000   Median : 155114   Median :2.00  
+                    Mean   :3.105   Mean   :2183670   Mean   :1.63  
+                    3rd Qu.:9.000   3rd Qu.: 987093   3rd Qu.:2.00  
+                    Max.   :9.000   Max.   :9208093   Max.   :3.00  
+                                                                    
+       x            yes_press          half          Accept         
+ Min.   :   1.0   Min.   :4.000   Min.   :1.000   Length:2786       
+ 1st Qu.: 374.2   1st Qu.:4.000   1st Qu.:1.000   Class :character  
+ Median : 787.5   Median :4.000   Median :1.000   Mode  :character  
+ Mean   : 795.8   Mean   :4.487   Mean   :1.487                     
+ 3rd Qu.:1258.8   3rd Qu.:5.000   3rd Qu.:2.000                     
+ Max.   :1697.0   Max.   :5.000   Max.   :2.000                     
+                                                                    
+    accuracy          accept          log.gaze         log.tt     
+ Min.   :0.0000   Min.   :0.0000   Min.   :4.394   Min.   :4.394  
+ 1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:5.371   1st Qu.:5.587  
+ Median :1.0000   Median :1.0000   Median :5.876   Median :6.178  
+ Mean   :0.6249   Mean   :0.6213   Mean   :6.075   Mean   :6.263  
+ 3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:6.680   3rd Qu.:6.865  
+ Max.   :1.0000   Max.   :1.0000   Max.   :8.897   Max.   :8.897  
+                                                                  
+    log.rpd       log.sentence       log.rt     
+ Min.   :4.394   Min.   :0.000   Min.   :6.279  
+ 1st Qu.:5.513   1st Qu.:3.296   1st Qu.:7.228  
+ Median :6.106   Median :4.007   Median :7.573  
+ Mean   :6.241   Mean   :3.816   Mean   :7.632  
+ 3rd Qu.:6.882   3rd Qu.:4.466   3rd Qu.:7.993  
+ Max.   :8.897   Max.   :5.338   Max.   :9.658  
+                                                </code></pre>
+</div>
+</div>
+</section><section id="character-class" class="level3"><h3 class="anchored" data-anchor-id="character-class">
+<code>character</code> class</h3>
+<ul>
+<li>we usually aren’t interested in character class variables
+<ul>
+<li>unless e.g., we have unique values per row (e.g., if a participant gave a free-text answer)</li>
+<li>or perhaps we have stored some stimuli sentences
+<ul>
+<li>although this would arguably be better as a factor</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul></section><section id="pop-quiz" class="level3"><h3 class="anchored" data-anchor-id="pop-quiz">Pop quiz</h3>
+<ol type="1">
+<li>
+<p>of the classes <code>numeric</code>, <code>factor</code>, and <code>character</code>:</p>
+<ul>
+<li>participant ID</li>
+<li>trial number</li>
+<li>first-pass reading time</li>
+<li>regression path duration</li>
+<li>regressions in</li>
+<li>verb type</li>
+<li>adverb type</li>
+</ul>
+</li>
+<li><p>change them to these class types, and print a summary</p></li>
+<li><p>save render the document</p></li>
+<li><p>upload the source file (day1-nachname_vorname.qmd) to XYZ</p></li>
+<li><p>download the source file below yours in the list to the same folder, and try to run it</p></li>
+</ol>
+<ul>
+<li>does it run?</li>
+</ul></section></section><section id="plot-the-data" class="level2"><h2 class="anchored" data-anchor-id="plot-the-data">3. Plot the data</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>at this stage we want to explore the data
+<ul>
+<li>distribution
+<ul>
+<li>peaks, spread</li>
+</ul>
+</li>
+<li>boundaries</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div class="columns">
+<div class="column" style="width:40%;">
+<p>Histogram</p>
+<div class="cell" data-output-location="fragment">
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/hist.html">hist</a></span><span class="op">(</span><span class="va">df_lifetime</span><span class="op">$</span><span class="va">gaze</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="_et_dataset_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div><div class="column" style="width:40%;">
+<p>Boxplot</p>
+<div class="cell" data-output-location="fragment">
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/boxplot.html">boxplot</a></span><span class="op">(</span><span class="va">df_lifetime</span><span class="op">$</span><span class="va">gaze</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="_et_dataset_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div><div class="column" style="width:40%;">
+<p>Scatterplot</p>
+<div class="cell" data-output-location="fragment">
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">df_lifetime</span><span class="op">$</span><span class="va">gaze</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="_et_dataset_files/figure-html/unnamed-chunk-21-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div><div class="column" style="width:40%;">
+<p>Scatterplot</p>
+<div class="cell" data-output-location="fragment">
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html">plot</a></span><span class="op">(</span><span class="va">df_lifetime</span><span class="op">$</span><span class="va">gaze</span>, <span class="va">df_lifetime</span><span class="op">$</span><span class="va">tt</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="_et_dataset_files/figure-html/unnamed-chunk-22-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</div>
+</div>
+<section id="exercise" class="level3"><h3 class="anchored" data-anchor-id="exercise">Exercise</h3>
+<p>In your Quarto document:</p>
+<ol type="1">
+<li>create a heading ‘Data exploration’ + briefly describe the data</li>
+<li>For each of our depenent variables: + create a subheading + calculate the mean and standard deviation of the variable (<code><a href="https://rdrr.io/r/base/mean.html">mean()</a></code>, <code><a href="https://rdrr.io/r/stats/sd.html">sd()</a></code>) + create a boxplot of the variable</li>
+<li>Render the document often to make sure it runs</li>
+</ol>
+<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+print options
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>each code chunk can have different print options:
+<ul>
+<li>
+<code>eval = FALSE</code>: do not evaluate this chunk</li>
+<li>
+<code>include = FALSE</code> evaluate this chunk but don’t show it or its results</li>
+<li>
+<code>echo = FALSE</code> print this chunk code</li>
+<li>
+<code>message = FALSE</code>/<code>warning = false</code> don’t print warnings or messages</li>
+<li>
+<code>error = TRUE</code> continue rendering document even if there’s an error
+<ul>
+<li>do not use <code>error = TRUE</code> for final versions! You want to make sure things work as they should</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div class="sourceCode" id="cb34"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="in">```{r, eval = T, echo = T, results = "asis", warning}</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>or</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</section></section></section><section id="session-info" class="level1 unlisted unnumbered" data-visibility="uncounted"><h1 class="unlisted unnumbered" data-visibility="uncounted">Session Info</h1>
+<div class="cell">
+<details><summary>Code</summary><div class="sourceCode" id="cb35"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details><div class="cell-output cell-output-stdout">
+<pre><code>R version 4.2.3 (2023-03-15)
+Platform: aarch64-apple-darwin20 (64-bit)
+Running under: macOS Ventura 13.2.1
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/lib/libRblas.0.dylib
+LAPACK: /Library/Frameworks/R.framework/Versions/4.2-arm64/Resources/lib/libRlapack.dylib
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] beepr_1.3       lubridate_1.9.2 forcats_1.0.0   stringr_1.5.0  
+ [5] dplyr_1.1.0     purrr_1.0.1     readr_2.1.4     tidyr_1.3.0    
+ [9] tibble_3.2.1    ggplot2_3.4.1   tidyverse_2.0.0 here_1.0.1     
+[13] rbbt_0.0.0.9000
+
+loaded via a namespace (and not attached):
+ [1] tidyselect_1.2.0  xfun_0.37         colorspace_2.1-0  vctrs_0.6.1      
+ [5] generics_0.1.3    htmltools_0.5.4   yaml_2.3.7        utf8_1.2.3       
+ [9] rlang_1.1.0       pillar_1.9.0      glue_1.6.2        withr_2.5.0      
+[13] bit64_4.0.5       audio_0.1-10      lifecycle_1.0.3   munsell_0.5.0    
+[17] gtable_0.3.3      htmlwidgets_1.6.2 evaluate_0.20     knitr_1.42       
+[21] tzdb_0.3.0        fastmap_1.1.1     curl_5.0.0        parallel_4.2.3   
+[25] fansi_1.0.4       scales_1.2.1      vroom_1.6.1       jsonlite_1.8.4   
+[29] fs_1.6.1          bit_4.0.5         hms_1.1.3         png_0.1-8        
+[33] digest_0.6.31     stringi_1.7.12    grid_4.2.3        rprojroot_2.0.3  
+[37] cli_3.6.0         tools_4.2.3       magrittr_2.0.3    crayon_1.5.2     
+[41] pkgconfig_2.0.3   timechange_0.2.0  rmarkdown_2.20    httr_1.4.5       
+[45] rstudioapi_0.14   R6_2.5.1          compiler_4.2.3   </code></pre>
+</div>
+</div>
+</section><section id="references" class="level1 unlisted unnumbered" data-visibility="uncounted"><h1 class="unlisted unnumbered" data-visibility="uncounted">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" data-custom-style="Bibliography" role="doc-bibliography">
+<div id="ref-comrie_aspect_1976" class="csl-entry" role="doc-biblioentry">
+Comrie, B. 1976. <em>Aspect: An Introduction to the Study of Verbal Aspect and Related Problems</em>. Cambridge: Cambridge University Press.
+</div>
+<div id="ref-mittwoch_tenses_2008" class="csl-entry" role="doc-biblioentry">
+Mittwoch, Anita. 2008a. <span>“Tenses for the Living and the Dead.”</span> <em>Theoretical and Crosslinguistic Approaches to the Semantics of Aspect</em> 110: 167.
+</div>
+<div id="ref-mittwoch_english_2008" class="csl-entry" role="doc-biblioentry">
+———. 2008b. <span>“The English Resultative Perfect and Its Relationship to the Experiential Perfect and the Simple Past Tense.”</span> <em>Linguistics and Philosophy</em> 31 (3): 323–51. <a href="https://doi.org/10.1007/s10988-008-9037-y">https://doi.org/10.1007/s10988-008-9037-y</a>.
+</div>
+</div>
+<!-- -->
+
+</section></main><!-- /main column --><script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  const viewSource = window.document.getElementById('quarto-view-source') ||
+                     window.document.getElementById('quarto-code-tools-source');
+  if (viewSource) {
+    const sourceUrl = viewSource.getAttribute("data-quarto-source-url");
+    viewSource.addEventListener("click", function(e) {
+      if (sourceUrl) {
+        // rstudio viewer pane
+        if (/\bcapabilities=\b/.test(window.location)) {
+          window.open(sourceUrl);
+        } else {
+          window.location.href = sourceUrl;
+        }
+      } else {
+        const modal = new bootstrap.Modal(document.getElementById('quarto-embedded-source-code-modal'));
+        modal.show();
+      }
+      return false;
+    });
+  }
+  function toggleCodeHandler(show) {
+    return function(e) {
+      const detailsSrc = window.document.querySelectorAll(".cell > details > .sourceCode");
+      for (let i=0; i<detailsSrc.length; i++) {
+        const details = detailsSrc[i].parentElement;
+        if (show) {
+          details.open = true;
+        } else {
+          details.removeAttribute("open");
+        }
+      }
+      const cellCodeDivs = window.document.querySelectorAll(".cell > .sourceCode");
+      const fromCls = show ? "hidden" : "unhidden";
+      const toCls = show ? "unhidden" : "hidden";
+      for (let i=0; i<cellCodeDivs.length; i++) {
+        const codeDiv = cellCodeDivs[i];
+        if (codeDiv.classList.contains(fromCls)) {
+          codeDiv.classList.remove(fromCls);
+          codeDiv.classList.add(toCls);
+        } 
+      }
+      return false;
+    }
+  }
+  const hideAllCode = window.document.getElementById("quarto-hide-all-code");
+  if (hideAllCode) {
+    hideAllCode.addEventListener("click", toggleCodeHandler(false));
+  }
+  const showAllCode = window.document.getElementById("quarto-show-all-code");
+  if (showAllCode) {
+    showAllCode.addEventListener("click", toggleCodeHandler(true));
+  }
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script><div class="modal fade" id="quarto-embedded-source-code-modal" tabindex="-1" aria-labelledby="quarto-embedded-source-code-modal-label" aria-hidden="true"><div class="modal-dialog modal-dialog-scrollable"><div class="modal-content"><div class="modal-header"><h5 class="modal-title" id="quarto-embedded-source-code-modal-label">Source Code</h5><button class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body"><div class="">
+<div class="sourceCode" id="cb37" data-shortcodes="false"><pre class="sourceCode markdown code-with-copy"><code class="sourceCode markdown"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a><span class="an">title:</span><span class="co"> "Working with eye-tracking reading data in R"</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a><span class="an">subtitle:</span><span class="co"> "Biondo et al. (2021)"</span></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="an">author:</span><span class="co"> "Daniela Palleschi"</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="an">institute:</span><span class="co"> Humboldt-Universität zu Berlin</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a><span class="an">lang:</span><span class="co"> en</span></span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a><span class="an">date:</span><span class="co"> 2023-04-12</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a><span class="an">format:</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a><span class="co">  revealjs: </span></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a><span class="co">  # all docs:</span></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a><span class="co">    output-file: slide-et_dataset.html</span></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a><span class="co">  # revealjs and html:</span></span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a><span class="co">    # toc</span></span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a><span class="co">    # code</span></span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-depth: 2</span></span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-title: 'Overview'</span></span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a><span class="co">    code-link: true</span></span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a><span class="co">    code-overflow: wrap</span></span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true</span></span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a><span class="co">  # revealjs specific:</span></span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a><span class="co">    theme: [dark]</span></span>
+<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a><span class="co">    width: 1600</span></span>
+<span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a><span class="co">    height: 900</span></span>
+<span id="cb37-25"><a href="#cb37-25" aria-hidden="true" tabindex="-1"></a><span class="co">    progress: true</span></span>
+<span id="cb37-26"><a href="#cb37-26" aria-hidden="true" tabindex="-1"></a><span class="co">    font-size: 0.6em</span></span>
+<span id="cb37-27"><a href="#cb37-27" aria-hidden="true" tabindex="-1"></a><span class="co">    slide-level: 4</span></span>
+<span id="cb37-28"><a href="#cb37-28" aria-hidden="true" tabindex="-1"></a><span class="co">    slide-number: c/t</span></span>
+<span id="cb37-29"><a href="#cb37-29" aria-hidden="true" tabindex="-1"></a><span class="co">    navigation-mode: linear</span></span>
+<span id="cb37-30"><a href="#cb37-30" aria-hidden="true" tabindex="-1"></a><span class="co">    # smaller: true</span></span>
+<span id="cb37-31"><a href="#cb37-31" aria-hidden="true" tabindex="-1"></a><span class="co">    incremental: true</span></span>
+<span id="cb37-32"><a href="#cb37-32" aria-hidden="true" tabindex="-1"></a><span class="co">    scrollable: true</span></span>
+<span id="cb37-33"><a href="#cb37-33" aria-hidden="true" tabindex="-1"></a><span class="co">    controls-layout: bottom-right</span></span>
+<span id="cb37-34"><a href="#cb37-34" aria-hidden="true" tabindex="-1"></a><span class="co">    fig-cap-location: top</span></span>
+<span id="cb37-35"><a href="#cb37-35" aria-hidden="true" tabindex="-1"></a><span class="co">    title-slide-attributes: </span></span>
+<span id="cb37-36"><a href="#cb37-36" aria-hidden="true" tabindex="-1"></a><span class="co">      data-background-image: logos/logos.tif</span></span>
+<span id="cb37-37"><a href="#cb37-37" aria-hidden="true" tabindex="-1"></a><span class="co">      data-background-size: 15%</span></span>
+<span id="cb37-38"><a href="#cb37-38" aria-hidden="true" tabindex="-1"></a><span class="co">      data-background-position: 50% 92%</span></span>
+<span id="cb37-39"><a href="#cb37-39" aria-hidden="true" tabindex="-1"></a><span class="co">    # to add drawings:</span></span>
+<span id="cb37-40"><a href="#cb37-40" aria-hidden="true" tabindex="-1"></a><span class="co">    chalkboard:</span></span>
+<span id="cb37-41"><a href="#cb37-41" aria-hidden="true" tabindex="-1"></a><span class="co">      src: drawings/day1-drawings.json</span></span>
+<span id="cb37-42"><a href="#cb37-42" aria-hidden="true" tabindex="-1"></a><span class="co">    # logo: logos/hu_logo.png</span></span>
+<span id="cb37-43"><a href="#cb37-43" aria-hidden="true" tabindex="-1"></a><span class="co">    # css: logo.css</span></span>
+<span id="cb37-44"><a href="#cb37-44" aria-hidden="true" tabindex="-1"></a><span class="co">    # number-sections: true</span></span>
+<span id="cb37-45"><a href="#cb37-45" aria-hidden="true" tabindex="-1"></a><span class="co">  html:</span></span>
+<span id="cb37-46"><a href="#cb37-46" aria-hidden="true" tabindex="-1"></a><span class="co">    output-file: sheet-et_dataset.html</span></span>
+<span id="cb37-47"><a href="#cb37-47" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
+<span id="cb37-48"><a href="#cb37-48" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-depth: 2</span></span>
+<span id="cb37-49"><a href="#cb37-49" aria-hidden="true" tabindex="-1"></a><span class="co">    toc-title: 'Overview'</span></span>
+<span id="cb37-50"><a href="#cb37-50" aria-hidden="true" tabindex="-1"></a><span class="co">    code-link: true</span></span>
+<span id="cb37-51"><a href="#cb37-51" aria-hidden="true" tabindex="-1"></a><span class="co">    code-overflow: wrap</span></span>
+<span id="cb37-52"><a href="#cb37-52" aria-hidden="true" tabindex="-1"></a><span class="co">    code-tools: true</span></span>
+<span id="cb37-53"><a href="#cb37-53" aria-hidden="true" tabindex="-1"></a><span class="co">    number-sections: false</span></span>
+<span id="cb37-54"><a href="#cb37-54" aria-hidden="true" tabindex="-1"></a><span class="co">  pdf:</span></span>
+<span id="cb37-55"><a href="#cb37-55" aria-hidden="true" tabindex="-1"></a><span class="co">    output-file: pdf-et_dataset.pdf</span></span>
+<span id="cb37-56"><a href="#cb37-56" aria-hidden="true" tabindex="-1"></a><span class="co">    toc: true</span></span>
+<span id="cb37-57"><a href="#cb37-57" aria-hidden="true" tabindex="-1"></a><span class="co">    number-sections: false</span></span>
+<span id="cb37-58"><a href="#cb37-58" aria-hidden="true" tabindex="-1"></a><span class="co">    colorlinks: true</span></span>
+<span id="cb37-59"><a href="#cb37-59" aria-hidden="true" tabindex="-1"></a><span class="co">    code-overflow: wrap</span></span>
+<span id="cb37-60"><a href="#cb37-60" aria-hidden="true" tabindex="-1"></a><span class="an">editor_options:</span><span class="co"> </span></span>
+<span id="cb37-61"><a href="#cb37-61" aria-hidden="true" tabindex="-1"></a><span class="co">  chunk_output_type: console</span></span>
+<span id="cb37-62"><a href="#cb37-62" aria-hidden="true" tabindex="-1"></a><span class="an">bibliography:</span><span class="co"> references/references.json</span></span>
+<span id="cb37-63"><a href="#cb37-63" aria-hidden="true" tabindex="-1"></a><span class="an">biblio-style:</span><span class="co"> apalike</span></span>
+<span id="cb37-64"><a href="#cb37-64" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
+<span id="cb37-65"><a href="#cb37-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-66"><a href="#cb37-66" aria-hidden="true" tabindex="-1"></a><span class="fu"># Set-up {.unlisted .unnumbered visibility="uncounted"}</span></span>
+<span id="cb37-67"><a href="#cb37-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-70"><a href="#cb37-70" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb37-71"><a href="#cb37-71" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">eval =</span> T, <span class="co"># evaluate = T for REPRODUCIBLE analyses</span></span>
+<span id="cb37-72"><a href="#cb37-72" aria-hidden="true" tabindex="-1"></a>                      <span class="at">echo =</span> T, <span class="co"># 'print code chunk?'</span></span>
+<span id="cb37-73"><a href="#cb37-73" aria-hidden="true" tabindex="-1"></a>                      <span class="at">message =</span> F, <span class="co"># print messages?</span></span>
+<span id="cb37-74"><a href="#cb37-74" aria-hidden="true" tabindex="-1"></a>                      <span class="at">error =</span> T, <span class="co"># render even if errors encountered?</span></span>
+<span id="cb37-75"><a href="#cb37-75" aria-hidden="true" tabindex="-1"></a>                      <span class="at">warning =</span> F) <span class="co"># print warnings?</span></span>
+<span id="cb37-76"><a href="#cb37-76" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-77"><a href="#cb37-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-80"><a href="#cb37-80" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb37-81"><a href="#cb37-81" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rbbt) <span class="co"># zotero plugin</span></span>
+<span id="cb37-82"><a href="#cb37-82" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here) <span class="co"># relative path</span></span>
+<span id="cb37-83"><a href="#cb37-83" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse) <span class="co"># tidy/transform</span></span>
+<span id="cb37-84"><a href="#cb37-84" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(beepr) <span class="co"># beeps when code runs or fails</span></span>
+<span id="cb37-85"><a href="#cb37-85" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-86"><a href="#cb37-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-89"><a href="#cb37-89" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb37-90"><a href="#cb37-90" aria-hidden="true" tabindex="-1"></a><span class="do">## play sound if error encountered</span></span>
+<span id="cb37-91"><a href="#cb37-91" aria-hidden="true" tabindex="-1"></a><span class="do">### from: https://sejohnston.com/2015/02/24/make-r-beep-when-r-markdown-finishes-or-when-it-fails/</span></span>
+<span id="cb37-92"><a href="#cb37-92" aria-hidden="true" tabindex="-1"></a><span class="fu">options</span>(<span class="at">error =</span> <span class="cf">function</span>(){    <span class="co"># Beep on error</span></span>
+<span id="cb37-93"><a href="#cb37-93" aria-hidden="true" tabindex="-1"></a>  beepr<span class="sc">::</span><span class="fu">beep</span>(<span class="at">sound =</span> <span class="st">"wilhelm"</span>)</span>
+<span id="cb37-94"><a href="#cb37-94" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Sys.sleep</span>(<span class="dv">2</span>) <span class="co"># </span></span>
+<span id="cb37-95"><a href="#cb37-95" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb37-96"><a href="#cb37-96" aria-hidden="true" tabindex="-1"></a> )</span>
+<span id="cb37-97"><a href="#cb37-97" aria-hidden="true" tabindex="-1"></a><span class="do">## and when knitting is complete</span></span>
+<span id="cb37-98"><a href="#cb37-98" aria-hidden="true" tabindex="-1"></a>.Last <span class="ot">&lt;-</span> <span class="cf">function</span>() {          <span class="co"># Beep on exiting session</span></span>
+<span id="cb37-99"><a href="#cb37-99" aria-hidden="true" tabindex="-1"></a>  beepr<span class="sc">::</span><span class="fu">beep</span>(<span class="at">sound =</span> <span class="st">"ping"</span>)</span>
+<span id="cb37-100"><a href="#cb37-100" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Sys.sleep</span>(<span class="dv">6</span>) <span class="co"># allow to play for 6 seconds</span></span>
+<span id="cb37-101"><a href="#cb37-101" aria-hidden="true" tabindex="-1"></a>  }</span>
+<span id="cb37-102"><a href="#cb37-102" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-103"><a href="#cb37-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-104"><a href="#cb37-104" aria-hidden="true" tabindex="-1"></a><span class="in">```{r, eval = T, cache = F}</span></span>
+<span id="cb37-105"><a href="#cb37-105" aria-hidden="true" tabindex="-1"></a><span class="co"># Create references.json file based on the citations in this script:</span></span>
+<span id="cb37-106"><a href="#cb37-106" aria-hidden="true" tabindex="-1"></a><span class="co"># 1. make sure you have 'bibliography: references/references.json' in the YAML</span></span>
+<span id="cb37-107"><a href="#cb37-107" aria-hidden="true" tabindex="-1"></a><span class="co"># 2. create a new folder called 'references'</span></span>
+<span id="cb37-108"><a href="#cb37-108" aria-hidden="true" tabindex="-1"></a><span class="co"># 3. run:</span></span>
+<span id="cb37-109"><a href="#cb37-109" aria-hidden="true" tabindex="-1"></a>rbbt<span class="sc">::</span><span class="fu">bbt_update_bib</span>(<span class="st">"_et_dataset.qmd"</span>)</span>
+<span id="cb37-110"><a href="#cb37-110" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-111"><a href="#cb37-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-112"><a href="#cb37-112" aria-hidden="true" tabindex="-1"></a><span class="fu"># The Perfect Lifetime Effect {.smaller}</span></span>
+<span id="cb37-113"><a href="#cb37-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-114"><a href="#cb37-114" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>the English Present Perfect (e.g., *has done*) <span class="co">[</span><span class="ot">e.g., @comrie_aspect_1976</span><span class="co">]</span></span>
+<span id="cb37-115"><a href="#cb37-115" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>must be used in temporal contexts that *include the present*</span>
+<span id="cb37-116"><a href="#cb37-116" aria-hidden="true" tabindex="-1"></a><span class="ss">        -   </span>*I have been sick* [***since last week***]{.underline}</span>
+<span id="cb37-117"><a href="#cb37-117" aria-hidden="true" tabindex="-1"></a><span class="ss">        -   </span><span class="sc">\*</span>*I have been sick* [***last year***]{.underline}</span>
+<span id="cb37-118"><a href="#cb37-118" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>The Lifetime Effect</span>
+<span id="cb37-119"><a href="#cb37-119" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>a referent's lifetime (dead/alive) constrains verb tense in certain circumstances <span class="co">[</span><span class="ot">e.g., @mittwoch_tenses_2008</span><span class="co">]</span></span>
+<span id="cb37-120"><a href="#cb37-120" aria-hidden="true" tabindex="-1"></a><span class="ss">        -   </span><span class="sc">\*</span>*Queen Elizabeth II* [***is***]{.underline} *the British monarch.*</span>
+<span id="cb37-121"><a href="#cb37-121" aria-hidden="true" tabindex="-1"></a><span class="ss">        -   </span><span class="sc">\*</span>*King Charles III* [***was***]{.underline} *the British monarch.*</span>
+<span id="cb37-122"><a href="#cb37-122" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>the Perfect Lifetime Effect</span>
+<span id="cb37-123"><a href="#cb37-123" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>the (English) Present Perfect cannot be used to describe events of a dead person <span class="co">[</span><span class="ot">e.g., @mittwoch_english_2008</span><span class="co">]</span></span>
+<span id="cb37-124"><a href="#cb37-124" aria-hidden="true" tabindex="-1"></a><span class="ss">        -   </span><span class="sc">\*</span>*Queen Elizabeth II* [***has met***]{.underline} *many politicians.*</span>
+<span id="cb37-125"><a href="#cb37-125" aria-hidden="true" tabindex="-1"></a><span class="ss">        -   </span>*King Charles III* [***has met***]{.underline} *many politicians.*</span>
+<span id="cb37-126"><a href="#cb37-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-127"><a href="#cb37-127" aria-hidden="true" tabindex="-1"></a><span class="fu">## Our first dataset</span></span>
+<span id="cb37-128"><a href="#cb37-128" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-129"><a href="#cb37-129" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>eye-tracking during reading</span>
+<span id="cb37-130"><a href="#cb37-130" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>participants read a referent-lifetime context, followed by a critical sentence</span>
+<span id="cb37-131"><a href="#cb37-131" aria-hidden="true" tabindex="-1"></a><span class="ss">        -   </span>button-press when done reading</span>
+<span id="cb37-132"><a href="#cb37-132" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>critical sentences contained the Present Perfect or Simple Future</span>
+<span id="cb37-133"><a href="#cb37-133" aria-hidden="true" tabindex="-1"></a><span class="ss">        -   </span>button-press when done reading</span>
+<span id="cb37-134"><a href="#cb37-134" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>each trial ended with a 7-point naturalness Likert scale</span>
+<span id="cb37-135"><a href="#cb37-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-136"><a href="#cb37-136" aria-hidden="true" tabindex="-1"></a><span class="fu">## Design description</span></span>
+<span id="cb37-137"><a href="#cb37-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-138"><a href="#cb37-138" aria-hidden="true" tabindex="-1"></a>:::: {.columns}</span>
+<span id="cb37-139"><a href="#cb37-139" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-140"><a href="#cb37-140" aria-hidden="true" tabindex="-1"></a>::: {.column width="100%"}</span>
+<span id="cb37-141"><a href="#cb37-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-142"><a href="#cb37-142" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>2x2 design</span>
+<span id="cb37-143"><a href="#cb37-143" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>two 2-level factors (2x2 = 2-level x 2-level)</span>
+<span id="cb37-144"><a href="#cb37-144" aria-hidden="true" tabindex="-1"></a><span class="ss">        -   </span>factor 1: lifetime (levels: dead, alive)</span>
+<span id="cb37-145"><a href="#cb37-145" aria-hidden="true" tabindex="-1"></a><span class="ss">        -   </span>factor 2: tense (levels: PP, SF)</span>
+<span id="cb37-146"><a href="#cb37-146" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb37-147"><a href="#cb37-147" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-148"><a href="#cb37-148" aria-hidden="true" tabindex="-1"></a>::::</span>
+<span id="cb37-149"><a href="#cb37-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-150"><a href="#cb37-150" aria-hidden="true" tabindex="-1"></a>:::: {.columns}</span>
+<span id="cb37-151"><a href="#cb37-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-152"><a href="#cb37-152" aria-hidden="true" tabindex="-1"></a>::: {.column width="50%"}</span>
+<span id="cb37-153"><a href="#cb37-153" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>predictors/independent variables</span>
+<span id="cb37-154"><a href="#cb37-154" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>lifetime</span>
+<span id="cb37-155"><a href="#cb37-155" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>tense</span>
+<span id="cb37-156"><a href="#cb37-156" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb37-157"><a href="#cb37-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-158"><a href="#cb37-158" aria-hidden="true" tabindex="-1"></a>::: {.column width="50%"}</span>
+<span id="cb37-159"><a href="#cb37-159" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>measure/dependent variable(s)</span>
+<span id="cb37-160"><a href="#cb37-160" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>first-fixation time (milliseconds)</span>
+<span id="cb37-161"><a href="#cb37-161" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>first-pass reading time (ms)</span>
+<span id="cb37-162"><a href="#cb37-162" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>regression path duration (ms)</span>
+<span id="cb37-163"><a href="#cb37-163" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>tt (ms)</span>
+<span id="cb37-164"><a href="#cb37-164" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb37-165"><a href="#cb37-165" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-166"><a href="#cb37-166" aria-hidden="true" tabindex="-1"></a>::::</span>
+<span id="cb37-167"><a href="#cb37-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-168"><a href="#cb37-168" aria-hidden="true" tabindex="-1"></a><span class="fu"># Working with the data</span></span>
+<span id="cb37-169"><a href="#cb37-169" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-170"><a href="#cb37-170" aria-hidden="true" tabindex="-1"></a>::: columns</span>
+<span id="cb37-171"><a href="#cb37-171" aria-hidden="true" tabindex="-1"></a>::: {.column width="30%"}</span>
+<span id="cb37-172"><a href="#cb37-172" aria-hidden="true" tabindex="-1"></a>Day 1</span>
+<span id="cb37-173"><a href="#cb37-173" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-174"><a href="#cb37-174" aria-hidden="true" tabindex="-1"></a><span class="ss">1.  </span>load the data</span>
+<span id="cb37-175"><a href="#cb37-175" aria-hidden="true" tabindex="-1"></a><span class="ss">2.  </span>inspect data</span>
+<span id="cb37-176"><a href="#cb37-176" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>eyeball data structure</span>
+<span id="cb37-177"><a href="#cb37-177" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>print summaries</span>
+<span id="cb37-178"><a href="#cb37-178" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>plot the data</span>
+<span id="cb37-179"><a href="#cb37-179" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb37-180"><a href="#cb37-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-181"><a href="#cb37-181" aria-hidden="true" tabindex="-1"></a>::: {.column width="30%"}</span>
+<span id="cb37-182"><a href="#cb37-182" aria-hidden="true" tabindex="-1"></a>Day 2</span>
+<span id="cb37-183"><a href="#cb37-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-184"><a href="#cb37-184" aria-hidden="true" tabindex="-1"></a><span class="ss">3.  </span>tidy data</span>
+<span id="cb37-185"><a href="#cb37-185" aria-hidden="true" tabindex="-1"></a><span class="ss">4.  </span>transform data</span>
+<span id="cb37-186"><a href="#cb37-186" aria-hidden="true" tabindex="-1"></a><span class="ss">5.  </span>visualise data</span>
+<span id="cb37-187"><a href="#cb37-187" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb37-188"><a href="#cb37-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-189"><a href="#cb37-189" aria-hidden="true" tabindex="-1"></a>::: {.column width="30%"}</span>
+<span id="cb37-190"><a href="#cb37-190" aria-hidden="true" tabindex="-1"></a>Day 3</span>
+<span id="cb37-191"><a href="#cb37-191" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-192"><a href="#cb37-192" aria-hidden="true" tabindex="-1"></a><span class="ss">6.  </span>analyse data</span>
+<span id="cb37-193"><a href="#cb37-193" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>confirmatory (a priori)</span>
+<span id="cb37-194"><a href="#cb37-194" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>exploratory (post-hoc)</span>
+<span id="cb37-195"><a href="#cb37-195" aria-hidden="true" tabindex="-1"></a><span class="ss">7.  </span>report analyses</span>
+<span id="cb37-196"><a href="#cb37-196" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb37-197"><a href="#cb37-197" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb37-198"><a href="#cb37-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-199"><a href="#cb37-199" aria-hidden="true" tabindex="-1"></a><span class="fu">## 1. Load/install packages</span></span>
+<span id="cb37-200"><a href="#cb37-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-201"><a href="#cb37-201" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>install</span>
+<span id="cb37-202"><a href="#cb37-202" aria-hidden="true" tabindex="-1"></a><span class="ss">  + </span>only do once (or when you working on a new computer, etc.)</span>
+<span id="cb37-205"><a href="#cb37-205" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb37-206"><a href="#cb37-206" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"tidyverse"</span>)</span>
+<span id="cb37-207"><a href="#cb37-207" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"here"</span>)</span>
+<span id="cb37-208"><a href="#cb37-208" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-209"><a href="#cb37-209" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-210"><a href="#cb37-210" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>load</span>
+<span id="cb37-211"><a href="#cb37-211" aria-hidden="true" tabindex="-1"></a><span class="ss">  + </span>needed at the start of each session</span>
+<span id="cb37-212"><a href="#cb37-212" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb37-215"><a href="#cb37-215" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb37-216"><a href="#cb37-216" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb37-217"><a href="#cb37-217" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
+<span id="cb37-218"><a href="#cb37-218" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-219"><a href="#cb37-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-220"><a href="#cb37-220" aria-hidden="true" tabindex="-1"></a><span class="fu">## 2. Load dataset</span></span>
+<span id="cb37-221"><a href="#cb37-221" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-224"><a href="#cb37-224" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb37-225"><a href="#cb37-225" aria-hidden="true" tabindex="-1"></a>df_lifetime <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data/data_lifetime_pilot.csv"</span>))</span>
+<span id="cb37-226"><a href="#cb37-226" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-227"><a href="#cb37-227" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-228"><a href="#cb37-228" aria-hidden="true" tabindex="-1"></a>::: callout-tip</span>
+<span id="cb37-229"><a href="#cb37-229" aria-hidden="true" tabindex="-1"></a><span class="fu">### `here` package</span></span>
+<span id="cb37-230"><a href="#cb37-230" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-231"><a href="#cb37-231" aria-hidden="true" tabindex="-1"></a>Using the <span class="in">`here`</span> package, we can access files *relative* to where our .RProj is stored.</span>
+<span id="cb37-232"><a href="#cb37-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-233"><a href="#cb37-233" aria-hidden="true" tabindex="-1"></a>In 'olden times', we had to specify the file path with something like:</span>
+<span id="cb37-234"><a href="#cb37-234" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-235"><a href="#cb37-235" aria-hidden="true" tabindex="-1"></a><span class="in">```{r, eval = F}</span></span>
+<span id="cb37-236"><a href="#cb37-236" aria-hidden="true" tabindex="-1"></a><span class="co"># load in data from an *absolute* file path</span></span>
+<span id="cb37-237"><a href="#cb37-237" aria-hidden="true" tabindex="-1"></a>df_lifetime <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"Users/yournamehere/Documents/SoSe2023/ET_reading/data/data6reg_cleaned_fixed_Oct2020.csv"</span>)</span>
+<span id="cb37-238"><a href="#cb37-238" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-239"><a href="#cb37-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-240"><a href="#cb37-240" aria-hidden="true" tabindex="-1"></a>Or, we'd set an *absolute* path as our working directory, to which all other file paths were *relative*</span>
+<span id="cb37-241"><a href="#cb37-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-242"><a href="#cb37-242" aria-hidden="true" tabindex="-1"></a><span class="in">```{r, eval = F}</span></span>
+<span id="cb37-243"><a href="#cb37-243" aria-hidden="true" tabindex="-1"></a><span class="co"># set *absolute* path as working directory</span></span>
+<span id="cb37-244"><a href="#cb37-244" aria-hidden="true" tabindex="-1"></a><span class="fu">setwd</span>(<span class="st">"Users/username/Documents/SoSe2023/ET_reading"</span>)</span>
+<span id="cb37-245"><a href="#cb37-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-246"><a href="#cb37-246" aria-hidden="true" tabindex="-1"></a><span class="co"># load in data *relative* to our wd</span></span>
+<span id="cb37-247"><a href="#cb37-247" aria-hidden="true" tabindex="-1"></a>df_lifetime <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/data_biondo_2021.csv"</span>)</span>
+<span id="cb37-248"><a href="#cb37-248" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-249"><a href="#cb37-249" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-250"><a href="#cb37-250" aria-hidden="true" tabindex="-1"></a>This meant that if I sent my project folder to somebody else, they wouldn't be able to run my code because they would have to change the *absolute* file path to match their machine.</span>
+<span id="cb37-251"><a href="#cb37-251" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb37-252"><a href="#cb37-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-253"><a href="#cb37-253" aria-hidden="true" tabindex="-1"></a><span class="fu">## 2. Inspect dataset</span></span>
+<span id="cb37-254"><a href="#cb37-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-255"><a href="#cb37-255" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>there are several different things you can inspect</span>
+<span id="cb37-256"><a href="#cb37-256" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>and different ways to accomplish those things</span>
+<span id="cb37-257"><a href="#cb37-257" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-258"><a href="#cb37-258" aria-hidden="true" tabindex="-1"></a><span class="fu">### Data structure</span></span>
+<span id="cb37-259"><a href="#cb37-259" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-260"><a href="#cb37-260" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>datasets typically contain a lot of *rows*</span>
+<span id="cb37-261"><a href="#cb37-261" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>so we want to get a feel for how the data is structured</span>
+<span id="cb37-262"><a href="#cb37-262" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-263"><a href="#cb37-263" aria-hidden="true" tabindex="-1"></a>:::: columns</span>
+<span id="cb37-264"><a href="#cb37-264" aria-hidden="true" tabindex="-1"></a>::: {.column width="60%"}</span>
+<span id="cb37-265"><a href="#cb37-265" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-266"><a href="#cb37-266" aria-hidden="true" tabindex="-1"></a>::: panel-tabset</span>
+<span id="cb37-267"><a href="#cb37-267" aria-hidden="true" tabindex="-1"></a><span class="fu">#### with base R</span></span>
+<span id="cb37-268"><a href="#cb37-268" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-271"><a href="#cb37-271" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb37-272"><a href="#cb37-272" aria-hidden="true" tabindex="-1"></a><span class="co">#| output-location: fragment</span></span>
+<span id="cb37-273"><a href="#cb37-273" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(df_lifetime)</span>
+<span id="cb37-274"><a href="#cb37-274" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-275"><a href="#cb37-275" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-276"><a href="#cb37-276" aria-hidden="true" tabindex="-1"></a><span class="fu">#### with a pipe</span></span>
+<span id="cb37-277"><a href="#cb37-277" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-280"><a href="#cb37-280" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb37-281"><a href="#cb37-281" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-line-numbers: "|1|2"</span></span>
+<span id="cb37-282"><a href="#cb37-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-283"><a href="#cb37-283" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb37-284"><a href="#cb37-284" aria-hidden="true" tabindex="-1"></a>df_lifetime <span class="sc">%&gt;%</span></span>
+<span id="cb37-285"><a href="#cb37-285" aria-hidden="true" tabindex="-1"></a>  head</span>
+<span id="cb37-286"><a href="#cb37-286" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-287"><a href="#cb37-287" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb37-288"><a href="#cb37-288" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb37-289"><a href="#cb37-289" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-290"><a href="#cb37-290" aria-hidden="true" tabindex="-1"></a>::: {.column width="40%"}</span>
+<span id="cb37-291"><a href="#cb37-291" aria-hidden="true" tabindex="-1"></a><span class="in">```{r eval = T, fig.env = "figure",out.height="100%", fig.align = "center", set.cap.width=T, fig.cap="Image source: @kathawalla_easing_2021 (all rights reserved)"}</span></span>
+<span id="cb37-292"><a href="#cb37-292" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span><span class="fu">include_graphics</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"mats/media/magrittr_badge.png"</span>))</span>
+<span id="cb37-293"><a href="#cb37-293" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-294"><a href="#cb37-294" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb37-295"><a href="#cb37-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-296"><a href="#cb37-296" aria-hidden="true" tabindex="-1"></a>::::</span>
+<span id="cb37-297"><a href="#cb37-297" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-298"><a href="#cb37-298" aria-hidden="true" tabindex="-1"></a><span class="fu">### `head()` function</span></span>
+<span id="cb37-299"><a href="#cb37-299" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-300"><a href="#cb37-300" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>*prints* the first 6 rows of your data</span>
+<span id="cb37-301"><a href="#cb37-301" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>you can also specify the number of rows</span>
+<span id="cb37-302"><a href="#cb37-302" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-305"><a href="#cb37-305" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb37-306"><a href="#cb37-306" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb37-307"><a href="#cb37-307" aria-hidden="true" tabindex="-1"></a><span class="co">#| output-location: fragment</span></span>
+<span id="cb37-308"><a href="#cb37-308" aria-hidden="true" tabindex="-1"></a>df_lifetime <span class="sc">%&gt;%</span></span>
+<span id="cb37-309"><a href="#cb37-309" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>(<span class="at">n =</span> <span class="dv">2</span>)</span>
+<span id="cb37-310"><a href="#cb37-310" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-311"><a href="#cb37-311" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-312"><a href="#cb37-312" aria-hidden="true" tabindex="-1"></a><span class="fu">### `head()` function task {.unlisted .unnumbered visibility="uncounted"}</span></span>
+<span id="cb37-313"><a href="#cb37-313" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-314"><a href="#cb37-314" aria-hidden="true" tabindex="-1"></a>::: callout-tip</span>
+<span id="cb37-315"><a href="#cb37-315" aria-hidden="true" tabindex="-1"></a><span class="fu">#### Task: `head()`</span></span>
+<span id="cb37-316"><a href="#cb37-316" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-317"><a href="#cb37-317" aria-hidden="true" tabindex="-1"></a><span class="ss">1.  </span>print only 2 rows, but using the syntax for a single line of code</span>
+<span id="cb37-318"><a href="#cb37-318" aria-hidden="true" tabindex="-1"></a><span class="ss">2.  </span>change <span class="in">`n = 2`</span> to some other number and print</span>
+<span id="cb37-319"><a href="#cb37-319" aria-hidden="true" tabindex="-1"></a><span class="ss">3.  </span>run <span class="in">`?head`</span> in the <span class="in">`Console`</span></span>
+<span id="cb37-320"><a href="#cb37-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-321"><a href="#cb37-321" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>find the opposite function (i.e., prints last rows) in the function description?</span>
+<span id="cb37-322"><a href="#cb37-322" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>run this function with <span class="in">`df_lifetime`</span> as argument; how many rows does it print as default?</span>
+<span id="cb37-323"><a href="#cb37-323" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>play with <span class="in">`n =`</span> in this function to print some other number of rows</span>
+<span id="cb37-324"><a href="#cb37-324" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb37-325"><a href="#cb37-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-326"><a href="#cb37-326" aria-hidden="true" tabindex="-1"></a><span class="fu">### `tail()` function</span></span>
+<span id="cb37-327"><a href="#cb37-327" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-328"><a href="#cb37-328" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>prints the last rows of a dataframe (or matrix, vector, table, or function)</span>
+<span id="cb37-329"><a href="#cb37-329" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-332"><a href="#cb37-332" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb37-333"><a href="#cb37-333" aria-hidden="true" tabindex="-1"></a>df_lifetime <span class="sc">%&gt;%</span></span>
+<span id="cb37-334"><a href="#cb37-334" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tail</span>()</span>
+<span id="cb37-335"><a href="#cb37-335" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-336"><a href="#cb37-336" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-337"><a href="#cb37-337" aria-hidden="true" tabindex="-1"></a><span class="fu">### `names()`</span></span>
+<span id="cb37-338"><a href="#cb37-338" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-339"><a href="#cb37-339" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>prints the column/variable names</span>
+<span id="cb37-340"><a href="#cb37-340" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-343"><a href="#cb37-343" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb37-344"><a href="#cb37-344" aria-hidden="true" tabindex="-1"></a>df_lifetime <span class="sc">%&gt;%</span></span>
+<span id="cb37-345"><a href="#cb37-345" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>()</span>
+<span id="cb37-346"><a href="#cb37-346" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-347"><a href="#cb37-347" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-348"><a href="#cb37-348" aria-hidden="true" tabindex="-1"></a><span class="fu">### `summary()`</span></span>
+<span id="cb37-349"><a href="#cb37-349" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-350"><a href="#cb37-350" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>prints a summary of each variable (column)</span>
+<span id="cb37-351"><a href="#cb37-351" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-354"><a href="#cb37-354" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb37-355"><a href="#cb37-355" aria-hidden="true" tabindex="-1"></a>df_lifetime <span class="sc">%&gt;%</span></span>
+<span id="cb37-356"><a href="#cb37-356" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span>
+<span id="cb37-357"><a href="#cb37-357" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-358"><a href="#cb37-358" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-359"><a href="#cb37-359" aria-hidden="true" tabindex="-1"></a><span class="fu">## class types</span></span>
+<span id="cb37-360"><a href="#cb37-360" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-361"><a href="#cb37-361" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>there are difference classes of data that R can read</span>
+<span id="cb37-362"><a href="#cb37-362" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>the function <span class="in">`class()`</span> takes as its argument an object or number</span>
+<span id="cb37-363"><a href="#cb37-363" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-366"><a href="#cb37-366" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb37-367"><a href="#cb37-367" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-line-numbers: "|1|2"</span></span>
+<span id="cb37-368"><a href="#cb37-368" aria-hidden="true" tabindex="-1"></a>df_lifetime<span class="sc">$</span>RT_value <span class="sc">%&gt;%</span></span>
+<span id="cb37-369"><a href="#cb37-369" aria-hidden="true" tabindex="-1"></a>  <span class="fu">class</span>()</span>
+<span id="cb37-370"><a href="#cb37-370" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-371"><a href="#cb37-371" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-372"><a href="#cb37-372" aria-hidden="true" tabindex="-1"></a><span class="fu">### `numeric` class</span></span>
+<span id="cb37-373"><a href="#cb37-373" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-374"><a href="#cb37-374" aria-hidden="true" tabindex="-1"></a><span class="fu">### `integer` class</span></span>
+<span id="cb37-375"><a href="#cb37-375" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-376"><a href="#cb37-376" aria-hidden="true" tabindex="-1"></a><span class="fu">### `factor` class</span></span>
+<span id="cb37-377"><a href="#cb37-377" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-378"><a href="#cb37-378" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>we typically want things *grouping* variables to be <span class="in">`factor`</span> class</span>
+<span id="cb37-379"><a href="#cb37-379" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>factor class is ***categorical*** data</span>
+<span id="cb37-380"><a href="#cb37-380" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>any number that could be replaced and maintain its value should be a factor</span>
+<span id="cb37-381"><a href="#cb37-381" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>region of interest (ROI) = 1:7</span>
+<span id="cb37-382"><a href="#cb37-382" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>but we want to know how many observations per region, the number is not informative</span>
+<span id="cb37-383"><a href="#cb37-383" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>ROI could alternatively be coded as, e.g., "adverb", "pronoun", "verb", "spillover"</span>
+<span id="cb37-384"><a href="#cb37-384" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-385"><a href="#cb37-385" aria-hidden="true" tabindex="-1"></a><span class="fu">### `factor` class {.unlisted .unnumbered visibility="uncounted"}</span></span>
+<span id="cb37-386"><a href="#cb37-386" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-387"><a href="#cb37-387" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>let's change <span class="in">`df_lifetime$ROI`</span> to <span class="in">`factor`</span></span>
+<span id="cb37-388"><a href="#cb37-388" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>using <span class="in">`mutate()`</span> from dplyr</span>
+<span id="cb37-389"><a href="#cb37-389" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>and <span class="in">`as_factor()`</span> from forcats</span>
+<span id="cb37-390"><a href="#cb37-390" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-393"><a href="#cb37-393" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb37-394"><a href="#cb37-394" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-line-numbers: "|"</span></span>
+<span id="cb37-395"><a href="#cb37-395" aria-hidden="true" tabindex="-1"></a><span class="co">#| output-location: fragment</span></span>
+<span id="cb37-396"><a href="#cb37-396" aria-hidden="true" tabindex="-1"></a><span class="co"># change ROI &amp; label to factor</span></span>
+<span id="cb37-397"><a href="#cb37-397" aria-hidden="true" tabindex="-1"></a>df_lifetime <span class="sc">%&gt;%</span></span>
+<span id="cb37-398"><a href="#cb37-398" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">TRIAL_INDEX =</span> <span class="fu">as_factor</span>(TRIAL_INDEX)) <span class="sc">%&gt;%</span></span>
+<span id="cb37-399"><a href="#cb37-399" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span>
+<span id="cb37-400"><a href="#cb37-400" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-401"><a href="#cb37-401" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-402"><a href="#cb37-402" aria-hidden="true" tabindex="-1"></a><span class="fu">### `character` class</span></span>
+<span id="cb37-403"><a href="#cb37-403" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-404"><a href="#cb37-404" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>we usually aren't interested in character class variables</span>
+<span id="cb37-405"><a href="#cb37-405" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>unless e.g., we have unique values per row (e.g., if a participant gave a free-text answer)</span>
+<span id="cb37-406"><a href="#cb37-406" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>or perhaps we have stored some stimuli sentences</span>
+<span id="cb37-407"><a href="#cb37-407" aria-hidden="true" tabindex="-1"></a><span class="ss">        -   </span>although this would arguably be better as a factor</span>
+<span id="cb37-408"><a href="#cb37-408" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-409"><a href="#cb37-409" aria-hidden="true" tabindex="-1"></a><span class="fu">### Pop quiz</span></span>
+<span id="cb37-410"><a href="#cb37-410" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-411"><a href="#cb37-411" aria-hidden="true" tabindex="-1"></a><span class="ss">1.  </span>of the classes <span class="in">`numeric`</span>, <span class="in">`factor`</span>, and <span class="in">`character`</span>:</span>
+<span id="cb37-412"><a href="#cb37-412" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>participant ID</span>
+<span id="cb37-413"><a href="#cb37-413" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>trial number</span>
+<span id="cb37-414"><a href="#cb37-414" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>first-pass reading time</span>
+<span id="cb37-415"><a href="#cb37-415" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>regression path duration</span>
+<span id="cb37-416"><a href="#cb37-416" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>regressions in</span>
+<span id="cb37-417"><a href="#cb37-417" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>verb type</span>
+<span id="cb37-418"><a href="#cb37-418" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>adverb type</span>
+<span id="cb37-419"><a href="#cb37-419" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-420"><a href="#cb37-420" aria-hidden="true" tabindex="-1"></a><span class="ss">2.  </span>change them to these class types, and print a summary</span>
+<span id="cb37-421"><a href="#cb37-421" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-422"><a href="#cb37-422" aria-hidden="true" tabindex="-1"></a><span class="ss">3.  </span>save render the document</span>
+<span id="cb37-423"><a href="#cb37-423" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-424"><a href="#cb37-424" aria-hidden="true" tabindex="-1"></a><span class="ss">4.  </span>upload the source file (day1-nachname_vorname.qmd) to XYZ</span>
+<span id="cb37-425"><a href="#cb37-425" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-426"><a href="#cb37-426" aria-hidden="true" tabindex="-1"></a><span class="ss">5.  </span>download the source file below yours in the list to the same folder, and try to run it</span>
+<span id="cb37-427"><a href="#cb37-427" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-428"><a href="#cb37-428" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>does it run?</span>
+<span id="cb37-429"><a href="#cb37-429" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-430"><a href="#cb37-430" aria-hidden="true" tabindex="-1"></a><span class="fu">## 3. Plot the data</span></span>
+<span id="cb37-431"><a href="#cb37-431" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-432"><a href="#cb37-432" aria-hidden="true" tabindex="-1"></a>::: columns</span>
+<span id="cb37-433"><a href="#cb37-433" aria-hidden="true" tabindex="-1"></a>::: {.column width="50%"}</span>
+<span id="cb37-434"><a href="#cb37-434" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>at this stage we want to explore the data</span>
+<span id="cb37-435"><a href="#cb37-435" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>distribution</span>
+<span id="cb37-436"><a href="#cb37-436" aria-hidden="true" tabindex="-1"></a><span class="ss">        -   </span>peaks, spread</span>
+<span id="cb37-437"><a href="#cb37-437" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>boundaries</span>
+<span id="cb37-438"><a href="#cb37-438" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb37-439"><a href="#cb37-439" aria-hidden="true" tabindex="-1"></a>::::</span>
+<span id="cb37-440"><a href="#cb37-440" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-441"><a href="#cb37-441" aria-hidden="true" tabindex="-1"></a>::: columns</span>
+<span id="cb37-442"><a href="#cb37-442" aria-hidden="true" tabindex="-1"></a>::: {.column width="40%"}</span>
+<span id="cb37-443"><a href="#cb37-443" aria-hidden="true" tabindex="-1"></a>Histogram</span>
+<span id="cb37-444"><a href="#cb37-444" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-447"><a href="#cb37-447" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb37-448"><a href="#cb37-448" aria-hidden="true" tabindex="-1"></a><span class="co">#| output-location: fragment</span></span>
+<span id="cb37-449"><a href="#cb37-449" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(df_lifetime<span class="sc">$</span>gaze)</span>
+<span id="cb37-450"><a href="#cb37-450" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-451"><a href="#cb37-451" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb37-452"><a href="#cb37-452" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-453"><a href="#cb37-453" aria-hidden="true" tabindex="-1"></a>::: {.column width="40%"}</span>
+<span id="cb37-454"><a href="#cb37-454" aria-hidden="true" tabindex="-1"></a>Boxplot</span>
+<span id="cb37-455"><a href="#cb37-455" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-458"><a href="#cb37-458" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb37-459"><a href="#cb37-459" aria-hidden="true" tabindex="-1"></a><span class="co">#| output-location: fragment</span></span>
+<span id="cb37-460"><a href="#cb37-460" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(df_lifetime<span class="sc">$</span>gaze)</span>
+<span id="cb37-461"><a href="#cb37-461" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-462"><a href="#cb37-462" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb37-463"><a href="#cb37-463" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-464"><a href="#cb37-464" aria-hidden="true" tabindex="-1"></a>::: {.column width="40%"}</span>
+<span id="cb37-465"><a href="#cb37-465" aria-hidden="true" tabindex="-1"></a>Scatterplot</span>
+<span id="cb37-466"><a href="#cb37-466" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-469"><a href="#cb37-469" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb37-470"><a href="#cb37-470" aria-hidden="true" tabindex="-1"></a><span class="co">#| output-location: fragment</span></span>
+<span id="cb37-471"><a href="#cb37-471" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df_lifetime<span class="sc">$</span>gaze)</span>
+<span id="cb37-472"><a href="#cb37-472" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-473"><a href="#cb37-473" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb37-474"><a href="#cb37-474" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-475"><a href="#cb37-475" aria-hidden="true" tabindex="-1"></a>::: {.column width="40%"}</span>
+<span id="cb37-476"><a href="#cb37-476" aria-hidden="true" tabindex="-1"></a>Scatterplot</span>
+<span id="cb37-477"><a href="#cb37-477" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-480"><a href="#cb37-480" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb37-481"><a href="#cb37-481" aria-hidden="true" tabindex="-1"></a><span class="co">#| output-location: fragment</span></span>
+<span id="cb37-482"><a href="#cb37-482" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df_lifetime<span class="sc">$</span>gaze, df_lifetime<span class="sc">$</span>tt)</span>
+<span id="cb37-483"><a href="#cb37-483" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-484"><a href="#cb37-484" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb37-485"><a href="#cb37-485" aria-hidden="true" tabindex="-1"></a>:::::</span>
+<span id="cb37-486"><a href="#cb37-486" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-487"><a href="#cb37-487" aria-hidden="true" tabindex="-1"></a><span class="fu">### Exercise</span></span>
+<span id="cb37-488"><a href="#cb37-488" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-489"><a href="#cb37-489" aria-hidden="true" tabindex="-1"></a>In your Quarto document:</span>
+<span id="cb37-490"><a href="#cb37-490" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-491"><a href="#cb37-491" aria-hidden="true" tabindex="-1"></a><span class="ss">  1. </span>create a heading 'Data exploration'</span>
+<span id="cb37-492"><a href="#cb37-492" aria-hidden="true" tabindex="-1"></a><span class="ss">    + </span>briefly describe the data</span>
+<span id="cb37-493"><a href="#cb37-493" aria-hidden="true" tabindex="-1"></a><span class="ss">  2. </span>For each of our depenent variables:</span>
+<span id="cb37-494"><a href="#cb37-494" aria-hidden="true" tabindex="-1"></a><span class="ss">    + </span>create a subheading</span>
+<span id="cb37-495"><a href="#cb37-495" aria-hidden="true" tabindex="-1"></a><span class="ss">    + </span>calculate the mean and standard deviation of the variable (<span class="in">`mean()`</span>, <span class="in">`sd()`</span>)</span>
+<span id="cb37-496"><a href="#cb37-496" aria-hidden="true" tabindex="-1"></a><span class="ss">    + </span>create a boxplot of the variable</span>
+<span id="cb37-497"><a href="#cb37-497" aria-hidden="true" tabindex="-1"></a><span class="ss">  3. </span>Render the document often to make sure it runs</span>
+<span id="cb37-498"><a href="#cb37-498" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb37-499"><a href="#cb37-499" aria-hidden="true" tabindex="-1"></a>::: callout-tip</span>
+<span id="cb37-500"><a href="#cb37-500" aria-hidden="true" tabindex="-1"></a><span class="fu">#### print options</span></span>
+<span id="cb37-501"><a href="#cb37-501" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-502"><a href="#cb37-502" aria-hidden="true" tabindex="-1"></a><span class="ss">- </span>each code chunk can have different print options:</span>
+<span id="cb37-503"><a href="#cb37-503" aria-hidden="true" tabindex="-1"></a><span class="ss">  + </span><span class="in">`eval = FALSE`</span>: do not evaluate this chunk</span>
+<span id="cb37-504"><a href="#cb37-504" aria-hidden="true" tabindex="-1"></a><span class="ss">  + </span><span class="in">`include = FALSE`</span> evaluate this chunk but don't show it or its results</span>
+<span id="cb37-505"><a href="#cb37-505" aria-hidden="true" tabindex="-1"></a><span class="ss">  + </span><span class="in">`echo = FALSE`</span> print this chunk code</span>
+<span id="cb37-506"><a href="#cb37-506" aria-hidden="true" tabindex="-1"></a><span class="ss">  + </span><span class="in">`message = FALSE`</span>/<span class="in">`warning = false`</span> don't print warnings or messages</span>
+<span id="cb37-507"><a href="#cb37-507" aria-hidden="true" tabindex="-1"></a><span class="ss">  + </span><span class="in">`error = TRUE`</span> continue rendering document even if there's an error</span>
+<span id="cb37-508"><a href="#cb37-508" aria-hidden="true" tabindex="-1"></a><span class="ss">    + </span>do not use <span class="in">`error = TRUE`</span> for final versions! You want to make sure things work as they should</span>
+<span id="cb37-509"><a href="#cb37-509" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb37-510"><a href="#cb37-510" aria-hidden="true" tabindex="-1"></a><span class="in">`````markdown</span></span>
+<span id="cb37-511"><a href="#cb37-511" aria-hidden="true" tabindex="-1"></a>`r ''````{r, eval = T, echo = T, results = "asis", warning}</span>
+<span id="cb37-512"><a href="#cb37-512" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-513"><a href="#cb37-513" aria-hidden="true" tabindex="-1"></a><span class="in">or</span></span>
+<span id="cb37-514"><a href="#cb37-514" aria-hidden="true" tabindex="-1"></a><span class="in">`r ''````{r}</span></span>
+<span id="cb37-515"><a href="#cb37-515" aria-hidden="true" tabindex="-1"></a><span class="in">#| eval: false</span></span>
+<span id="cb37-516"><a href="#cb37-516" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-517"><a href="#cb37-517" aria-hidden="true" tabindex="-1"></a><span class="in">`````</span></span>
+<span id="cb37-518"><a href="#cb37-518" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-519"><a href="#cb37-519" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb37-520"><a href="#cb37-520" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-521"><a href="#cb37-521" aria-hidden="true" tabindex="-1"></a><span class="fu"># Session Info {.unlisted .unnumbered visibility="uncounted"}</span></span>
+<span id="cb37-522"><a href="#cb37-522" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-525"><a href="#cb37-525" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb37-526"><a href="#cb37-526" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb37-527"><a href="#cb37-527" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span>
+<span id="cb37-528"><a href="#cb37-528" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb37-529"><a href="#cb37-529" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-530"><a href="#cb37-530" aria-hidden="true" tabindex="-1"></a><span class="fu"># References {.unlisted .unnumbered visibility="uncounted"}</span></span>
+<span id="cb37-531"><a href="#cb37-531" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-532"><a href="#cb37-532" aria-hidden="true" tabindex="-1"></a>::: {#refs custom-style="Bibliography"}</span>
+<span id="cb37-533"><a href="#cb37-533" aria-hidden="true" tabindex="-1"></a>:::</span>
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div></div></div></div></div>
+</div> <!-- /content -->
+
+
+
+</body></html>

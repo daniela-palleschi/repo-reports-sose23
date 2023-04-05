@@ -1,0 +1,210 @@
+---
+title: "Eye-tracking during reading"
+subtitle: "What can we learn from the measures?"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+lang: en
+date: 2023-04-12
+format:
+  revealjs:
+    output-file: slides-et_reading.html
+    code-overflow: wrap
+    theme: [dark]
+    width: 1600
+    height: 600
+    progress: true
+    # smaller: true
+    scrollable: true
+    slide-number: c/t
+    code-link: true
+    link-external-icon: true
+    embed-resources: true
+    # logo: logos/hu_logo.png
+    # css: logo.css
+    incremental: true
+    # number-sections: true
+    toc: true
+    toc-depth: 2
+    toc-title: 'Overview'
+    navigation-mode: linear
+    controls-layout: bottom-right
+    fig-cap-location: top
+    font-size: 0.6em
+    slide-level: 4
+    chalkboard: true
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+  html:
+    output-file: sheet-et_reading.html
+    number-sections: true
+    toc: true
+    code-overflow: wrap
+    embed-resources: true
+    link-external-icon: true
+  pdf:
+    output-file: pdf-et_reading.pdf
+    toc: true
+    number-sections: true
+    colorlinks: true
+    code-overflow: wrap
+editor_options: 
+  chunk_output_type: console
+bibliography: references/references.json
+biblio-style: apalike
+---
+
+```{r, eval = T, cache = F, echo = F}
+# Create references.json file based on the citations in this script
+# make sure you have 'bibliography: references.json' in the YAML
+rbbt::bbt_update_bib("_et_reading.qmd")
+```
+
+# Eye-tracking
+
+- in (psycho)linguistics
+  + during reading
+  + visual world paradigm
+- in psychology
+  + pupillometry
+  + visual search
+- but also
+  + market research
+  + diagnostic tool
+
+## Eye movements^[@rayner_eye_2009-1]
+
+- **saccades**: eye *movements* (e.g., from one word to another)
+  + average saccade legnth: 7-9 letters (in alphabetic writing systems)
+- **fixations**: 'looking at' something, e.g., a word (little movement)
+  + when information is taken in
+  + average duration: 225-250ms (ranging 50-600ms)
+- **regressions**: saccades to earlier text
+  + occurance: 10-15% of saccades in skilled readers
+
+## The eye-tracker
+
+:::: {.columns}
+
+::: {.column width="50%"}
+- eye-tracker
+  + camera $+$ infrared illuminator
+- screen
+- chin/head rest
+- in our lab: desk-mounted
+
+:::
+
+::: {.column width="50%"}
+```{r eval = T, fig.env = "figure",out.width="100%", fig.align = "center", set.cap.width=T, fig.cap="Image source: [SR Research](https://www.sr-research.com/about-eye-tracking/) (all rights reserved)"}
+knitr::include_graphics(here::here("mats/day1/3-et_reading/images/SR_Research.png"))
+```
+
+:::
+
+::::
+
+# Eye-tracking during reading
+
+## Eye-tracking reading measures
+
+- inform theories of language processing via linking hypotheses
+  + linking visual attention to processing
+- typically, we compare reading times as a function of some manipulation
+
+e.g., The 
+      They key on the cabinets is on the table.
+
+- longer reading times 
+
+## Region of interest (ROI)
+
+- can be anything on-screen
+  + sentence-level
+  + word/region-level
+  + a certain part of the screen
+
+:::: {.columns}
+
+::: {.column width="60%"}
+![](images/crit_trial_px03.mov){fig-align="center" width="100%"}
+:::
+
+::::
+
+## Measures (dependent variables)
+
+- what we measure = *dependent* variables (usually...)
+  + their value *depends* on some *predictor* (e.g., word frequency)
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+- measures of duration (time spent on a region)
+  + first fixation
+  + first-pass reading time
+  + regression path duration
+  + total reading time
+- data type: *continuous*
+  
+:::
+ 
+::: {.column width="50%"}
+
+- measures of revisits
+  + number of fixations
+  + number of regressions in/out
+  + regression in/out (yes or no)
+  + probability of regressions in/out (0:1)
+- data type: binary (0,1) or count
+  
+:::
+
+::::
+
+## Independent variables
+
+- what can influence reading measures? [@juhasz_lexical_2011; @rayner_linguistic_2011; @warren_influence_2011; @clifton_syntactic_2011]
+  + some examples:
+
+:::: {.columns}
+
+::: {.column width="26%"}
+- Word properties
+  - word frequency
+  - word length
+
+:::
+
+::: {.column width="37%"}
+- Sentence-level influences
+  - context (i.e., prediction)
+  - semantic or grammatical manipulations
+
+:::
+
+::: {.column width="37%"}
+- Inter- and intra-individual
+  - domain-specific expertise
+  - reading skill level
+
+:::
+
+::::
+
+
+## What do these measures tell us?
+
+- eye-tracking during reading can tell use *when* and *where* processing costs are incurred
+- *early measures* involve "first contact with a word" or region: first-fixation, first-pass reading time [@vasishth_what_2013, p.126]
+- *late measures* involve regressions to a region: e.g., total reading time
+  + may also include 'spillover' effects from early processing
+- eye-tracking during reading measures can therefore tell us about stages of processing
+
+# References {.unlisted .unnumbered visibility="uncounted"}
+
+::: {#refs custom-style="Bibliography"}
+:::
+

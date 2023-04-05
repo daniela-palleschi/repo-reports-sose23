@@ -1,0 +1,95 @@
+---
+title: "Reproducible analysis reports with eye-tracking reading time data"
+subtitle: "SoSe2023"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+lang: en
+date: 2023-04-12
+format: 
+  pdf:
+    output-file: pdf-welcome.pdf
+    toc: true
+    number-sections: false
+    colorlinks: true
+    code-overflow: wrap
+  html:
+    output-file: sheet-welcome.html
+    number-sections: false
+    toc: true
+    code-overflow: wrap
+  revealjs:
+    output-file: slides-welcome.html
+    code-overflow: wrap
+    theme: [dark]
+    width: 1600
+    height: 900
+    progress: true
+    scrollable: true
+    # smaller: true
+    slide-number: c/t
+    code-link: true
+    # logo: logos/hu_logo.png
+    # css: logo.css
+    incremental: true
+    # number-sections: true
+    toc: true
+    toc-depth: 2
+    toc-title: 'Overview'
+    navigation-mode: linear
+    controls-layout: bottom-right
+    fig-cap-location: top
+    font-size: 0.6em
+    slide-level: 4
+    chalkboard: true
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+editor_options: 
+  chunk_output_type: console
+bibliography: references/references.bib
+biblio-style: apalike
+---
+
+```{r, eval = T, cache = F}
+# Create references.json file based on the citations in this script
+rbbt::bbt_update_bib("_welcome.qmd")
+```
+
+# Welcome!
+
+-   the language of instruction is English
+-   Block course:
+    -   April 12-14 (10am-4pm)
+    -   June 30th (2-6pm)
+    -   July 1st (10am-4pm)
+    
+## Course description
+
+- skills and know-how needed to 
+  + create reproducible **reports & presentations** of eye-tracking reading data
+  + common measures in **eye-tracking reading**
+  + importance of **reproducible workflow**
+  + **communicate** findings
+
+- hands-on exercises in RStudio with the R programming language
+  + data **wrangling** (tidyverse)
+  + data **visualisation** (ggplot2), 
+  + descriptive and inferential **statistics**
+
+# Reading list
+
+-   this course does not have a heavy reading load, but a few readings are required:
+    -   @biondo_yesterday_2022; @laurinavichyute_share_2022; @vasishth_what_2013; @vasishth_statistical_2016-1
+
+## Recommended readings
+
+- there are lots of useful resources out there, specifically:
+  + anything from Bodo Winter, but especially: @winter_linear_nodate; @winter_very_2014; @winter_statistics_2019
+  + the [PsyTeachR](https://psyteachr.github.io/) website is a *great* resource
+  
+
+# References {.unlisted .unnumbered visibility="uncounted"}
+
+::: {#refs custom-style="Bibliography"}
+:::

@@ -1,0 +1,717 @@
+---
+title: "Data wrangling"
+subtitle: "Tame your data"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+footer: "Data Wrangling"
+lang: en
+date: 2023-04-13
+format:
+  revealjs: 
+    output-file: slides-wrangling.html
+    theme: [dark]
+    width: 1600
+    height: 900
+    progress: true
+    # smaller: true
+    scrollable: true
+    slide-number: c/t
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    # logo: logos/hu_logo.png
+    # css: logo.css
+    incremental: true
+    # number-sections: true
+    toc: true
+    toc-depth: 1
+    toc-title: 'Topics'
+    navigation-mode: linear
+    controls-layout: bottom-right
+    fig-cap-location: top
+    font-size: 0.6em
+    slide-level: 4
+    chalkboard: true
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+  html:
+    self-contained: true
+    output-file: sheet-wrangling.html
+    theme: [dark]
+    number-sections: true
+    toc: true
+    code-overflow: wrap
+    code-tools: true
+  pdf:
+    output-file: pdf-wrangling.pdf
+    toc: true
+    number-sections: false
+    colorlinks: true
+    code-overflow: wrap
+editor_options: 
+  chunk_output_type: console
+bibliography: references/references.json
+biblio-style: apalike
+---
+
+```{r}
+## play sound if error encountered
+### from: https://sejohnston.com/2015/02/24/make-r-beep-when-r-markdown-finishes-or-when-it-fails/
+options(error = function(){    # Beep on error
+  beepr::beep(sound = "wilhelm")
+  Sys.sleep(2) # 
+  }
+ )
+## and when knitting is complete
+.Last <- function() {          # Beep on exiting session
+  beepr::beep(sound = "ping")
+  Sys.sleep(6) # allow to play for 6 seconds
+  }
+```
+
+```{r, eval = T, cache = F}
+# Create references.json file based on the citations in this script
+# make sure you have 'bibliography: references.json' in the YAML
+rbbt::bbt_update_bib("_wrangling.qmd")
+```
+
+```{r}
+knitr::opts_chunk$set(eval = T, # change this to 'eval = T' to reproduce the analyses; make sure to comment out
+                      echo = T, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F,
+                      warning = F)
+```
+
+## 'wrangle' defined
+
+/ˈraŋɡl/
+
+*noun*
+
+a dispute or argument, typically one that is long and complicated. "an insurance wrangle is holding up compensation payments"
+
+*verb*
+
+1.  have a long, complicated dispute or argument. "the bureaucrats continue wrangling over the fine print"
+
+2.  NORTH AMERICAN round up, herd, or take charge of (livestock). "the horses were wrangled early"
+
+## Wrangler
+
+-   Jeep Wrangler ![](media/jeep_wrangler.jpeg){.absolute .fragment width="500" top="0" right="100"}
+-   Wrangler Jeans ![](images/wrangler_jeans.jpeg){.absolute .fragment top="200" right="650" width="531"}
+-   Cowboys ![](images/wrangler_cowboy-01.jpeg){.absolute .fragment width="500" left="50"}
+
+# Data Wrangling
+
+::: columns
+::: {.column width="50%"}
+-   data wrangling = tidying + transforming
+-   an often long, arduous stage of analysis
+
+**Tidy**
+
+-   re-shaping
+    -   e.g., from wide to long data
+-   outcome:
+    -   each column = a variable
+    -   each row = an observation
+:::
+
+::: {.column width="50%"}
+```{r echo = F, fig.env = "figure",out.height="100%", fig.align = "center", set.cap.width=T, fig.cap="[Image source](https://r4ds.hadley.nz/intro.html): @wickham_r_nodate (all rights reserved)"}
+knitr::include_graphics(here::here("media/Wickham_tidyworkflow.png"))
+```
+
+**Transform**
+
+-   filtering
+-   creating new variables based on observations (e.g., reaction times)
+-   computing summary statistics (e.g., means)
+:::
+:::
+
+## Why tidy data?
+
+-   helps future you
+    -   and collaborators
+-   facilitates sharing your data *and* code [@laurinavichyute_share_2022]
+-   in short: facilitates reproducibility!
+
+## What does tidy data look like?
+
+Three rules [@wickham_r_nodate]:
+
+1.  Each variable is a column, each column is a variable
+2.  Each observation is a row, each row is an observation
+3.  Each value is a cell, each cell is a single value
+
+```{r echo = F, fig.env = "figure",out.width="70%", fig.align = "center", set.cap.width=T, fig.cap=" [Image source:](https://r4ds.hadley.nz/data-tidy.html) @wickham_r_nodate (all rights reserved)"}
+knitr::include_graphics(here::here("media/Wickham_tidydata.png"))
+```
+
+-   N.B., how you define a *variable* or *observation* is relative to what you want to do
+    -   for now, let's consider a single trial per participant as an observation
+    
+# the `tidyverse`
+
+- a collection of R packages for tidy data
+- you need to load a package at the beginning of every session
+  + today we will mostly use functions from the `dplyr` package
+    + if you load the `tidyverse` you don't need to also load `dplyr`
+
+```{r}
+# load tidyverse
+library(tidyverse)
+```
+
+## package versions
+
+-   you can check the package version with:
+
+```{r}
+#| output-location: fragment
+packageVersion("tidyverse")
+```
+
+-   need to update?
+
+```{r, eval = F}
+# update a single package
+install.packages("tidyverse")
+```
+
+-   what about your other packages?
+
+```{r, eval = F}
+# which packages need updating?
+old.packages()
+# update all old packages
+update.packages()
+```
+
+## the magitrr pipe `%>%`
+
+::: {.column width="100%"}
+-   takes the object before it and feeds it into the next command
+    -   the pipe could be read as "and then"
+    -   N.B., there's a new pipe in town! The R native `|>` (Ctrl/Cmd+Shift+M)
+:::
+
+::: columns
+::: {.column width="60%"}
+```{r}
+#| code-line-numbers: "|1-2|3-4|"
+#| output-location: fragment
+# take data frame and then...
+iris %>%
+  # print the head
+  head()
+```
+:::
+
+::: {.column width="40%"}
+```{r echo = F, fig.env = "figure",out.width="70%", fig.align = "center", set.cap.width=T, fig.cap="Image source: [magittr documentation](https://magrittr.tidyverse.org/reference/pipe.html#:~:text=The%20magrittr%20pipe%20operators%20use,to%20the%20left%2Dhand%20side.) (all rights reserved)"}
+knitr::include_graphics(here::here("media/magrittr_badge.png"))
+```
+:::
+:::
+
+## load our data
+
+```{r}
+#| output-location: fragment
+# load lifetime data
+readr::read_csv(here::here("data/data_lifetime_pilot.csv")) 
+```
+
+-   was anything added to the Environment pane (top right box in RStudio)?
+
+## save dataframe as object `<-`
+
+-   object_name `<-` code_output_to_be_saved_as_object_name
+
+```{r}
+#| code-line-numbers: "|1-2|3-4|"
+# load lifetime data and store it under df_lifetime
+df_lifetime <- readr::read_csv(here::here("data/data_lifetime_pilot.csv"), 
+                               # for special characters
+                               locale = readr::locale(encoding = "latin1") 
+                               ) 
+```
+
+-   you should now see the object `df_lifetime` in the Environment pane
+
+## A note on annotation
+
+-   annotation as you go: provide useful comments to describe your code
+-   you always have at least one collaborator: future you!
+    -   try to write useful comments to help future you/collaborators follow
+
+```{r}
+#| eval: false
+#| code-line-numbers: "1"
+library(tidyverse) # for tidy data wrangling
+```
+
+# Tidyverse verbs
+
+- verbs are functions from the `tidyverse` package
+- for data tidying and transforming we'll mostly use verbs from the `dplyr` package, which is part of the `tidyverse`
+- check out [RLadies Freiburg](https://www.meetup.com/rladies-freiburg/events/292108309/) to see a [YouTube video](https://youtu.be/NRgdTaAfwTo) that covers most of these verbs
+
+## `rename()`
+
+- one of the first things you'll often want to do is rename some variables
+- let's start by re-naming some of our variables
+    - e.g., `RECORDING_SESSION_LABEL` is a long way of saying 'participant'
+
+```{r}
+#| eval: true
+#| code-line-numbers: "|3-4|"
+# rename variables
+df_lifetime <- df_lifetime %>%
+  rename("px" = RECORDING_SESSION_LABEL,
+         "trial" = TRIAL_INDEX)
+```
+
+### Exercise {.smaller}
+
+Change the following names:
+
+:::{.column width="40%"}
+- `EYE_USED` to `eye`
+- `IA_DWELL_TIME` to `tt`
+- `IA_FIRST_FIXATION_DURATION` to `ff`
+- `IA_FIXATION_COUNT` to `fix_count`
+- `IA_FIRST_RUN_DWELL_TIME` to `fp`
+- `IA_ID` to `region_n`
+- `IA_LABEL` to `region_text`
+:::
+
+:::{.column width="50%"}
+- `IA_REGRESSION_IN` to `reg_in`
+- `IA_REGRESSION_IN_COUNT` to `reg_in_count`
+- `IA_REGRESSION_OUT` to `reg_out`
+- `IA_REGRESSION_OUT_COUNT` to `reg_out_count`
+- `IA_REGRESSION_PATH_DURATION` to `rpd`
+- `name_vital_status` to `lifetime`
+:::
+
+```{r, echo = F}
+df_lifetime <- df_lifetime |> 
+  rename(
+    "eye" = EYE_USED,
+    "tt" = IA_DWELL_TIME,
+    "ff" = IA_FIRST_FIXATION_DURATION,
+    "fix_count" = IA_FIXATION_COUNT,
+    "fp" = IA_FIRST_RUN_DWELL_TIME,
+    "region_n" = IA_ID,
+    "region_text" = IA_LABEL,
+    "reg_in" = IA_REGRESSION_IN,
+    "reg_in_count" = IA_REGRESSION_IN_COUNT,
+    "reg_out" = IA_REGRESSION_OUT,
+    "reg_out_count" = IA_REGRESSION_OUT_COUNT,
+    "rpd" = IA_REGRESSION_PATH_DURATION,
+    "lifetime" = name_vital_status
+  )
+```
+
+```{r}
+#| output-location: column
+# the names should then look like this:
+names(df_lifetime)
+```
+
+## `mutate()`
+
+Make some change
+
+-   new columns
+
+```{r}
+#| code-line-numbers: "|2|"
+df_lifetime <- df_lifetime %>%
+  mutate(new_column = "new")
+```
+
+-   change existing column
+
+```{r}
+#| code-line-numbers: "|3|"
+df_lifetime <- df_lifetime %>%
+  mutate(new_column = px,
+         trial = trial + 5)
+```
+
+-   but let's undo that...
+
+```{r}
+#| code-line-numbers: "|2|"
+df_lifetime <- df_lifetime %>%
+  mutate(trial = trial - 5)
+```
+
+### `if_else()`
+
+-   can be used inside `mutate()`
+    -   change values based on some logical condition
+    -   can be used to change an existing column, or create a new one
+-   `ifelse(condition, output_if_true, output_if_false)`
+
+```{r}
+#| code-line-numbers: "|2|"
+df_lifetime <- df_lifetime %>%
+  mutate(new_column = if_else(name=="Aaliyah","name is Aaliyah","name is not Aaliyah"))
+```
+
+### `case_when()`
+
+-   can be used inside `mutate()`
+    -   change values based on multiple logical conditions
+    -   can be used to change an existing column, or create a new one
+-   `case_when(condition & other_condition | other_condition ~ output, TRUE ~ output_otherwise)`
+    - if you don't include `TRUE ~ output` then `NA`s will created
+
+```{r}
+#| code-line-numbers: "|1-2|3|4|5"
+df_lifetime <- df_lifetime %>%
+  mutate(newer_column = case_when(
+    name=="Aaliyah" & trial > 104 ~ "Aaliyah 2nd half",
+    name=="Beyoncé" & (px == "px01" | px == "px04") ~ "Beyoncé px04 or px06",
+    TRUE ~ "otherwise"))
+```
+
+### Exercise {.smaller}
+
+::: {.column width="50%"}
+1. Create a new variable `accept` that checks whether the button pressed (`KeyPress`) equals the button that corresponds to an acceptance (`yes_press`)
+    + if `KeyPress` and `yes_press` are the same, `accept` should be `1`. If not, `accept` should be `0`
+    + hint: you will need `if_else()` or `case_when()`
+:::
+
+::: {.column width="50%"}
+2. Create a new variable `accuracy` where:
+    + if `match` is `yes` and `accept` is `1`, `accuracy` is `1`
+    + if `match` is `no` and `accept` is `0`, `accuracy` is `1`
+    + if `match` is `yes` and `accept` is `0`, `accuracy` is `0`
+    + if `match` is `no` and `accept` is `1`, `accuracy` is `0`
+:::
+
+- the means and summaries should look like this:
+
+::: {.column width="50%"}
+   
+```{r, echo = F}
+df_lifetime <- df_lifetime |> 
+  mutate(accept = if_else(KeyPress == yes_press, 1,0))
+```
+
+```{r}
+mean(df_lifetime$accept)
+```
+
+```{r}
+summary(as_factor(df_lifetime$accept))
+```
+:::
+
+::: {.column width="50%"}
+
+```{r, echo = F}
+df_lifetime <- df_lifetime |> 
+  mutate(accuracy = case_when(
+    (match == "yes" & accept == "1") | (match == "no" & accept == "0") ~ 1,
+    TRUE ~ 0))
+```
+
+```{r}
+mean(df_lifetime$accuracy)
+```
+
+```{r}
+summary(as_factor(df_lifetime$accuracy))
+```
+:::
+
+## `group_by()` and `ungroup()`
+
+Group data by certain variable(s)
+
+- then perform some mutation
+- then ungroup the data
+
+```{r}
+df_lifetime <- df_lifetime |>
+  group_by(px) |>
+  mutate(px_accuracy = mean(accuracy)) %>%
+  ungroup()
+```
+
+```{r}
+round(
+  range(df_lifetime$px_accuracy),
+  2)
+```
+
+
+## `select()`
+
+-   keep only certain column(s)
+
+::: {.column width="50%"}
+```{r}
+#| output-location: column-fragment
+df_lifetime %>%
+  select(px)
+```
+:::
+::: {.column width="50%"}
+```{r}
+#| output-location: column-fragment
+df_lifetime %>%
+  select(px, trial)
+```
+:::
+
+## `select()` {.unnumbered}
+
+-   or remove certain columns
+
+```{r}
+#| output-location: fragment
+df_lifetime %>%
+  select(-px, -trial)
+```
+
+### Exercise
+
+Remove the example variables we created with `mutate`: 
+
+- `new_column` and `newer_column`
+
+```{r, echo = F}
+df_lifetime <- df_lifetime |> 
+  select(-new_column, -newer_column)
+```
+
+```{r}
+# should look like this after
+names(df_lifetime)
+```
+
+## `filter()`
+
+-   select certain rows based on certain criteria (`==`, `!=`, `>`, `<`, `|`)
+    -   N.B. when testing logical conditions `==` is needed
+
+```{r}
+#| output-location: fragment
+#| code-line-numbers: "|2|"
+df_lifetime %>%
+  filter(trial == 1)
+```
+
+## `filter()`
+
+What are these code chunks doing?
+
+::: columns
+::: {.column width="50%"}
+```{r}
+#| results: hide
+#| code-line-numbers: "|2|"
+df_lifetime %>%
+  filter(px_accuracy > .5)
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| results: hide
+#| code-line-numbers: "|2|"
+df_lifetime %>%
+  filter(px == "px3")
+```
+:::
+:::
+
+::: columns
+::: {.column width="50%"}
+```{r}
+#| results: hide
+#| code-line-numbers: "|2|"
+df_lifetime %>%
+  filter(px == "px3" | trial == "3")
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| results: hide
+#| code-line-numbers: "|2|"
+df_lifetime %>%
+  filter(px == "px3" & trial != "3")
+```
+:::
+:::
+
+###  {.unnumbered}
+
+::: callout-tip
+#### Logical operators
+
+-   symbols used to describe a logical condition
+
+-   `==` is idential (`1 == 1`)
+
+-   `!=` is not identical (`1 != 2`)
+
+-   `>` is greater than (`2 > 1`)
+
+-   `<` is less than (`1 < 2`)
+
+-   `&` and also (for multiple conditions)
+
+-   `|` or (for multiple conditions)
+:::
+
+### Exercise
+
+1. Create a new dataframe `df_crit` that includes only critical trials
+2. Create a new dataframe `df_fill` that includes only filler trials
+
+-  Tip: trial type is stored in the column `type`
+
+```{r, echo = F}
+df_crit <- df_lifetime |> 
+  filter(type == "critical")
+
+df_fill <- df_lifetime |> 
+  filter(type == "filler")
+```
+
+::: {.column width="50%"}
+```{r}
+#| output-location: fragment
+df_crit |> select(type) |> head()
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| output-location: fragment
+df_fill |> select(type) |> head()
+```
+:::
+
+## `distinct()`
+
+::: columns
+::: {.column width="100%"}
+-   like `filter()`, but for *distinct values* of a variable
+    -   "select rows with distinct values for some row(s)"
+:::
+
+::: {.column width="30%"}
+```{r}
+#| code-line-numbers: "|2|"
+#| output-location: fragment
+df_crit %>%
+  distinct(px)
+```
+:::
+
+::: {.column width="30%"}
+```{r}
+#| output-location: fragment
+#| code-line-numbers: "|2|"
+df_crit %>%
+  distinct(px, name)
+```
+:::
+
+::: {.column width="30%"}
+```{r}
+#| code-line-numbers: "|3|"
+#| output-location: fragment
+df_crit %>%
+  distinct(px, name,
+           .keep_all=T)
+```
+:::
+:::
+
+## `arrange()`
+
+::: columns
+::: {.column width="100%"}
+-   sort column(s) in ascending or descending order
+    -   this is really just for ease of reading
+:::
+
+::: {.column width="50%"}
+```{r}
+#| output-location: fragment
+# default: ascending order (A-Z)
+df_crit %>%
+  distinct(px, trial, name, condition) %>%
+  arrange(px, trial)
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| output-location: fragment
+# descending order (Z-A)
+df_crit %>%
+  distinct(px, trial, name, condition) %>%
+  arrange(desc(px), trial)
+```
+:::
+:::
+
+## `separate()`
+
+-   create new columns from a single column
+
+```{r}
+df_crit<- df_crit %>%
+  separate(name,
+           sep=" ",
+           into = c("First","Last"),
+           remove = F, # don't remove original column (name)
+           extra = "merge") # if extra chunks, combine in 'Last' (von der...)
+```
+
+-   opposite: `unite()`
+
+## `pivot_wider()`
+
+## `pivote_longer()`
+
+# Save your tidy data
+
+- once your data is nice and tidy, save it with a **new filename**
+  + this way you always have the same starting point for your data exploration/analyses
+
+```{r}
+write.csv(df_crit, here::here("data/tidy_data_lifetime_pilot.csv"))
+```
+
+
+# Session Info
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show code"
+sessionInfo()
+```
+
+# References {.unlisted .unnumbered visibility="uncounted"}
+
+::: {#refs custom-style="Bibliography"}
+:::

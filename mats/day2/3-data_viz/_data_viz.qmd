@@ -1,0 +1,94 @@
+---
+title: "Data Visualisation with `ggplot2`"
+subtitle: "Communicating your data"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+footer: "Data Visualisation"
+lang: en
+date: 2023-04-13
+format:
+  revealjs: 
+    output-file: slides-data_viz.html
+    theme: [dark]
+    width: 1600
+    height: 900
+    progress: true
+    # smaller: true
+    scrollable: true
+    slide-number: c/t
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    # logo: logos/hu_logo.png
+    # css: logo.css
+    incremental: true
+    # number-sections: true
+    toc: true
+    toc-depth: 1
+    toc-title: 'Topics'
+    navigation-mode: linear
+    controls-layout: bottom-right
+    fig-cap-location: top
+    font-size: 0.6em
+    slide-level: 4
+    chalkboard: true
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+  html:
+    self-contained: true
+    output-file: sheet-data_viz.html
+    theme: [dark]
+    number-sections: true
+    toc: true
+    code-overflow: wrap
+    code-tools: true
+  pdf:
+    output-file: pdf-data_viz.pdf
+    toc: true
+    number-sections: false
+    colorlinks: true
+    code-overflow: wrap
+editor_options: 
+  chunk_output_type: console
+bibliography: references/references.json
+biblio-style: apalike
+---
+
+```{r}
+## play sound if error encountered
+### from: https://sejohnston.com/2015/02/24/make-r-beep-when-r-markdown-finishes-or-when-it-fails/
+options(error = function(){    # Beep on error
+  beepr::beep(sound = "wilhelm")
+  Sys.sleep(2) # 
+  }
+ )
+## and when knitting is complete
+.Last <- function() {          # Beep on exiting session
+  beepr::beep(sound = "ping")
+  Sys.sleep(6) # allow to play for 6 seconds
+  }
+```
+
+```{r, eval = T, cache = F}
+# Create references.json file based on the citations in this script
+# make sure you have 'bibliography: references.json' in the YAML
+# rbbt::bbt_update_bib("_data_viz.qmd")
+```
+
+```{r}
+knitr::opts_chunk$set(eval = T, # change this to 'eval = T' to reproduce the analyses; make sure to comment out
+                      echo = T, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F,
+                      warning = F)
+```
+
+# Data communication
+
+# `ggplot2`: grammar of graphics
+
+- `ggplot2` is part of the tidyverse
+
+

@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.269">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Daniela Palleschi">
+<meta name="dcterms.date" content="2023-04-12">
+
+<title>Eye-tracking during reading</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+
+<script src="et_reading_files/libs/clipboard/clipboard.min.js"></script>
+<script src="et_reading_files/libs/quarto-html/quarto.js"></script>
+<script src="et_reading_files/libs/quarto-html/popper.min.js"></script>
+<script src="et_reading_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="et_reading_files/libs/quarto-html/anchor.min.js"></script>
+<link href="et_reading_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="et_reading_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="et_reading_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="et_reading_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="et_reading_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#eye-tracking" id="toc-eye-tracking" class="nav-link active" data-scroll-target="#eye-tracking"><span class="toc-section-number">1</span>  Eye-tracking</a>
+  <ul class="collapse">
+  <li><a href="#history" id="toc-history" class="nav-link" data-scroll-target="#history"><span class="toc-section-number">1.1</span>  History</a></li>
+  <li><a href="#eye-movements" id="toc-eye-movements" class="nav-link" data-scroll-target="#eye-movements"><span class="toc-section-number">1.2</span>  Eye movements</a></li>
+  <li><a href="#data-collection" id="toc-data-collection" class="nav-link" data-scroll-target="#data-collection"><span class="toc-section-number">1.3</span>  Data collection</a></li>
+  </ul></li>
+  <li><a href="#reading" id="toc-reading" class="nav-link" data-scroll-target="#reading"><span class="toc-section-number">2</span>  Reading</a></li>
+  <li><a href="#visual-world-paradigm" id="toc-visual-world-paradigm" class="nav-link" data-scroll-target="#visual-world-paradigm"><span class="toc-section-number">3</span>  Visual World Paradigm</a></li>
+  <li><a href="#eye-tracking-reading-measures" id="toc-eye-tracking-reading-measures" class="nav-link" data-scroll-target="#eye-tracking-reading-measures"><span class="toc-section-number">4</span>  Eye-tracking reading measures</a>
+  <ul class="collapse">
+  <li><a href="#region-of-interest-roi" id="toc-region-of-interest-roi" class="nav-link" data-scroll-target="#region-of-interest-roi"><span class="toc-section-number">4.1</span>  Region of interest (ROI)</a></li>
+  <li><a href="#measures-dependent-variables" id="toc-measures-dependent-variables" class="nav-link" data-scroll-target="#measures-dependent-variables"><span class="toc-section-number">4.2</span>  Measures (dependent variables)</a></li>
+  <li><a href="#what-do-these-measures-tell-us" id="toc-what-do-these-measures-tell-us" class="nav-link" data-scroll-target="#what-do-these-measures-tell-us"><span class="toc-section-number">4.3</span>  What do these measures tell us?</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Eye-tracking during reading</h1>
+<p class="subtitle lead">What can we learn from the measures?</p>
+</div>
+
+
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Author</div>
+  <div class="quarto-title-meta-heading">Affiliation</div>
+  
+    <div class="quarto-title-meta-contents">
+    Daniela Palleschi 
+  </div>
+    <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Humboldt-Universität zu Berlin
+          </p>
+      </div>
+    </div>
+
+<div class="quarto-title-meta">
+
+      
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">April 12, 2023</p>
+    </div>
+  </div>
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create references.json file based on the citations in this script</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co"># make sure you have 'bibliography: references.json' in the YAML</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>rbbt<span class="sc">::</span><span class="fu">bbt_update_bib</span>(<span class="st">"et_reading.qmd"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Wrote 1 reference to './references/references.json'</code></pre>
+</div>
+</div>
+<section id="eye-tracking" class="level1" data-number="1">
+<h1 data-number="1"><span class="header-section-number">1</span> Eye-tracking</h1>
+<ul>
+<li>in (psycho)linguistics
+<ul>
+<li>during reading</li>
+<li>visual world paradigm</li>
+</ul></li>
+<li>in psychology
+<ul>
+<li>pupillometry</li>
+<li>visual search</li>
+</ul></li>
+<li>but also
+<ul>
+<li>market research</li>
+<li>diagnostic tool</li>
+</ul></li>
+</ul>
+<section id="history" class="level2" data-number="1.1">
+<h2 data-number="1.1" class="anchored" data-anchor-id="history"><span class="header-section-number">1.1</span> History</h2>
+<ul>
+<li>this history of eye-tracking</li>
+</ul>
+</section>
+<section id="eye-movements" class="level2" data-number="1.2">
+<h2 data-number="1.2" class="anchored" data-anchor-id="eye-movements"><span class="header-section-number">1.2</span> Eye movements</h2>
+<ul>
+<li>fixations</li>
+<li>saccades</li>
+<li>parafoveal preview</li>
+<li>link to cognition</li>
+</ul>
+</section>
+<section id="data-collection" class="level2" data-number="1.3">
+<h2 data-number="1.3" class="anchored" data-anchor-id="data-collection"><span class="header-section-number">1.3</span> Data collection</h2>
+<ul>
+<li>eye-tracking</li>
+<li>screen</li>
+<li>calibration</li>
+<li>chin/head rest</li>
+<li>desk or head mounted, screen</li>
+</ul>
+</section>
+</section>
+<section id="reading" class="level1" data-number="2">
+<h1 data-number="2"><span class="header-section-number">2</span> Reading</h1>
+<ul>
+<li>reading span</li>
+<li>fixate</li>
+<li>skip words</li>
+<li>regress</li>
+<li>frequency/length effects</li>
+</ul>
+</section>
+<section id="visual-world-paradigm" class="level1" data-number="3">
+<h1 data-number="3"><span class="header-section-number">3</span> Visual World Paradigm</h1>
+<ul>
+<li>auditory stimuli</li>
+<li>visual stimuli</li>
+<li>anticipatory eye movements</li>
+<li>inferences</li>
+<li>time course of anticipation or inferences
+<ul>
+<li>L1-development, L2-acquisition, neurodivergence, diagnostic tool</li>
+</ul></li>
+</ul>
+</section>
+<section id="eye-tracking-reading-measures" class="level1" data-number="4">
+<h1 data-number="4"><span class="header-section-number">4</span> Eye-tracking reading measures</h1>
+<section id="region-of-interest-roi" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="region-of-interest-roi"><span class="header-section-number">4.1</span> Region of interest (ROI)</h2>
+<ul>
+<li>can be anything
+<ul>
+<li>sentence-level</li>
+<li>word/region-level</li>
+<li>a certain part of the screen</li>
+</ul></li>
+</ul>
+</section>
+<section id="measures-dependent-variables" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="measures-dependent-variables"><span class="header-section-number">4.2</span> Measures (dependent variables)</h2>
+<ul>
+<li>what we measure = <em>dependent</em> variables<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>
+<ul>
+<li>their value <em>depends</em> on some <em>predictor</em> (e.g., word frequency)</li>
+</ul></li>
+<li>measures of duration (time spent on a region)
+<ul>
+<li>first fixation</li>
+<li>first-pass reading time</li>
+<li>regression path duration</li>
+<li>total reading time</li>
+</ul></li>
+<li>measures of revisits
+<ul>
+<li>number of fixations</li>
+<li>number of regressions in/out</li>
+<li>regression in/out (yes or no)</li>
+<li>probability of regressions in/out (0:1)</li>
+</ul></li>
+</ul>
+</section>
+<section id="what-do-these-measures-tell-us" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="what-do-these-measures-tell-us"><span class="header-section-number">4.3</span> What do these measures tell us?</h2>
+<ul>
+<li>lots <span class="citation" data-cites="vasishth_what_2013">(<a href="#ref-vasishth_what_2013" role="doc-biblioref">Vasishth, von der Malsburg, and Engelmann 2013</a>)</span></li>
+</ul>
+</section>
+</section>
+<section id="references" class="level1 unlisted unnumbered" data-visibility="uncounted">
+<h1 class="unlisted unnumbered" data-visibility="uncounted">References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" data-custom-style="Bibliography" role="doc-bibliography">
+<div id="ref-vasishth_what_2013" class="csl-entry" role="doc-biblioentry">
+Vasishth, Shravan, Titus von der Malsburg, and Felix Engelmann. 2013. <span>“What Eye Movements Can Tell Us about Sentence Comprehension.”</span> <em>Wiley Interdisciplinary Reviews: Cognitive Science</em> 4 (2): 125–34. <a href="https://doi.org/10.1002/wcs.1209">https://doi.org/10.1002/wcs.1209</a>.
+</div>
+</div>
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>usually…<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
