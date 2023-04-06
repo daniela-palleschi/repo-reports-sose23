@@ -7,7 +7,7 @@ lang: en
 date: 2023-04-12
 format:
   revealjs: 
-    footer: "Daniela Palleschi - SS23: Reproducibility"
+    footer: "Reproducibility"
     output-file: slides-reproducibility.html
     theme: [dark]
     width: 1600

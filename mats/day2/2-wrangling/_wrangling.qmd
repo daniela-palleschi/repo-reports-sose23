@@ -155,13 +155,13 @@ knitr::include_graphics(here::here("media/Wickham_tidydata.png"))
 
 -   N.B., how you define a *variable* or *observation* is relative to what you want to do
     -   for now, let's consider a single trial per participant as an observation
-    
+
 # the `tidyverse`
 
-- a collection of R packages for tidy data
-- you need to load a package at the beginning of every session
-  + today we will mostly use functions from the `dplyr` package
-    + if you load the `tidyverse` you don't need to also load `dplyr`
+-   a collection of R packages for tidy data
+-   you need to load a package at the beginning of every session
+    -   today we will mostly use functions from the `dplyr` package
+        -   if you load the `tidyverse` you don't need to also load `dplyr`
 
 ```{r}
 # load tidyverse
@@ -259,46 +259,46 @@ library(tidyverse) # for tidy data wrangling
 
 # Tidyverse verbs
 
-- verbs are functions from the `tidyverse` package
-- for data tidying and transforming we'll mostly use verbs from the `dplyr` package, which is part of the `tidyverse`
-- check out [RLadies Freiburg](https://www.meetup.com/rladies-freiburg/events/292108309/) to see a [YouTube video](https://youtu.be/NRgdTaAfwTo) that covers most of these verbs
+-   verbs are functions from the `tidyverse` package
+-   for data tidying and transforming we'll mostly use verbs from the `dplyr` package, which is part of the `tidyverse`
+-   check out [RLadies Freiburg](https://www.meetup.com/rladies-freiburg/events/292108309/) to see a [YouTube video](https://youtu.be/NRgdTaAfwTo) that covers most of these verbs
 
 ## `rename()`
 
-- one of the first things you'll often want to do is rename some variables
-- let's start by re-naming some of our variables
-    - e.g., `RECORDING_SESSION_LABEL` is a long way of saying 'participant'
+-   one of the first things you'll often want to do is rename some variables
+-   let's start by re-naming some of our variables
+    -   e.g., `RECORDING_SESSION_LABEL` is a long way of saying 'participant'
 
 ```{r}
 #| eval: true
 #| code-line-numbers: "|3-4|"
 # rename variables
-df_lifetime <- df_lifetime %>%
-  rename("px" = RECORDING_SESSION_LABEL,
-         "trial" = TRIAL_INDEX)
+df_lifetime <- df_lifetime %>% # make df_lifetime from df_lifetime BUT THEN
+  rename("px" = RECORDING_SESSION_LABEL, # rename a variable and (comma = 'and')
+         "trial" = TRIAL_INDEX) # another variable
 ```
 
 ### Exercise {.smaller}
 
 Change the following names:
 
-:::{.column width="40%"}
-- `EYE_USED` to `eye`
-- `IA_DWELL_TIME` to `tt`
-- `IA_FIRST_FIXATION_DURATION` to `ff`
-- `IA_FIXATION_COUNT` to `fix_count`
-- `IA_FIRST_RUN_DWELL_TIME` to `fp`
-- `IA_ID` to `region_n`
-- `IA_LABEL` to `region_text`
+::: {.column width="40%"}
+-   `EYE_USED` to `eye`
+-   `IA_DWELL_TIME` to `tt`
+-   `IA_FIRST_FIXATION_DURATION` to `ff`
+-   `IA_FIXATION_COUNT` to `fix_count`
+-   `IA_FIRST_RUN_DWELL_TIME` to `fp`
+-   `IA_ID` to `region_n`
+-   `IA_LABEL` to `region_text`
 :::
 
-:::{.column width="50%"}
-- `IA_REGRESSION_IN` to `reg_in`
-- `IA_REGRESSION_IN_COUNT` to `reg_in_count`
-- `IA_REGRESSION_OUT` to `reg_out`
-- `IA_REGRESSION_OUT_COUNT` to `reg_out_count`
-- `IA_REGRESSION_PATH_DURATION` to `rpd`
-- `name_vital_status` to `lifetime`
+::: {.column width="50%"}
+-   `IA_REGRESSION_IN` to `reg_in`
+-   `IA_REGRESSION_IN_COUNT` to `reg_in_count`
+-   `IA_REGRESSION_OUT` to `reg_out`
+-   `IA_REGRESSION_OUT_COUNT` to `reg_out_count`
+-   `IA_REGRESSION_PATH_DURATION` to `rpd`
+-   `name_vital_status` to `lifetime`
 :::
 
 ```{r, echo = F}
@@ -324,6 +324,21 @@ df_lifetime <- df_lifetime |>
 #| output-location: column
 # the names should then look like this:
 names(df_lifetime)
+```
+
+## relocate
+
+-   the second step thing you might want to do is reorder your variables so the most important/relevant are near the beginning and ordered logically
+    -   let's order our continuous reading time variables from 'earliest' to 'latest' measure
+
+```{r}
+df_lifetime <- df_lifetime %>%
+  relocate(ff,fp,rpd,tt, .after="eye") %>% 
+  relocate(region_n, region_text, .after="trial")
+```
+
+```{r}
+names(df_lifetime[1:10])
 ```
 
 ## `mutate()`
@@ -374,7 +389,7 @@ df_lifetime <- df_lifetime %>%
     -   change values based on multiple logical conditions
     -   can be used to change an existing column, or create a new one
 -   `case_when(condition & other_condition | other_condition ~ output, TRUE ~ output_otherwise)`
-    - if you don't include `TRUE ~ output` then `NA`s will created
+    -   if you don't include `TRUE ~ output` then `NA`s will created
 
 ```{r}
 #| code-line-numbers: "|1-2|3|4|5"
@@ -388,23 +403,22 @@ df_lifetime <- df_lifetime %>%
 ### Exercise {.smaller}
 
 ::: {.column width="50%"}
-1. Create a new variable `accept` that checks whether the button pressed (`KeyPress`) equals the button that corresponds to an acceptance (`yes_press`)
-    + if `KeyPress` and `yes_press` are the same, `accept` should be `1`. If not, `accept` should be `0`
-    + hint: you will need `if_else()` or `case_when()`
+1.  Create a new variable `accept` that checks whether the button pressed (`KeyPress`) equals the button that corresponds to an acceptance (`yes_press`)
+    -   if `KeyPress` and `yes_press` are the same, `accept` should be `1`. If not, `accept` should be `0`
+    -   hint: you will need `if_else()` or `case_when()`
 :::
 
 ::: {.column width="50%"}
-2. Create a new variable `accuracy` where:
-    + if `match` is `yes` and `accept` is `1`, `accuracy` is `1`
-    + if `match` is `no` and `accept` is `0`, `accuracy` is `1`
-    + if `match` is `yes` and `accept` is `0`, `accuracy` is `0`
-    + if `match` is `no` and `accept` is `1`, `accuracy` is `0`
+2.  Create a new variable `accuracy` where:
+    -   if `match` is `yes` and `accept` is `1`, `accuracy` is `1`
+    -   if `match` is `no` and `accept` is `0`, `accuracy` is `1`
+    -   if `match` is `yes` and `accept` is `0`, `accuracy` is `0`
+    -   if `match` is `no` and `accept` is `1`, `accuracy` is `0`
 :::
 
-- the means and summaries should look like this:
+-   the means and summaries should look like this:
 
 ::: {.column width="50%"}
-   
 ```{r, echo = F}
 df_lifetime <- df_lifetime |> 
   mutate(accept = if_else(KeyPress == yes_press, 1,0))
@@ -420,7 +434,6 @@ summary(as_factor(df_lifetime$accept))
 :::
 
 ::: {.column width="50%"}
-
 ```{r, echo = F}
 df_lifetime <- df_lifetime |> 
   mutate(accuracy = case_when(
@@ -437,12 +450,58 @@ summary(as_factor(df_lifetime$accuracy))
 ```
 :::
 
+### Extra exercise
+
+::: {.column width="50%"}
+3.  Create a new variable `region`, that has the following values based on `region_n`
+
+-   region_n `1` is region `verb-1`
+-   region_n `2` is region `verb`
+-   region_n `3` is region `verb+1`
+-   region_n `4` is region `verb+2`
+-   region_n `5` is region `verb+3`
+-   region_n `6` is region `verb+4`
+
+```{r, echo = F}
+df_lifetime <- df_lifetime |> 
+  mutate(region = case_when(
+    type == "critical" & region_n == "1" ~ "verb-1",
+    type == "critical" & region_n == "2" ~ "verb",
+    type == "critical" & region_n == "3" ~ "verb+1",
+    type == "critical" & region_n == "4" ~ "verb+2",
+    type == "critical" & region_n == "5" ~ "verb+3",
+    type == "critical" & region_n == "6" ~ "verb+4",
+    TRUE ~ "filler"))
+```
+
+```{r}
+summary(as_factor(df_lifetime$region))
+```
+:::
+
+::: {.column width="50%"}
+4.  Now relocate our new variables so that:
+
+-   `region` is before `region_n`
+-   `KeyPress` is after `yes_press`
+
+```{r, echo = F}
+df_lifetime <- df_lifetime %>%
+  relocate(region, .before="region_n") %>%
+  relocate(KeyPress, .after="yes_press")
+```
+
+```{r}
+names(df_lifetime)
+```
+:::
+
 ## `group_by()` and `ungroup()`
 
 Group data by certain variable(s)
 
-- then perform some mutation
-- then ungroup the data
+-   then perform some mutation
+-   then ungroup the data
 
 ```{r}
 df_lifetime <- df_lifetime |>
@@ -457,7 +516,6 @@ round(
   2)
 ```
 
-
 ## `select()`
 
 -   keep only certain column(s)
@@ -469,6 +527,7 @@ df_lifetime %>%
   select(px)
 ```
 :::
+
 ::: {.column width="50%"}
 ```{r}
 #| output-location: column-fragment
@@ -489,9 +548,9 @@ df_lifetime %>%
 
 ### Exercise
 
-Remove the example variables we created with `mutate`: 
+Remove the example variables we created with `mutate`:
 
-- `new_column` and `newer_column`
+-   `new_column` and `newer_column`
 
 ```{r, echo = F}
 df_lifetime <- df_lifetime |> 
@@ -581,10 +640,10 @@ df_lifetime %>%
 
 ### Exercise
 
-1. Create a new dataframe `df_crit` that includes only critical trials
-2. Create a new dataframe `df_fill` that includes only filler trials
+1.  Create a new dataframe `df_crit` that includes only critical trials
+2.  Create a new dataframe `df_fill` that includes only filler trials
 
--  Tip: trial type is stored in the column `type`
+-   Tip: trial type is stored in the column `type`
 
 ```{r, echo = F}
 df_crit <- df_lifetime |> 
@@ -695,13 +754,52 @@ df_crit<- df_crit %>%
 
 # Save your tidy data
 
-- once your data is nice and tidy, save it with a **new filename**
-  + this way you always have the same starting point for your data exploration/analyses
+-   once your data is nice and tidy, save it with a **new filename**
+    -   this way you always have the same starting point for your data exploration/analyses
 
-```{r}
-write.csv(df_crit, here::here("data/tidy_data_lifetime_pilot.csv"))
+```{r, eval = F}
+# run this manually!
+write.csv(df_lifetime, here::here("data/tidy_data_lifetime_pilot.csv"))
 ```
 
+# Summary
+
+-   we saw that the equation for a straight line boils down to its intercept and slope
+
+-   we fit our first linear model with a categorical predictor
+
+-   next, we'll look at a case with more than one predictor: **multiple** regression
+
+## Important terms {.unnumbered}
+
+|                             |                                                                              |
+|-----------------------|-------------------------------------------------|
+| wrangle                     | have a long dispute                                                          |
+| data wrangling              | tidying and transforming your data                                           |
+| tidy data                   | data where each column is a variable and each row is an observation          |
+| the tidyverse               | a group of packages for tidy data                                            |
+| dplyr                       | a package within the tidyverse for data wrangling                            |
+| pipe operator (`%>%` or `|>`) | operational function, passes the result of one function/argument to the next |
+| logical operators           | compare values of two arguments: `&`, `|`, `==`, `!=`, \>, \<                |
+
+## Important functions {.smaller .unnumbered}
+
+|                  |                                                    |
+|------------------|----------------------------------------------------|
+| `read_csv()`     | log-transform a continuous variable                |
+| `rename()`       | rename variables                                   |
+| `relocate()`     | move variables                                     |
+| `mutate()`       | change or create new variables                     |
+| `if_else()`      | condition for \`mutate()\`                         |
+| `case_when()`    | can handle multiple conditions for \`mutate()\`    |
+| `group_by()`     | group by a certain variable                        |
+| `select()`       | keep (or exclude) certain variables                |
+| `filter()`       | keep (or exclude) rows based on some criteria      |
+| `distinct()`     | keep rows with distinct value of given variable(s) |
+| `arrange()`      | sort variable(s) in ascending or descending order  |
+| `separate()`     | split a variable into multiple variables           |
+| `pivot_longer()` | make wide data longer                              |
+| `pivot_wider()`  | make long data wider                               |
 
 # Session Info
 

@@ -76,6 +76,15 @@ rbbt::bbt_update_bib("_welcome.qmd")
   + data **wrangling** (tidyverse)
   + data **visualisation** (ggplot2), 
   + descriptive and inferential **statistics**
+  
+## Course credits
+
+- 4 LP
+  + attendance and participation: 1LP
+  + Exercises: 1LP
+  + Assignments: 2 LP
+    1. Reproducible (pilot) data report + Pre-registration
+    2. Reproducible analysis report
 
 # Reading list
 

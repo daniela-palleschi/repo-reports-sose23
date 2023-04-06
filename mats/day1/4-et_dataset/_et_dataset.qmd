@@ -353,6 +353,13 @@ df_lifetime %>%
   summary()
 ```
 
+### Exercise
+
+Take some time to explore the dataset.
+  
+  - double click on the dataset name in the Environment pane to view it like a spreadsheet
+  - look at the names, can you figure out what they represent?
+
 ## class types
 
 -   there are difference classes of data that R can read
@@ -464,7 +471,7 @@ Histogram
 
 ```{r}
 #| output-location: fragment
-hist(df_lifetime$gaze)
+hist(df_lifetime$IA_FIRST_RUN_DWELL_TIME)
 ```
 :::
 
@@ -473,7 +480,7 @@ Boxplot
 
 ```{r}
 #| output-location: fragment
-boxplot(df_lifetime$gaze)
+boxplot(df_lifetime$IA_FIRST_RUN_DWELL_TIME)
 ```
 :::
 
@@ -482,7 +489,7 @@ Scatterplot
 
 ```{r}
 #| output-location: fragment
-plot(df_lifetime$IA_FIRST_FIXATION_DURATION)
+plot(df_lifetime$IA_FIRST_RUN_DWELL_TIME)
 ```
 :::
 
