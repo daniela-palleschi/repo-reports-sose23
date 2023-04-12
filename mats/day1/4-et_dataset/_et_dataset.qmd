@@ -1,6 +1,6 @@
 ---
 title: "Working with eye-tracking reading data in R"
-subtitle: "Biondo et al. (2021)"
+subtitle: "Loading and eye-balling a dataset"
 author: "Daniela Palleschi"
 institute: Humboldt-Universität zu Berlin
 lang: en
@@ -38,13 +38,15 @@ format:
       data-background-size: 15%
       data-background-position: 50% 92%
     # to add drawings:
-    chalkboard:
-      src: drawings/day1-drawings.json
+    # chalkboard:
+    #   src: drawings/day1-drawings.json
+    embed-resources: true
     # logo: logos/hu_logo.png
     # css: logo.css
     # number-sections: true
   html:
     output-file: sheet-et_dataset.html
+    embed-resources: true
     toc: true
     toc-depth: 2
     toc-title: 'Overview'
@@ -61,7 +63,7 @@ format:
 editor_options: 
   chunk_output_type: console
 bibliography: references/references.json
-biblio-style: apalike
+csl: references/apa.csl
 ---
 
 # Set-up {.unlisted .unnumbered visibility="uncounted"}
@@ -75,13 +77,16 @@ knitr::opts_chunk$set(eval = T, # evaluate = T for REPRODUCIBLE analyses
 ```
 
 ```{r}
-library(rbbt) # zotero plugin
+#| code-line-numbers: "1,2"
 library(here) # relative path
 library(tidyverse) # tidy/transform
 library(beepr) # beeps when code runs or fails
+library(rbbt) # zotero plugin
 ```
 
 ```{r}
+#| code-fold: true
+#| code-summary: beep code
 ## play sound if error encountered
 ### from: https://sejohnston.com/2015/02/24/make-r-beep-when-r-markdown-finishes-or-when-it-fails/
 options(error = function(){    # Beep on error
@@ -97,6 +102,9 @@ options(error = function(){    # Beep on error
 ```
 
 ```{r, eval = T, cache = F}
+#| code-fold: true
+#| code-summary: rbbt code
+#| 
 # Create references.json file based on the citations in this script:
 # 1. make sure you have 'bibliography: references/references.json' in the YAML
 # 2. create a new folder called 'references'
@@ -121,31 +129,42 @@ rbbt::bbt_update_bib("_et_dataset.qmd")
 
 ## Our first dataset
 
--   eye-tracking during reading
-    -   participants read a referent-lifetime context, followed by a critical sentence
-        -   button-press when done reading
-    -   critical sentences contained the Present Perfect or Simple Future
-        -   button-press when done reading
--   each trial ended with a 7-point naturalness Likert scale
+::: columns
+::: {.column width="40%"}
+-   referent-lifetime context
+    -   dead/alive
+-   critical sentence
+    -   Present Perfect/Simple Future
+-   binary naturalness judgement to end trial
+    -   accept/reject
+:::
+
+::: {.content-visible when-format="revealjs" when-format="html"}
+::: {.column width="60%"}
+![](media/livingPP_pilot1.mp4){fig-align="center" width="100%"}
+:::
+:::
+:::
 
 ## Design description
 
-:::: {.columns}
-
-::: {.column width="100%"}
-
+::: columns
+::: {.column width="50%"}
 -   2x2 mixed design
     -   two 2-level factors (2x2 = 2-level x 2-level)
         -   factor 1: lifetime (levels: dead, alive)
         -   factor 2: tense (levels: PP, SF)
-    - four conditions:
-        - dead-PP, living-PP, dead-SF, living-SF
 :::
 
-::::
+::: {.column width="50%"}
+|     | alive                     | dead                    |
+|-----|---------------------------|-------------------------|
+| PP  | Eddie Redmayne...has won  | Gene Kelly...\*has won  |
+| SF  | Eddie Redmayne...will win | Gene Kelly...\*will win |
+:::
+:::
 
-:::: {.columns}
-
+::: columns
 ::: {.column width="50%"}
 -   predictors/independent variables
     -   lifetime
@@ -153,24 +172,19 @@ rbbt::bbt_update_bib("_et_dataset.qmd")
 :::
 
 ::: {.column width="50%"}
--   measure/dependent variable(s)
+-   measure/dependent variables (verb region)
     -   first-fixation time (milliseconds)
     -   first-pass reading time (ms)
     -   regression path duration (ms)
-    -   tt (ms)
+    -   total reading time (ms)
+:::
 :::
 
-::::
+### Repeated measures design
 
-## Repeated measures design
-
-- repeated measures design
-  - observations are repeated e.g., multiple data points per participant, and per item within and across participants
-  - essentially, data are not independent
-
-- relevant terms
-  - counterbalancing: each condition presented equally across participants, across experimental lists, 
-  - Latin-square design
+-   observations are repeated e.g., multiple data points per participant, and per item across participants
+    -   essentially, data are not independent
+    -   e.g., each participant will have their own reading speed, some items might be systematically less acceptable for some unforeseen reason, etc.
 
 # Working with the data
 
@@ -182,15 +196,15 @@ Day 1
 2.  inspect data
     -   eyeball data structure
     -   print summaries
-    -   plot the data
+    -   plot data distributions
 :::
 
 ::: {.column width="30%"}
 Day 2
 
 3.  tidy data
-4.  transform data
-5.  visualise data
+4.  visualise data
+5.  communicate data
 :::
 
 ::: {.column width="30%"}
@@ -203,40 +217,44 @@ Day 3
 :::
 :::
 
-## 1. Load/install packages
+## Install packages
 
-- install
-  + only do once
-  + ...or when you working on a new computer
-  + ...or after updating R
-- might be a wise idea to create a script just for installing packages
-  + can save time/energy when updating R
-  
-```{r}
+```{r, eval = F}
 install.packages("tidyverse")
 install.packages("here")
 ```
 
-- load packages
-  + needed at the start of each session
-  
+-   install
+    -   only do once
+    -   ...or when you working on a new computer
+    -   ...or after updating R
+-   might be a wise idea to create a script just for installing packages
+    -   can save time/energy when updating R
+
+## Load packages
+
 ```{r}
 library(tidyverse)
 library(here)
 ```
 
-## 2. Load dataset
+-   load packages
+    -   needed at the start of each session
+
+## Load dataset
 
 ```{r}
 df_lifetime <- readr::read_csv(here::here("data/data_lifetime_pilot.csv"))
 ```
 
-- N.B., `readr::read_csv` can be read as "`read_csv()` function in the `readr` package"
-  + i.e., `package::function`
-  + you only need to use this syntax if you haven't loaded the specific package yet (maybe because you only need it once), or if a function name is included in multiple packages (i.e., there's a discrepancy in what `read_csv` could be referring to)
-  + why did I use it here?
+-   N.B., `readr::read_csv` can be read as "`read_csv()` function in the `readr` package"
+    -   i.e., `package::function()`
+    -   you only need to use this syntax if you haven't loaded the specific package yet (maybe because you only need it once), or if a function name is included in multiple packages (i.e., there's a discrepancy in what `read_csv` could be referring to)
+    -   why did I use it here?
 
+## {.unlisted}
 ::: {.callout-tip collapse="true"}
+
 ### `here` package
 
 Using the `here` package, we can access files *relative* to where our .RProj is stored.
@@ -261,14 +279,69 @@ df_lifetime <- read_csv("data/data_lifetime_pilot.csv")
 This meant that if I sent my project folder to somebody else, they wouldn't be able to run my code because they would have to change the *absolute* file path to match their machine.
 :::
 
-## 2. Inspect dataset
+## Inspect dataset
 
 -   there are several different things you can inspect
     -   and different ways to accomplish those things
+-   the first thing I usually do is look at the column/variable names
+
+### `names()` {.smaller}
+
+:::: {columns}
+
+::: {.column width="60%"}
+-   the names in all caps are variables created during the experiment
+    -   i.e., they are our recorded *data*, mainly what we wanted to measure: dependent variables (DV)
+    -   also includes some information about the experiment set-up per participant
+-   the other names are variables from my stimuli lists
+    -   i.e., they mostly contain our independent variables (IV)/stimuli
+-   we typically want to see what effect our IVs had on any given DVs
+-   variable descriptions can be found on the Moodle: Data > Documentation
+:::
+
+::: {.column width="40%"}
+```{r}
+names(df_lifetime)
+```
+
+:::
+
+::::
+
+
+
+
+
+### `rename()`
+
+-   the dependent variable names are pretty clunky, let's rename a few:
+    -   `RECORDING_SESSION_LABEL` corresponds to a single participant
+    -   `TRIAL_INDEX` logged the trial number
+    -   `EYE_USED` logged which eye was tracked
+
+```{r}
+#| code-fold: true
+df_lifetime <- df_lifetime %>%
+  rename("px" = RECORDING_SESSION_LABEL,
+         "trial" = TRIAL_INDEX,
+         "eye" = EYE_USED)
+```
+
+#### Naming variables
+
+::: callout-tip
+#### Naming conventions
+
+It's wise to keep variable and object names concise but informative
+
+-   all lowercase means fewer key strokes overall
+-   separate words with either periods or underscores, e.g., `trial.index` or `trial_index`
+-   e.g., we called our dataset `df_lifetime` because it is a dataframe (`df`) with data from our lifetime experiment
+:::
 
 ### Data structure
 
--   datasets typically contain a lot of *rows*
+-   datasets typically contain a lot of rows and columns
     -   so we want to get a feel for how the data is structured
 
 ::: panel-tabset
@@ -283,8 +356,6 @@ head(df_lifetime)
 
 ```{r}
 #| code-line-numbers: "|1|2"
-
-library(tidyverse)
 df_lifetime %>%
   head()
 ```
@@ -297,8 +368,7 @@ df_lifetime %>%
 df_lifetime |> 
   head()
 ```
-
-::::
+:::
 
 ### `head()` function
 
@@ -315,15 +385,14 @@ df_lifetime %>%
 ### `head()` function task {.unlisted .unnumbered visibility="uncounted"}
 
 ::: {.callout-tip collapse="true"}
-#### Task: `head()`
+#### Exercise: `head()`
 
-1.  print only 2 rows, but using the syntax for a single line of code
+1.  print only 2 rows using whichever syntax you prefer
 2.  change `n = 2` to some other number and print
 3.  run `?head` in the `Console`
-
--   find the opposite function (i.e., prints last rows) in the function description?
--   run this function with `df_lifetime` as argument; how many rows does it print as default?
--   play with `n =` in this function to print some other number of rows
+    -  find the opposite function (i.e., prints last rows) in the function description?
+4.   run this function with `df_lifetime` as argument; how many rows does it print as default?
+5.   play with `n =` in this function to print some other number of rows
 :::
 
 ### `tail()` function
@@ -356,9 +425,9 @@ df_lifetime %>%
 ### Exercise
 
 Take some time to explore the dataset.
-  
-  - double click on the dataset name in the Environment pane to view it like a spreadsheet
-  - look at the names, can you figure out what they represent?
+
+-   double click on the dataset name in the Environment pane to view it like a spreadsheet
+-   look at the names, can you figure out what they represent?
 
 ## class types
 
@@ -367,12 +436,15 @@ Take some time to explore the dataset.
 
 ```{r}
 #| code-line-numbers: "|1|2"
-df_lifetime$RT_value %>%
+#| output-location: column-fragment
+df_lifetime$rt %>%
   class()
 ```
 
+## {.unlisted}
+
 ::: {.callout-tip collapse="true"}
-# Selecting a column
+## Selecting a column
 
 ```{r}
 # with column index
@@ -381,92 +453,109 @@ df_lifetime[2] %>% summary()
 
 ```{r}
 # with column name
-df_lifetime[,"TRIAL_INDEX"] %>% summary()
+df_lifetime[,"trial"] %>% summary()
 ```
 
 ```{r}
 # with data$column_name
-df_lifetime$TRIAL_INDEX %>% summary()
+df_lifetime$trial %>% summary()
 ```
 
 ```{r}
 # with the tidyverse: select()
 df_lifetime %>% 
-  select(TRIAL_INDEX) %>%
+  select(trial) %>%
   summary()
 ```
-
 :::
+
+### `character` class
+
+-   contain *strings*: collection of characters (i.e., text)
+-   there's no grouping in character variables
+    -   each value is considered 'unique' and assumed to not be repeated
+-   we usually aren't interested in character class variables
+    -   unless e.g., we have unique values per row (e.g., if a participant gave a free-text answer)
+    -   or perhaps we have stored some stimuli sentences
+        -   although this would arguably be better as a 'category', since there should be multiple trials across participants that contain the same sentences
 
 ### `numeric` class
 
-### `integer` class
+-   variables with numeric values, usually some variable we'd want to compute summaries on, e.g., means
+-   sometimes we don't want numbers to be stored as numeric class, however
+    -   this is the case for our variables `yes_press` and `KeyPress` (with `4` or `5`)
+-   the same is true for our variable `item_id`, which ranges from 1:120
+    -   the numbers are just unique codes for our stimuli, the difference between `item 1` and `item 2` has nothing to do with the difference between the numbers `1` and `2`
 
 ### `factor` class
 
--   we typically want things *grouping* variables to be `factor` class
-    -   factor class is ***categorical*** data
-    -   any number that could be replaced and maintain its value should be a factor
+-   we typically want *grouping* variables to be `factor` class
+    -   factors contain ***categorical*** data
+    -   any number that could be replaced with some other label should be a factor
 -   region of interest (ROI) = 1:7
     -   but we want to know how many observations per region, the number is not informative
     -   ROI could alternatively be coded as, e.g., "adverb", "pronoun", "verb", "spillover"
 
 ### `factor` class {.unlisted .unnumbered visibility="uncounted"}
 
--   let's change `df_lifetime$ROI` to `factor`
-    -   using `mutate()` from dplyr
-    -   and `as_factor()` from forcats
+-   let's change `df_lifetime$yes_press` to `factor`
+    -   using the `mutate()` verb from `dplyr`
+    -   and `as_factor()` from `forcats`
 
 ```{r}
+#| cold-fold: true
 #| code-line-numbers: "|"
 #| output-location: fragment
-# change ROI & label to factor
+# change yes_press to factor
 df_lifetime %>%
-  mutate(TRIAL_INDEX = as_factor(TRIAL_INDEX)) %>%
+  mutate(yes_press = as_factor(yes_press)) %>%
   summary()
 ```
 
-### `character` class
+### multiple arguments in a verb
 
--   we usually aren't interested in character class variables
-    -   unless e.g., we have unique values per row (e.g., if a participant gave a free-text answer)
-    -   or perhaps we have stored some stimuli sentences
-        -   although this would arguably be better as a factor
+-   we can also change multiple columns at once:
+
+```{r}
+# change ROI & label to factor
+df_lifetime %>%
+  mutate(KeyPress = as_factor(KeyPress),
+         item_id = as_factor(item_id)) %>%
+  summary()
+```
 
 ### Pop quiz
 
-1.  of the classes `numeric`, `factor`, and `character`:
+1.  Which class *should* the following variables be (`numeric`, `factor`, or `character`)?:
+
     -   participant ID
     -   trial number
     -   first-pass reading time
     -   regression path duration
     -   regressions in
-    -   verb type
-    -   adverb type
+    -   context sentence
+    -   lifetime
+    -   tense
+    -   celebrity name
 
 2.  change them to these class types, and print a summary
 
-3.  save render the document
+3.  save and render the document
 
-4.  upload the source file (day1-nachname_vorname.qmd) to XYZ
 
-5.  download the source file below yours in the list to the same folder, and try to run it
+## Plot the data
 
--   does it run?
 
-## 3. Plot the data
-
-::: columns
-::: {.column width="50%"}
+::: {.column width="100%"}
 -   at this stage we want to explore the data
     -   distribution
         -   peaks, spread
     -   boundaries
 :::
-::::
 
-::: columns
-::: {.column width="40%"}
+
+:::: columns
+::: {.column width="33%"}
 Histogram
 
 ```{r}
@@ -475,7 +564,7 @@ hist(df_lifetime$IA_FIRST_RUN_DWELL_TIME)
 ```
 :::
 
-::: {.column width="40%"}
+::: {.column width="33%"}
 Boxplot
 
 ```{r}
@@ -484,7 +573,7 @@ boxplot(df_lifetime$IA_FIRST_RUN_DWELL_TIME)
 ```
 :::
 
-::: {.column width="40%"}
+::: {.column width="33%"}
 Scatterplot
 
 ```{r}
@@ -493,54 +582,64 @@ plot(df_lifetime$IA_FIRST_RUN_DWELL_TIME)
 ```
 :::
 
-::: {.column width="40%"}
+::::
+
+### Plotting two variables
+
 Scatterplot
 
 ```{r}
 #| output-location: fragment
 plot(df_lifetime$IA_FIRST_FIXATION_DURATION, df_lifetime$IA_FIRST_RUN_DWELL_TIME)
 ```
-:::
-:::::
 
 ### Exercise
 
 In your Quarto document:
 
-  1. create a heading 'Data exploration'
-    + briefly describe the data
-  2. For each of our depenent variables:
-    + create a subheading
-    + calculate the mean and standard deviation of the variable (`mean()`, `sd()`)
-    + create a boxplot of the variable
-  3. Render the document often to make sure it runs
-  
+1.  create a heading 'Data exploration' 
+  + briefly describe the data
+2.  For each of our depenent variables: 
+  + create a subheading
+  + calculate the mean and standard deviation of the variable (`mean()`, `sd()`) + create a boxplot of the variable
+3.  Render the document often to make sure it runs
+4.  Upload the source file (day1-nachname_vorname.qmd) to Moodle
+5.  download the source file below yours in the list to the same folder, and try to run it
+  +   does it run?
+
+### {.unlisted}
+
 ::: callout-tip
 #### print options
 
-- each code chunk can have different print options:
-  + `eval = FALSE`: do not evaluate this chunk
-  + `include = FALSE` evaluate this chunk but don't show it or its results
-  + `echo = FALSE` print this chunk code
-  + `message = FALSE`/`warning = false` don't print warnings or messages
-  + `error = TRUE` continue rendering document even if there's an error
-    + do not use `error = TRUE` for final versions! You want to make sure things work as they should
-    
-`````markdown
+-   each code chunk can have different print options:
+    -   `eval = FALSE`: do not evaluate this chunk
+    -   `include = FALSE` evaluate this chunk but don't show it or its results
+    -   `echo = FALSE` print this chunk code
+    -   `message = FALSE`/`warning = false` don't print warnings or messages
+    -   `error = TRUE` continue rendering document even if there's an error
+        -   do not use `error = TRUE` for final versions! You want to make sure things work as they should
+
+````markdown
 `r ''````{r, eval = T, echo = T, results = "asis", warning}
+code here
 ```
+````
+
 or
+````markdown
 `r ''````{r}
 #| eval: false
+code here
 ```
-`````
-
+````
 :::
 
 # Session Info {.unlisted .unnumbered visibility="uncounted"}
 
 ```{r}
 #| code-fold: true
+#| code-summary: "Show Session Info"
 sessionInfo()
 ```
 

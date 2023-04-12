@@ -45,13 +45,17 @@ format:
     number-sections: false
     toc: true
     code-overflow: wrap
+    code-tools: true
 editor_options: 
   chunk_output_type: console
 bibliography: references/references.json
-biblio-style: apalike
+csl: references/apa.csl
+editor: 
+  markdown: 
+    wrap: 72
 ---
 
-```{r setup, eval = T}
+```{r setup, eval = T, echo = F}
 knitr::opts_chunk$set(echo = F, # print chunks?
                       eval = T, # run chunks?
                       error = F, # print errors?
@@ -61,7 +65,6 @@ knitr::opts_chunk$set(echo = F, # print chunks?
                       )
 ```
 
-
 ```{r, cache = F}
 # Create references.json file based on the citations in this script
 rbbt::bbt_update_bib("syllabus_repro_sose23.qmd")
@@ -69,7 +72,21 @@ rbbt::bbt_update_bib("syllabus_repro_sose23.qmd")
 
 # Course description
 
-This course will provide students with the skills and know-how needed to create reproducible reports and presentations of eye-tracking reading data. A brief introduction will be given into common measures in eye-tracking reading and the importance of developing a reproducible workflow, followed by hands-on exercises in RStudio with the R programming language. The main skills developed include data wrangling (with the tidyverse package), data visualisation (with the ggplot2 package), and running and communicating descriptive and inferential statistics. By the end of the course, students will be able to apply what they learned to a variety of data types in both academic and professional settings. This course is aimed at students who have some practical experience with R and RStudio, although this is not a strict requirement. Students who cannot bring their own laptop to class should contact the instructor as early as possible, so an alternative laptop can be organised. The language of instruction is English.
+This course will provide students with the skills and know-how needed to
+create reproducible reports and presentations of eye-tracking reading
+data. A brief introduction will be given into common measures in
+eye-tracking reading and the importance of developing a reproducible
+workflow, followed by hands-on exercises in RStudio with the R
+programming language. The main skills developed include data wrangling
+(with the tidyverse package), data visualisation (with the ggplot2
+package), and running and communicating descriptive and inferential
+statistics. By the end of the course, students will be able to apply
+what they learned to a variety of data types in both academic and
+professional settings. This course is aimed at students who have some
+practical experience with R and RStudio, although this is not a strict
+requirement. Students who cannot bring their own laptop to class should
+contact the instructor as early as possible, so an alternative laptop
+can be organised. The language of instruction is English.
 
 ## Skills and know-how
 
@@ -82,69 +99,106 @@ At the end of the course, you will:
 
 # Course credits
 
-- to earn credits for this course, you need to hand in:
-  + 2 in-class quizzes (15 minutes each)
-  + mid-course analysis report (due May 31st)
-  + final analysis report (Due August 15th)
-
-- for the first report, we will do some work in-class
-  + e.g., data wrangling and tidying
-  + independent work: turning it into a *reproducible report*
-- for the second report, you will get new data
-  + you will need to do the wrangling and analyses independently
-  + and turn it into a *reproducible report*
+-   to earn credits for this course, you need to hand in:
+    -   2 in-class quizzes (15 minutes each)
+    -   mid-course analysis report (due May 31st)
+    -   final analysis report (Due August 15th)
+-   for the first report, we will do some work in-class
+    -   e.g., data wrangling and tidying
+    -   independent work: turning it into a *reproducible report*
+-   for the second report, you will get new data
+    -   you will need to do the wrangling and analyses independently
+    -   and turn it into a *reproducible report*
 
 ## Important dates
 
-- May 31st: first report due
-- August 15th: second report due
-
-## Schedule overview
-
-+---------+-----------------------+------------------------------------------+
-| Session | Date                  | Topic(s)                                 |
-+=========+=======================+==========================================+
-| 1       | Wed. April 12, 2023   | Eye-tracking during reading              |
-|         |                       |                                          |
-|         | 10:15 - 11:45         | Reading: @vasishth_what_2013             |
-+---------+-----------------------+------------------------------------------+
-| 2       | Wed. April 12, 2023   | Reproducible workflow with RStudio       |
-|         |                       |                                          |
-|         | 12:15 - 1:45          | Reading:                                 |
-+---------+-----------------------+------------------------------------------+
-| 3       | Wed. April 12, 2023   | Working with a dataset: data wrangling   |
-|         |                       |                                          |
-|         | 2:15 - 3:45           | Reading: @biondo_yesterday_2022          |
-+---------+-----------------------+------------------------------------------+
-| 4       | Thurs. April 13, 2023 | Data Wrangling and summary statistics    |
-+---------+-----------------------+------------------------------------------+
-| 5       | Thurs. April 13, 2023 | Data Visualisation                       |
-+---------+-----------------------+------------------------------------------+
-| 6       | Thurs. April 13, 2023 | Communicating your results               |
-+---------+-----------------------+------------------------------------------+
-| 7       | Fri. April 14, 2023   | Linear regression                        |
-+---------+-----------------------+------------------------------------------+
-| 8       | Fri. April 14, 2023   | Multiple regression                      |
-+---------+-----------------------+------------------------------------------+
-| 9       | Fri. April 14, 2023   | Linear mixed models                      |
-+---------+-----------------------+------------------------------------------+
-|         | ***April 15-June 29***| ***Individual work***                    |
-+---------+-----------------------+------------------------------------------+
-| 10      | Fri. June 30, 2023    | (Generalised) linear mixed models        |
-+---------+-----------------------+------------------------------------------+
-| 11      | Fri. June 30, 2023    | (Generalised) linear mixed models        |
-+---------+-----------------------+------------------------------------------+
-| 12      | Sat. July 1, 2023     |                                          |
-+---------+-----------------------+------------------------------------------+
-| 13      | Sat. July 1, 2023     |                                          |
-+---------+-----------------------+------------------------------------------+
-| 14      | Sat. July 1, 2023     |                                          |
-+---------+-----------------------+------------------------------------------+
+-   May 31st: first report due
+    + reproducible analysis report
+    + pre-registration of next dataset
+-   August 15th: second report due
+    + reporiducible analysis report
+    + summary of confirmatory and exploratory analyses
 
 \newpage
 
-# Reading list {-}
+## Schedule overview
+
++------+--------------+--------------------------------------------+
+|      | ### **Date** | ### **Topic(s)**                           |
++------+--------------+--------------------------------------------+
+| 1    | Wed. April   | **Reproducible workflow with RStudio**     |
+|      | 12, 2023     |                                            |
+|      |              | *Reading*: @kathawalla_easing_2021 \|      |
+|      | 10:15 -      |                                            |
+|      | 11:45        |                                            |
++------+--------------+--------------------------------------------+
+| 2    | Wed. April   | **Eye-tracking during reading**            |
+|      | 12, 2023     |                                            |
+|      |              | *Reading*: @vasishth_what_2013;            |
+|      | 12:15 - 1:45 | @clifton_eye_2007                          |
++------+--------------+--------------------------------------------+
+| 3    | Wed. April   | **Working with a dataset**: loading and    |
+|      | 12, 2023     | inspecting the data                        |
+|      |              |                                            |
+|      | 2:15 - 3:45  |                                            |
++------+--------------+--------------------------------------------+
+| 4    | Thurs. April | **Data Wrangling and summary statistics**  |
+|      | 13, 2023     |                                            |
++------+--------------+--------------------------------------------+
+| 5    | Thurs. April | **Data Visualisation**                     |
+|      | 13, 2023     |                                            |
++------+--------------+--------------------------------------------+
+| 6    | Thurs. April | **Communicating your results**             |
+|      | 13, 2023     |                                            |
++------+--------------+--------------------------------------------+
+| 7    | Fri. April   | **Linear regression**                      |
+|      | 14, 2023     |                                            |
+|      |              | *Reading*: @winter_linear_2013 (p.1-11);   |
+|      |              | @winter_statistics_2019 (Ch. 4 and 6) \|   |
++------+--------------+--------------------------------------------+
+| 8    | Fri. April   | **Multiple regression**                    |
+|      | 14, 2023     |                                            |
+|      |              | *Reading*: (from pg.11);                   |
+|      |              | @winter_statistics_2019 (Ch. 5 and \| 6)   |
++------+--------------+--------------------------------------------+
+| 9    | Fri. April   | **Linear mixed models**                    |
+|      | 14, 2023     |                                            |
+|      |              | *Reading*: @winter_very_2014,              |
+|      |              | @winter_statistics_2019 (Ch. 14)           |
++------+--------------+--------------------------------------------+
+|      | ***April     | ***Individual work***                      |
+|      | 15-June      |                                            |
+|      | 29***        |                                            |
++------+--------------+--------------------------------------------+
+| 10   | Fri. June    | **Generalised linear mixed models**        |
+|      | 30, 2023     |                                            |
+|      |              | *Reading*: @winter_statistics_2019 (Ch.    |
+|      |              | 12)                                        |
++------+--------------+--------------------------------------------+
+| 11   | Fri. June    | **Generalised linear mixed models**        |
+|      | 30, 2023     |                                            |
+|      |              | *Reading*: @winter_statistics_2019 (Ch.    |
+|      |              | 13)                                        |
++------+--------------+--------------------------------------------+
+| 12   | Sat. July 1, | **(Generalised) linear mixed models        |
+|      | 2023         | continued**                                |
+|      |              |                                            |
+|      |              | *Reading*: @winter_statistics_2019 (Ch.    |
+|      |              | 13)                                        |
++------+--------------+--------------------------------------------+
+| 13   | Sat. July 1, | **Placeholder session**                    |
+|      | 2023         |                                            |
+|      |              | Reserved for Q&A or extra time for a       |
+|      |              | previous topic                             |
++------+--------------+--------------------------------------------+
+| 14   | Sat. July 1, | **Choose your own adventure**              |
+|      | 2023         |                                            |
+|      |              | TBD by class vote held at the end of Day 3 |
++------+--------------+--------------------------------------------+
+
+\newpage
+
+# Reading list {.unnumbered}
 
 ::: {#refs custom-style="Bibliography"}
 :::
-

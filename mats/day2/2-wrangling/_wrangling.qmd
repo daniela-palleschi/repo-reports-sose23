@@ -31,7 +31,8 @@ format:
     fig-cap-location: top
     font-size: 0.6em
     slide-level: 4
-    chalkboard: true
+    self-contained: true
+    # chalkboard: true
     title-slide-attributes: 
       data-background-image: logos/logos.tif
       data-background-size: 15%
@@ -53,10 +54,26 @@ format:
 editor_options: 
   chunk_output_type: console
 bibliography: references/references.json
-biblio-style: apalike
+csl: references/apa.csl
 ---
 
 ```{r}
+knitr::opts_chunk$set(eval = T, # evaluate chunks
+                      echo = T, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F, # stop when error encountered
+                      warning = F) # don't print warnings
+```
+
+```{r, eval = T, cache = F}
+#| code-fold: true
+# Create references.json file based on the citations in this script
+# make sure you have 'bibliography: references.json' in the YAML
+rbbt::bbt_update_bib("_wrangling.qmd")
+```
+
+```{r}
+#| code-fold: true
 ## play sound if error encountered
 ### from: https://sejohnston.com/2015/02/24/make-r-beep-when-r-markdown-finishes-or-when-it-fails/
 options(error = function(){    # Beep on error
@@ -71,21 +88,7 @@ options(error = function(){    # Beep on error
   }
 ```
 
-```{r, eval = T, cache = F}
-# Create references.json file based on the citations in this script
-# make sure you have 'bibliography: references.json' in the YAML
-rbbt::bbt_update_bib("_wrangling.qmd")
-```
-
-```{r}
-knitr::opts_chunk$set(eval = T, # change this to 'eval = T' to reproduce the analyses; make sure to comment out
-                      echo = T, # 'print code chunk?'
-                      message = F, # 'print messages (e.g., warnings)?'
-                      error = F,
-                      warning = F)
-```
-
-## 'wrangle' defined
+# 'wrangle' defined
 
 /ˈraŋɡl/
 
@@ -101,9 +104,28 @@ a dispute or argument, typically one that is long and complicated. "an insurance
 
 ## Wrangler
 
+::: {.content-visible when-format="revealjs"}
 -   Jeep Wrangler ![](media/jeep_wrangler.jpeg){.absolute .fragment width="500" top="0" right="100"}
 -   Wrangler Jeans ![](images/wrangler_jeans.jpeg){.absolute .fragment top="200" right="650" width="531"}
 -   Cowboys ![](images/wrangler_cowboy-01.jpeg){.absolute .fragment width="500" left="50"}
+:::
+
+::: {.content-visible when-format="pdf" when-format="html"}
+:::: columns
+::: {.column width="33%"}
+Jeep Wrangler
+![](media/jeep_wrangler.jpeg){width="150"}
+:::
+::: {.column width="33%"}
+Wrangler Jeans
+![](images/wrangler_jeans.jpeg){width="100"}
+:::
+::: {.column width="33%"}
+Cowboys
+![](images/wrangler_cowboy-01.jpeg){width="150"}
+:::
+::::
+:::
 
 # Data Wrangling
 
@@ -121,10 +143,14 @@ a dispute or argument, typically one that is long and complicated. "an insurance
     -   each row = an observation
 :::
 
+
 ::: {.column width="50%"}
+::: {.content-visible when-format="revealjs"}
 ```{r echo = F, fig.env = "figure",out.height="100%", fig.align = "center", set.cap.width=T, fig.cap="[Image source](https://r4ds.hadley.nz/intro.html): @wickham_r_nodate (all rights reserved)"}
 knitr::include_graphics(here::here("media/Wickham_tidyworkflow.png"))
 ```
+:::
+
 
 **Transform**
 
@@ -132,6 +158,12 @@ knitr::include_graphics(here::here("media/Wickham_tidyworkflow.png"))
 -   creating new variables based on observations (e.g., reaction times)
 -   computing summary statistics (e.g., means)
 :::
+:::
+
+::: {.content-visible when-format="html"}
+```{r echo = F, fig.env = "figure",out.height="100%", fig.align = "center", set.cap.width=T, fig.cap="[Image source](https://r4ds.hadley.nz/intro.html): @wickham_r_nodate (all rights reserved)"}
+knitr::include_graphics(here::here("media/Wickham_tidyworkflow.png"))
+```
 :::
 
 ## Why tidy data?
@@ -168,6 +200,10 @@ knitr::include_graphics(here::here("media/Wickham_tidydata.png"))
 library(tidyverse)
 ```
 
+## {.unlisted .unnumbered}
+
+::: callout-tip
+
 ## package versions
 
 -   you can check the package version with:
@@ -192,6 +228,7 @@ old.packages()
 # update all old packages
 update.packages()
 ```
+:::
 
 ## the magitrr pipe `%>%`
 
@@ -212,12 +249,19 @@ iris %>%
   head()
 ```
 :::
-
+::: {.content-visible when-format="revealjs" when-format="html"}
 ::: {.column width="40%"}
 ```{r echo = F, fig.env = "figure",out.width="70%", fig.align = "center", set.cap.width=T, fig.cap="Image source: [magittr documentation](https://magrittr.tidyverse.org/reference/pipe.html#:~:text=The%20magrittr%20pipe%20operators%20use,to%20the%20left%2Dhand%20side.) (all rights reserved)"}
 knitr::include_graphics(here::here("media/magrittr_badge.png"))
 ```
 :::
+:::
+:::
+
+::: {.content-visible when-format="pdf"}
+```{r echo = F, fig.env = "figure",out.width="30%", fig.align = "center", set.cap.width=T, fig.cap="Image source: [magittr documentation](https://magrittr.tidyverse.org/reference/pipe.html#:~:text=The%20magrittr%20pipe%20operators%20use,to%20the%20left%2Dhand%20side.) (all rights reserved)"}
+knitr::include_graphics(here::here("media/magrittr_badge.png"))
+```
 :::
 
 ## load our data
@@ -230,7 +274,7 @@ readr::read_csv(here::here("data/data_lifetime_pilot.csv"))
 
 -   was anything added to the Environment pane (top right box in RStudio)?
 
-## save dataframe as object `<-`
+## variable assignment with `<-` 
 
 -   object_name `<-` code_output_to_be_saved_as_object_name
 
@@ -546,6 +590,18 @@ df_lifetime %>%
   select(-px, -trial)
 ```
 
+## {.unlisted .unnumbered}
+
+::: callout-tip
+## Select criteria
+
+You can also use criteria for `select`
+`select(starts_with("x"))`	select columns that start with a character string
+`select(ends_with("x"))`	select columns that end with a character string
+`select(contains("x"))`	select columns that contain a character string
+`select(num_range("prefix",10:20))` select columns with a `prefix` followed by a range of values
+:::
+
 ### Exercise
 
 Remove the example variables we created with `mutate`:
@@ -646,6 +702,7 @@ df_lifetime %>%
 -   Tip: trial type is stored in the column `type`
 
 ```{r, echo = F}
+# the following code should then produce this output:
 df_crit <- df_lifetime |> 
   filter(type == "critical")
 
@@ -748,9 +805,73 @@ df_crit<- df_crit %>%
 
 -   opposite: `unite()`
 
-## `pivot_wider()`
+# Reshape data
 
-## `pivote_longer()`
+- this is the major step of data tidying
+  + make each column a variable
+  + make each row an observation
+  + make each cell a data point
+- what variable and observation mean will depend on what you want to do, and will change at different steps of your analyses
+
+- you typically want *long* data
+  + but our dataset isn't as long as it could be
+
+
+## `pivot_longer()`
+
+- takes wide data and makes it longer
+  + converts headers of columns into values of a new column
+  + combines the values of those columns into a new condensed column
+- takes a few arguments:
+  + `cols`: which columns do we want to combine into a single column?
+  + `names_to`: what should we call the new column containing the previous column names?
+  + `values_to`: what should we call the new column containing the values from the previous columns?
+
+## `pivot_longer()` {-}
+
+```{r}
+#| output-location: fragment
+df_lifetime %>% 
+  select(px,trial,region,ff,fp,rpd,tt,rt,type,accept,condition) %>%
+  filter(type=="critical",region=="verb",px!="px3") %>%
+  pivot_longer(
+  cols = c(ff,fp,rpd,tt,rt), # columns to make long 
+  names_to = "measure", # new column name for headers
+  values_to = "time" # new column name for values
+)
+```
+
+::: footer
+Source: https://psyteachr.github.io/ads-v2/08-tidy.html#long-to-wide
+:::
+
+## `pivote_wider()`
+
+- takes long data and makes it wider
+- takes a few arguments:
+  + `id_cols`: identifying columns
+  + `names_from`: what should we call the new column containing the previous column names?
+  + `names_prefix`: 
+  + `values_from`: new column values
+  
+## `pivote_wider()` {-}
+  
+```{r}
+#| output-location: fragment
+df_lifetime %>% 
+  select(px,trial,region,ff,fp,rpd,tt,rt,type,accept,condition) %>%
+  filter(type=="critical",px!="px3") %>%
+  pivot_wider(
+  id_cols = c(px,trial), # columns to make long 
+  names_from = region, # new column name for headers
+  names_prefix = "reg_", # new column name for values
+  values_from = tt
+)
+```
+
+::: footer
+Source: https://psyteachr.github.io/ads-v2/08-tidy.html#long-to-wide
+:::
 
 # Save your tidy data
 
@@ -759,7 +880,7 @@ df_crit<- df_crit %>%
 
 ```{r, eval = F}
 # run this manually!
-write.csv(df_lifetime, here::here("data/tidy_data_lifetime_pilot.csv"))
+write.csv(df_lifetime, here::here("data/tidy_data_lifetime_pilot.csv"),row.names=FALSE)
 ```
 
 # Summary

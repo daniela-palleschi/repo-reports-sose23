@@ -31,7 +31,7 @@ format:
     fig-cap-location: top
     font-size: 0.6em
     slide-level: 4
-    chalkboard: true
+    chalkboard: false
     title-slide-attributes: 
       data-background-image: logos/logos.tif
       data-background-size: 15%
@@ -41,6 +41,7 @@ format:
     number-sections: true
     toc: true
     code-overflow: wrap
+    code-tools: true
     embed-resources: true
     link-external-icon: true
   pdf:
@@ -52,8 +53,16 @@ format:
 editor_options: 
   chunk_output_type: console
 bibliography: references/references.json
-biblio-style: apalike
+csl: references/apa.csl
 ---
+
+```{r, eval = T, echo = F}
+knitr::opts_chunk$set(eval = T, # evaluate = T for REPRODUCIBLE analyses
+                      echo = F, # 'print code chunk?'
+                      message = F, # print messages?
+                      error = T, # render even if errors encountered?
+                      warning = F) # print warnings?
+```
 
 ```{r, eval = T, cache = F, echo = F}
 # Create references.json file based on the citations in this script
@@ -73,7 +82,7 @@ rbbt::bbt_update_bib("_et_reading.qmd")
   + market research
   + diagnostic tool
 
-## Eye movements^[@rayner_eye_2009-1]
+## Eye movements
 
 - **saccades**: eye *movements* (e.g., from one word to another)
   + average saccade legnth: 7-9 letters (in alphabetic writing systems)
@@ -82,6 +91,10 @@ rbbt::bbt_update_bib("_et_reading.qmd")
   + average duration: 225-250ms (ranging 50-600ms)
 - **regressions**: saccades to earlier text
   + occurance: 10-15% of saccades in skilled readers
+
+::: {.footer}
+@rayner_eye_2009-1
+:::
 
 ## The eye-tracker
 
@@ -98,7 +111,7 @@ rbbt::bbt_update_bib("_et_reading.qmd")
 
 ::: {.column width="50%"}
 ```{r eval = T, fig.env = "figure",out.width="100%", fig.align = "center", set.cap.width=T, fig.cap="Image source: [SR Research](https://www.sr-research.com/about-eye-tracking/) (all rights reserved)"}
-knitr::include_graphics(here::here("mats/day1/3-et_reading/images/SR_Research.png"))
+knitr::include_graphics(here::here("media/SR_Research.png"))
 ```
 
 :::
@@ -112,11 +125,8 @@ knitr::include_graphics(here::here("mats/day1/3-et_reading/images/SR_Research.pn
 - inform theories of language processing via linking hypotheses
   + linking visual attention to processing
 - typically, we compare reading times as a function of some manipulation
-
-e.g., The 
-      They key on the cabinets is on the table.
-
-- longer reading times 
+  + e.g., Sally *went*/*goed* to the store.
+- longer reading times are taken to reflect processing costs, associated with e.g., sentence complexity or anomalies
 
 ## Region of interest (ROI)
 
@@ -124,14 +134,16 @@ e.g., The
   + sentence-level
   + word/region-level
   + a certain part of the screen
-
+  
+::: {.content-visible when-format="revealjs" when-format="html"}
 :::: {.columns}
 
 ::: {.column width="60%"}
-![](images/crit_trial_px03.mov){fig-align="center" width="100%"}
+![](media/crit_trial_px03.mp4){fig-align="center" width="100%"}
 :::
 
 ::::
+:::
 
 ## Measures (dependent variables)
 
@@ -158,7 +170,7 @@ e.g., The
   + number of regressions in/out
   + regression in/out (yes or no)
   + probability of regressions in/out (0:1)
-- data type: binary (0,1) or count
+- data type: *binary* (0,1) or *count*
   
 :::
 

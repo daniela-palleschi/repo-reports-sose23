@@ -53,7 +53,7 @@ format:
 editor_options: 
   chunk_output_type: console
 bibliography: references/references.json
-biblio-style: apalike
+csl: references/apa.csl
 ---
 
 ```{r}
@@ -116,6 +116,7 @@ df_lifetime |>
 ```
 
 ```{r}
+#| code-fold: true
 # compute summary 
 summary_ff <- df_lifetime |> 
   filter(region=="verb") |> 
@@ -130,15 +131,40 @@ summary_ff <- df_lifetime |>
          upper.ci = mean.ff + qt(1 - (0.05 / 2), N - 1) * se)
 ```
 
+- and print the output with the `kable()` function from the `knitr` package
+  + for extra customisation you can also use the `kableExtra` package (e.g., with the `kable_styling()` function)
+
 ```{r}
+#| output-location: fragment
 knitr::kable(summary_ff, digits=1,
              caption = "Table with summmary statistics for first-fixation duration at the verb region")
 ```
 
-# `ggplot2`: layered grammar of graphics
+### Exercise
+
+1. install the `knitr` package (`install.packages("knitr")`)
+2. create an object with some summary statistics
+
+```{r}
+#| echo: false
+summary_rt <- df_lifetime |> 
+  distinct(px,trial,.keep_all=T) |> 
+  group_by(lifetime,tense,condition) %>%
+  summarise(N = n(),
+            mean.rt = mean(rt, na.rm = T),
+            sd = sd(rt, na.rm = T))
+```
+
+```{r}
+#| output-location: fragment
+knitr::kable(summary_rt, digits=1,
+             caption = "Summary of reaction times (ms) per condition")
+```
+
+# Plots with `ggplot2`
 
 - `ggplot2` is part of the tidyverse (like `dplyr`)
-  + uses a layered grammar of graphics
+  + uses a *layered grammar of graphics*
   + i.e., we build layers
 
 # Plotting reading times
@@ -706,6 +732,14 @@ df_lifetime |>
 @nordmann_data_2022
 
 @nordmann_applied_2022
+
+@wickham_r_nodate, [Chapter 2](https://r4ds.hadley.nz/data-visualize.html)
+
+# References {.unlisted .unnumbered visibility="uncounted"}
+
+::: {#refs custom-style="Bibliography"}
+:::
+
 
 
 

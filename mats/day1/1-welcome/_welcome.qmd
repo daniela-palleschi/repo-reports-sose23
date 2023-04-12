@@ -17,6 +17,8 @@ format:
     number-sections: false
     toc: true
     code-overflow: wrap
+    code-tools: true
+    self-contained: true
   revealjs:
     output-file: slides-welcome.html
     code-overflow: wrap
@@ -40,7 +42,7 @@ format:
     fig-cap-location: top
     font-size: 0.6em
     slide-level: 4
-    chalkboard: true
+    self-contained: true
     title-slide-attributes: 
       data-background-image: logos/logos.tif
       data-background-size: 15%
@@ -48,13 +50,26 @@ format:
 editor_options: 
   chunk_output_type: console
 bibliography: references/references.bib
-biblio-style: apalike
+csl: references/apa.csl
 ---
+
+```{r setup, eval = T, echo = F}
+knitr::opts_chunk$set(echo = F, # print chunks?
+                      eval = T, # run chunks?
+                      error = F, # print errors?
+                      warning = F, # print warnings?
+                      message = F, # print messages?
+                      cache = F # cache?; be careful with this!
+                      )
+```
 
 ```{r, eval = T, cache = F}
 # Create references.json file based on the citations in this script
 rbbt::bbt_update_bib("_welcome.qmd")
 ```
+
+
+
 
 # Welcome!
 
@@ -64,39 +79,57 @@ rbbt::bbt_update_bib("_welcome.qmd")
     -   June 30th (2-6pm)
     -   July 1st (10am-4pm)
     
+# Course Moodle
+
+Course name: Reproducible analysis reports with eye-tracking reading time data (Blockseminar)
+Enrolment Key: Rmatey
+
+Most documents are available as slides, html, and PDF. Choose whichever you prefer (I suggest html).
+
 ## Course description
 
-- skills and know-how needed to 
+- develop skills and know-how
   + create reproducible **reports & presentations** of eye-tracking reading data
   + common measures in **eye-tracking reading**
   + importance of **reproducible workflow**
   + **communicate** findings
 
 - hands-on exercises in RStudio with the R programming language
-  + data **wrangling** (tidyverse)
-  + data **visualisation** (ggplot2), 
-  + descriptive and inferential **statistics**
+  + data **wrangling** (`tidyverse`)
+  + data **visualisation** (`ggplot2`), 
+  + descriptive and inferential **statistics** (`lme4` and `lmerTest`)
   
 ## Course credits
 
 - 4 LP
   + attendance and participation: 1LP
-  + Exercises: 1LP
+  + In-class exercises and preparation: 1LP
   + Assignments: 2 LP
-    1. Reproducible (pilot) data report + Pre-registration
+    1. Reproducible (pilot) analysis report + Pre-registration
     2. Reproducible analysis report
 
 # Reading list
 
--   this course does not have a heavy reading load, but a few readings are required:
-    -   @biondo_yesterday_2022; @laurinavichyute_share_2022; @vasishth_what_2013; @vasishth_statistical_2016-1
+-   this course does not have a heavy reading load, but a few readings are strongly recommended:
+    -   Open Science: @kathawalla_easing_2021 
+    -   Eye-tracking reading: @clifton_eye_2007; @vasishth_what_2013; 
+    -   A short recommendation for statistics for psycholinguists: @vasishth_statistical_2016
+    -   Statistics for Linguistics (textbook): @winter_statistics_2019 (E-book available via Grimm)
 
-## Recommended readings
+## Further readings
 
 - there are lots of useful resources out there, specifically:
-  + anything from Bodo Winter, but especially: @winter_linear_nodate; @winter_very_2014; @winter_statistics_2019
-  + the [PsyTeachR](https://psyteachr.github.io/) website is a *great* resource
+  + Bodo Winter's tutorials on linear (mixed) models [@winter_linear_2013; @winter_very_2014]
+  + the [PsyTeachR](https://psyteachr.github.io/) website is a *great* resource for hands-on stats and/or data analysis in R from the University of Glasgow School of Psychology and Neuroscience
   
+
+# Session Info {.unlisted .unnumbered visibility="uncounted"}
+
+Save your session info at the end of each document. Our results very often depend on the version of R/RStudio/a package we used. This is a great first step towards creating a reproducible workflow!
+
+```{r}
+sessionInfo()
+```
 
 # References {.unlisted .unnumbered visibility="uncounted"}
 
