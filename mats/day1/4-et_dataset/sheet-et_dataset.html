@@ -3851,65 +3851,28 @@ Selecting a column
 <div class="cell" data-cold-fold="true" data-output-location="fragment">
 <div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a><span class="co"># change yes_press to factor</span></span>
 <span id="cb37-2"><a href="#cb37-2"></a>df_lifetime <span class="sc">%&gt;%</span></span>
-<span id="cb37-3"><a href="#cb37-3"></a>  <span class="fu">mutate</span>(<span class="at">yes_press =</span> <span class="fu">as_factor</span>(yes_press)) <span class="sc">%&gt;%</span></span>
-<span id="cb37-4"><a href="#cb37-4"></a>  <span class="fu">summary</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb37-3"><a href="#cb37-3"></a>  <span class="fu">mutate</span>(<span class="at">yes_press =</span> <span class="fu">as_factor</span>(yes_press))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>      px                trial           eye            IA_DWELL_TIME   
- Length:4431        Min.   :  1.0   Length:4431        Min.   :   0.0  
- Class :character   1st Qu.: 52.5   Class :character   1st Qu.:   0.0  
- Mode  :character   Median :104.0   Mode  :character   Median : 301.0  
-                    Mean   :105.0                      Mean   : 587.5  
-                    3rd Qu.:157.0                      3rd Qu.: 765.5  
-                    Max.   :208.0                      Max.   :8968.0  
- IA_FIRST_FIXATION_DURATION IA_FIRST_RUN_DWELL_TIME IA_FIXATION_COUNT
- Min.   :  0.0              Min.   :   0.0          Min.   : 0.000   
- 1st Qu.:  0.0              1st Qu.:   0.0          1st Qu.: 0.000   
- Median :161.0              Median : 245.0          Median : 2.000   
- Mean   :139.4              Mean   : 507.9          Mean   : 2.714   
- 3rd Qu.:202.5              3rd Qu.: 586.0          3rd Qu.: 4.000   
- Max.   :775.0              Max.   :8968.0          Max.   :35.000   
-     IA_ID         IA_LABEL         IA_REGRESSION_IN  IA_REGRESSION_IN_COUNT
- Min.   :1.000   Length:4431        Min.   :0.00000   Min.   :0.0000        
- 1st Qu.:1.000   Class :character   1st Qu.:0.00000   1st Qu.:0.0000        
- Median :2.000   Mode  :character   Median :0.00000   Median :0.0000        
- Mean   :2.681                      Mean   :0.09817   Mean   :0.1318        
- 3rd Qu.:4.000                      3rd Qu.:0.00000   3rd Qu.:0.0000        
- Max.   :6.000                      Max.   :1.00000   Max.   :5.0000        
- IA_REGRESSION_OUT IA_REGRESSION_OUT_COUNT IA_REGRESSION_PATH_DURATION
- Min.   :0.00000   Min.   :0.00000         Min.   :    0.0            
- 1st Qu.:0.00000   1st Qu.:0.00000         1st Qu.:    0.0            
- Median :0.00000   Median :0.00000         Median :  282.0            
- Mean   :0.08147   Mean   :0.09185         Mean   :  595.6            
- 3rd Qu.:0.00000   3rd Qu.:0.00000         3rd Qu.:  747.0            
- Max.   :1.00000   Max.   :7.00000         Max.   :10242.0            
-    KeyPress           rt            bio              critical        
- Min.   :4.000   Min.   :  533   Length:4431        Length:4431       
- 1st Qu.:4.000   1st Qu.: 1332   Class :character   Class :character  
- Median :4.000   Median : 1890   Mode  :character   Mode  :character  
- Mean   :4.496   Mean   : 2467                                        
- 3rd Qu.:5.000   3rd Qu.: 2910                                        
- Max.   :5.000   Max.   :15654                                        
-    gender             item_id            list          match          
- Length:4431        Min.   :  1.00   Min.   :14.00   Length:4431       
- Class :character   1st Qu.: 26.00   1st Qu.:15.00   Class :character  
- Mode  :character   Median : 51.00   Median :25.00   Mode  :character  
-                    Mean   : 64.16   Mean   :29.45                     
-                    3rd Qu.: 78.50   3rd Qu.:35.00                     
-                    Max.   :208.00   Max.   :45.00                     
-  condition             name           name_vital_status     tense          
- Length:4431        Length:4431        Length:4431        Length:4431       
- Class :character   Class :character   Class :character   Class :character  
- Mode  :character   Mode  :character   Mode  :character   Mode  :character  
-                                                                            
-                                                                            
-                                                                            
-     type           yes_press
- Length:4431        4:2218   
- Class :character   5:2213   
- Mode  :character            
-                             
-                             
-                             </code></pre>
+<pre><code># A tibble: 4,431 × 28
+   px    trial eye   IA_DWELL_TIME IA_FIRST_FIXATION_DU…¹ IA_FIRST_RUN_DWELL_T…²
+   &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;         &lt;dbl&gt;                  &lt;dbl&gt;                  &lt;dbl&gt;
+ 1 px3       1 RIGHT             0                      0                      0
+ 2 px3       2 RIGHT             0                      0                      0
+ 3 px3       3 RIGHT             0                      0                      0
+ 4 px3       3 RIGHT             0                      0                      0
+ 5 px3       3 RIGHT             0                      0                      0
+ 6 px3       3 RIGHT             0                      0                      0
+ 7 px3       3 RIGHT             0                      0                      0
+ 8 px3       3 RIGHT             0                      0                      0
+ 9 px3       4 RIGHT             0                      0                      0
+10 px3       5 RIGHT             0                      0                      0
+# ℹ 4,421 more rows
+# ℹ abbreviated names: ¹​IA_FIRST_FIXATION_DURATION, ²​IA_FIRST_RUN_DWELL_TIME
+# ℹ 22 more variables: IA_FIXATION_COUNT &lt;dbl&gt;, IA_ID &lt;dbl&gt;, IA_LABEL &lt;chr&gt;,
+#   IA_REGRESSION_IN &lt;dbl&gt;, IA_REGRESSION_IN_COUNT &lt;dbl&gt;,
+#   IA_REGRESSION_OUT &lt;dbl&gt;, IA_REGRESSION_OUT_COUNT &lt;dbl&gt;,
+#   IA_REGRESSION_PATH_DURATION &lt;dbl&gt;, KeyPress &lt;dbl&gt;, rt &lt;dbl&gt;, bio &lt;chr&gt;,
+#   critical &lt;chr&gt;, gender &lt;chr&gt;, item_id &lt;dbl&gt;, list &lt;dbl&gt;, match &lt;chr&gt;, …</code></pre>
 </div>
 </div>
 </section><section id="multiple-arguments-in-a-verb" class="level3"><h3 class="anchored" data-anchor-id="multiple-arguments-in-a-verb">multiple arguments in a verb</h3>
@@ -3920,73 +3883,28 @@ Selecting a column
 <div class="sourceCode" id="cb39"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="co"># change ROI &amp; label to factor</span></span>
 <span><span class="va">df_lifetime</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>KeyPress <span class="op">=</span> <span class="fu"><a href="https://forcats.tidyverse.org/reference/as_factor.html">as_factor</a></span><span class="op">(</span><span class="va">KeyPress</span><span class="op">)</span>,</span>
-<span>         item_id <span class="op">=</span> <span class="fu"><a href="https://forcats.tidyverse.org/reference/as_factor.html">as_factor</a></span><span class="op">(</span><span class="va">item_id</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/summary.html">summary</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span>         item_id <span class="op">=</span> <span class="fu"><a href="https://forcats.tidyverse.org/reference/as_factor.html">as_factor</a></span><span class="op">(</span><span class="va">item_id</span><span class="op">)</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>      px                trial           eye            IA_DWELL_TIME   
- Length:4431        Min.   :  1.0   Length:4431        Min.   :   0.0  
- Class :character   1st Qu.: 52.5   Class :character   1st Qu.:   0.0  
- Mode  :character   Median :104.0   Mode  :character   Median : 301.0  
-                    Mean   :105.0                      Mean   : 587.5  
-                    3rd Qu.:157.0                      3rd Qu.: 765.5  
-                    Max.   :208.0                      Max.   :8968.0  
-                                                                       
- IA_FIRST_FIXATION_DURATION IA_FIRST_RUN_DWELL_TIME IA_FIXATION_COUNT
- Min.   :  0.0              Min.   :   0.0          Min.   : 0.000   
- 1st Qu.:  0.0              1st Qu.:   0.0          1st Qu.: 0.000   
- Median :161.0              Median : 245.0          Median : 2.000   
- Mean   :139.4              Mean   : 507.9          Mean   : 2.714   
- 3rd Qu.:202.5              3rd Qu.: 586.0          3rd Qu.: 4.000   
- Max.   :775.0              Max.   :8968.0          Max.   :35.000   
-                                                                     
-     IA_ID         IA_LABEL         IA_REGRESSION_IN  IA_REGRESSION_IN_COUNT
- Min.   :1.000   Length:4431        Min.   :0.00000   Min.   :0.0000        
- 1st Qu.:1.000   Class :character   1st Qu.:0.00000   1st Qu.:0.0000        
- Median :2.000   Mode  :character   Median :0.00000   Median :0.0000        
- Mean   :2.681                      Mean   :0.09817   Mean   :0.1318        
- 3rd Qu.:4.000                      3rd Qu.:0.00000   3rd Qu.:0.0000        
- Max.   :6.000                      Max.   :1.00000   Max.   :5.0000        
-                                                                            
- IA_REGRESSION_OUT IA_REGRESSION_OUT_COUNT IA_REGRESSION_PATH_DURATION KeyPress
- Min.   :0.00000   Min.   :0.00000         Min.   :    0.0             4:2234  
- 1st Qu.:0.00000   1st Qu.:0.00000         1st Qu.:    0.0             5:2197  
- Median :0.00000   Median :0.00000         Median :  282.0                     
- Mean   :0.08147   Mean   :0.09185         Mean   :  595.6                     
- 3rd Qu.:0.00000   3rd Qu.:0.00000         3rd Qu.:  747.0                     
- Max.   :1.00000   Max.   :7.00000         Max.   :10242.0                     
-                                                                               
-       rt            bio              critical            gender         
- Min.   :  533   Length:4431        Length:4431        Length:4431       
- 1st Qu.: 1332   Class :character   Class :character   Class :character  
- Median : 1890   Mode  :character   Mode  :character   Mode  :character  
- Mean   : 2467                                                           
- 3rd Qu.: 2910                                                           
- Max.   :15654                                                           
-                                                                         
-    item_id          list          match            condition        
- 2      :  48   Min.   :14.00   Length:4431        Length:4431       
- 7      :  48   1st Qu.:15.00   Class :character   Class :character  
- 8      :  48   Median :25.00   Mode  :character   Mode  :character  
- 9      :  48   Mean   :29.45                                        
- 10     :  48   3rd Qu.:35.00                                        
- 12     :  48   Max.   :45.00                                        
- (Other):4143                                                        
-     name           name_vital_status     tense               type          
- Length:4431        Length:4431        Length:4431        Length:4431       
- Class :character   Class :character   Class :character   Class :character  
- Mode  :character   Mode  :character   Mode  :character   Mode  :character  
-                                                                            
-                                                                            
-                                                                            
-                                                                            
-   yes_press    
- Min.   :4.000  
- 1st Qu.:4.000  
- Median :4.000  
- Mean   :4.499  
- 3rd Qu.:5.000  
- Max.   :5.000  
-                </code></pre>
+<pre><code># A tibble: 4,431 × 28
+   px    trial eye   IA_DWELL_TIME IA_FIRST_FIXATION_DU…¹ IA_FIRST_RUN_DWELL_T…²
+   &lt;chr&gt; &lt;dbl&gt; &lt;chr&gt;         &lt;dbl&gt;                  &lt;dbl&gt;                  &lt;dbl&gt;
+ 1 px3       1 RIGHT             0                      0                      0
+ 2 px3       2 RIGHT             0                      0                      0
+ 3 px3       3 RIGHT             0                      0                      0
+ 4 px3       3 RIGHT             0                      0                      0
+ 5 px3       3 RIGHT             0                      0                      0
+ 6 px3       3 RIGHT             0                      0                      0
+ 7 px3       3 RIGHT             0                      0                      0
+ 8 px3       3 RIGHT             0                      0                      0
+ 9 px3       4 RIGHT             0                      0                      0
+10 px3       5 RIGHT             0                      0                      0
+# ℹ 4,421 more rows
+# ℹ abbreviated names: ¹​IA_FIRST_FIXATION_DURATION, ²​IA_FIRST_RUN_DWELL_TIME
+# ℹ 22 more variables: IA_FIXATION_COUNT &lt;dbl&gt;, IA_ID &lt;dbl&gt;, IA_LABEL &lt;chr&gt;,
+#   IA_REGRESSION_IN &lt;dbl&gt;, IA_REGRESSION_IN_COUNT &lt;dbl&gt;,
+#   IA_REGRESSION_OUT &lt;dbl&gt;, IA_REGRESSION_OUT_COUNT &lt;dbl&gt;,
+#   IA_REGRESSION_PATH_DURATION &lt;dbl&gt;, KeyPress &lt;fct&gt;, rt &lt;dbl&gt;, bio &lt;chr&gt;,
+#   critical &lt;chr&gt;, gender &lt;chr&gt;, item_id &lt;fct&gt;, list &lt;dbl&gt;, match &lt;chr&gt;, …</code></pre>
 </div>
 </div>
 </section><section id="pop-quiz" class="level3"><h3 class="anchored" data-anchor-id="pop-quiz">Pop quiz</h3>
@@ -4967,145 +4885,143 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 <span id="cb49-548"><a href="#cb49-548" aria-hidden="true" tabindex="-1"></a><span class="co">#| output-location: fragment</span></span>
 <span id="cb49-549"><a href="#cb49-549" aria-hidden="true" tabindex="-1"></a><span class="co"># change yes_press to factor</span></span>
 <span id="cb49-550"><a href="#cb49-550" aria-hidden="true" tabindex="-1"></a>df_lifetime <span class="sc">%&gt;%</span></span>
-<span id="cb49-551"><a href="#cb49-551" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">yes_press =</span> <span class="fu">as_factor</span>(yes_press)) <span class="sc">%&gt;%</span></span>
-<span id="cb49-552"><a href="#cb49-552" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span>
-<span id="cb49-553"><a href="#cb49-553" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb49-554"><a href="#cb49-554" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-555"><a href="#cb49-555" aria-hidden="true" tabindex="-1"></a><span class="fu">### multiple arguments in a verb</span></span>
-<span id="cb49-556"><a href="#cb49-556" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-557"><a href="#cb49-557" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>we can also change multiple columns at once:</span>
-<span id="cb49-558"><a href="#cb49-558" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-561"><a href="#cb49-561" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb49-562"><a href="#cb49-562" aria-hidden="true" tabindex="-1"></a><span class="co"># change ROI &amp; label to factor</span></span>
-<span id="cb49-563"><a href="#cb49-563" aria-hidden="true" tabindex="-1"></a>df_lifetime <span class="sc">%&gt;%</span></span>
-<span id="cb49-564"><a href="#cb49-564" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">KeyPress =</span> <span class="fu">as_factor</span>(KeyPress),</span>
-<span id="cb49-565"><a href="#cb49-565" aria-hidden="true" tabindex="-1"></a>         <span class="at">item_id =</span> <span class="fu">as_factor</span>(item_id)) <span class="sc">%&gt;%</span></span>
-<span id="cb49-566"><a href="#cb49-566" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summary</span>()</span>
-<span id="cb49-567"><a href="#cb49-567" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb49-551"><a href="#cb49-551" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">yes_press =</span> <span class="fu">as_factor</span>(yes_press))</span>
+<span id="cb49-552"><a href="#cb49-552" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb49-553"><a href="#cb49-553" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-554"><a href="#cb49-554" aria-hidden="true" tabindex="-1"></a><span class="fu">### multiple arguments in a verb</span></span>
+<span id="cb49-555"><a href="#cb49-555" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-556"><a href="#cb49-556" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>we can also change multiple columns at once:</span>
+<span id="cb49-557"><a href="#cb49-557" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-560"><a href="#cb49-560" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb49-561"><a href="#cb49-561" aria-hidden="true" tabindex="-1"></a><span class="co"># change ROI &amp; label to factor</span></span>
+<span id="cb49-562"><a href="#cb49-562" aria-hidden="true" tabindex="-1"></a>df_lifetime <span class="sc">%&gt;%</span></span>
+<span id="cb49-563"><a href="#cb49-563" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">KeyPress =</span> <span class="fu">as_factor</span>(KeyPress),</span>
+<span id="cb49-564"><a href="#cb49-564" aria-hidden="true" tabindex="-1"></a>         <span class="at">item_id =</span> <span class="fu">as_factor</span>(item_id))</span>
+<span id="cb49-565"><a href="#cb49-565" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb49-566"><a href="#cb49-566" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-567"><a href="#cb49-567" aria-hidden="true" tabindex="-1"></a><span class="fu">### Pop quiz</span></span>
 <span id="cb49-568"><a href="#cb49-568" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-569"><a href="#cb49-569" aria-hidden="true" tabindex="-1"></a><span class="fu">### Pop quiz</span></span>
+<span id="cb49-569"><a href="#cb49-569" aria-hidden="true" tabindex="-1"></a><span class="ss">1.  </span>Which class *should* the following variables be (<span class="in">`numeric`</span>, <span class="in">`factor`</span>, or <span class="in">`character`</span>)?:</span>
 <span id="cb49-570"><a href="#cb49-570" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-571"><a href="#cb49-571" aria-hidden="true" tabindex="-1"></a><span class="ss">1.  </span>Which class *should* the following variables be (<span class="in">`numeric`</span>, <span class="in">`factor`</span>, or <span class="in">`character`</span>)?:</span>
-<span id="cb49-572"><a href="#cb49-572" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-573"><a href="#cb49-573" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>participant ID</span>
-<span id="cb49-574"><a href="#cb49-574" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>trial number</span>
-<span id="cb49-575"><a href="#cb49-575" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>first-pass reading time</span>
-<span id="cb49-576"><a href="#cb49-576" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>regression path duration</span>
-<span id="cb49-577"><a href="#cb49-577" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>regressions in</span>
-<span id="cb49-578"><a href="#cb49-578" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>context sentence</span>
-<span id="cb49-579"><a href="#cb49-579" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>lifetime</span>
-<span id="cb49-580"><a href="#cb49-580" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>tense</span>
-<span id="cb49-581"><a href="#cb49-581" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>celebrity name</span>
+<span id="cb49-571"><a href="#cb49-571" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>participant ID</span>
+<span id="cb49-572"><a href="#cb49-572" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>trial number</span>
+<span id="cb49-573"><a href="#cb49-573" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>first-pass reading time</span>
+<span id="cb49-574"><a href="#cb49-574" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>regression path duration</span>
+<span id="cb49-575"><a href="#cb49-575" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>regressions in</span>
+<span id="cb49-576"><a href="#cb49-576" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>context sentence</span>
+<span id="cb49-577"><a href="#cb49-577" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>lifetime</span>
+<span id="cb49-578"><a href="#cb49-578" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>tense</span>
+<span id="cb49-579"><a href="#cb49-579" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>celebrity name</span>
+<span id="cb49-580"><a href="#cb49-580" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-581"><a href="#cb49-581" aria-hidden="true" tabindex="-1"></a><span class="ss">2.  </span>change them to these class types, and print a summary</span>
 <span id="cb49-582"><a href="#cb49-582" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-583"><a href="#cb49-583" aria-hidden="true" tabindex="-1"></a><span class="ss">2.  </span>change them to these class types, and print a summary</span>
+<span id="cb49-583"><a href="#cb49-583" aria-hidden="true" tabindex="-1"></a><span class="ss">3.  </span>save and render the document</span>
 <span id="cb49-584"><a href="#cb49-584" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-585"><a href="#cb49-585" aria-hidden="true" tabindex="-1"></a><span class="ss">3.  </span>save and render the document</span>
-<span id="cb49-586"><a href="#cb49-586" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-585"><a href="#cb49-585" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-586"><a href="#cb49-586" aria-hidden="true" tabindex="-1"></a><span class="fu">## Plot the data</span></span>
 <span id="cb49-587"><a href="#cb49-587" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-588"><a href="#cb49-588" aria-hidden="true" tabindex="-1"></a><span class="fu">## Plot the data</span></span>
-<span id="cb49-589"><a href="#cb49-589" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-590"><a href="#cb49-590" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-591"><a href="#cb49-591" aria-hidden="true" tabindex="-1"></a>::: {.column width=&quot;100%&quot;}</span>
-<span id="cb49-592"><a href="#cb49-592" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>at this stage we want to explore the data</span>
-<span id="cb49-593"><a href="#cb49-593" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>distribution</span>
-<span id="cb49-594"><a href="#cb49-594" aria-hidden="true" tabindex="-1"></a><span class="ss">        -   </span>peaks, spread</span>
-<span id="cb49-595"><a href="#cb49-595" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>boundaries</span>
-<span id="cb49-596"><a href="#cb49-596" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb49-597"><a href="#cb49-597" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-598"><a href="#cb49-598" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-599"><a href="#cb49-599" aria-hidden="true" tabindex="-1"></a>:::: columns</span>
-<span id="cb49-600"><a href="#cb49-600" aria-hidden="true" tabindex="-1"></a>::: {.column width=&quot;33%&quot;}</span>
-<span id="cb49-601"><a href="#cb49-601" aria-hidden="true" tabindex="-1"></a>Histogram</span>
-<span id="cb49-602"><a href="#cb49-602" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-605"><a href="#cb49-605" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb49-606"><a href="#cb49-606" aria-hidden="true" tabindex="-1"></a><span class="co">#| output-location: fragment</span></span>
-<span id="cb49-607"><a href="#cb49-607" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(df_lifetime<span class="sc">$</span>IA_FIRST_RUN_DWELL_TIME)</span>
-<span id="cb49-608"><a href="#cb49-608" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb49-609"><a href="#cb49-609" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb49-610"><a href="#cb49-610" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-611"><a href="#cb49-611" aria-hidden="true" tabindex="-1"></a>::: {.column width=&quot;33%&quot;}</span>
-<span id="cb49-612"><a href="#cb49-612" aria-hidden="true" tabindex="-1"></a>Boxplot</span>
-<span id="cb49-613"><a href="#cb49-613" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-616"><a href="#cb49-616" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb49-617"><a href="#cb49-617" aria-hidden="true" tabindex="-1"></a><span class="co">#| output-location: fragment</span></span>
-<span id="cb49-618"><a href="#cb49-618" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(df_lifetime<span class="sc">$</span>IA_FIRST_RUN_DWELL_TIME)</span>
-<span id="cb49-619"><a href="#cb49-619" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb49-620"><a href="#cb49-620" aria-hidden="true" tabindex="-1"></a>:::</span>
-<span id="cb49-621"><a href="#cb49-621" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-622"><a href="#cb49-622" aria-hidden="true" tabindex="-1"></a>::: {.column width=&quot;33%&quot;}</span>
-<span id="cb49-623"><a href="#cb49-623" aria-hidden="true" tabindex="-1"></a>Scatterplot</span>
-<span id="cb49-624"><a href="#cb49-624" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-627"><a href="#cb49-627" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb49-628"><a href="#cb49-628" aria-hidden="true" tabindex="-1"></a><span class="co">#| output-location: fragment</span></span>
-<span id="cb49-629"><a href="#cb49-629" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df_lifetime<span class="sc">$</span>IA_FIRST_RUN_DWELL_TIME)</span>
-<span id="cb49-630"><a href="#cb49-630" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb49-631"><a href="#cb49-631" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb49-588"><a href="#cb49-588" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-589"><a href="#cb49-589" aria-hidden="true" tabindex="-1"></a>::: {.column width=&quot;100%&quot;}</span>
+<span id="cb49-590"><a href="#cb49-590" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>at this stage we want to explore the data</span>
+<span id="cb49-591"><a href="#cb49-591" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>distribution</span>
+<span id="cb49-592"><a href="#cb49-592" aria-hidden="true" tabindex="-1"></a><span class="ss">        -   </span>peaks, spread</span>
+<span id="cb49-593"><a href="#cb49-593" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span>boundaries</span>
+<span id="cb49-594"><a href="#cb49-594" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb49-595"><a href="#cb49-595" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-596"><a href="#cb49-596" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-597"><a href="#cb49-597" aria-hidden="true" tabindex="-1"></a>:::: columns</span>
+<span id="cb49-598"><a href="#cb49-598" aria-hidden="true" tabindex="-1"></a>::: {.column width=&quot;33%&quot;}</span>
+<span id="cb49-599"><a href="#cb49-599" aria-hidden="true" tabindex="-1"></a>Histogram</span>
+<span id="cb49-600"><a href="#cb49-600" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-603"><a href="#cb49-603" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb49-604"><a href="#cb49-604" aria-hidden="true" tabindex="-1"></a><span class="co">#| output-location: fragment</span></span>
+<span id="cb49-605"><a href="#cb49-605" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(df_lifetime<span class="sc">$</span>IA_FIRST_RUN_DWELL_TIME)</span>
+<span id="cb49-606"><a href="#cb49-606" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb49-607"><a href="#cb49-607" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb49-608"><a href="#cb49-608" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-609"><a href="#cb49-609" aria-hidden="true" tabindex="-1"></a>::: {.column width=&quot;33%&quot;}</span>
+<span id="cb49-610"><a href="#cb49-610" aria-hidden="true" tabindex="-1"></a>Boxplot</span>
+<span id="cb49-611"><a href="#cb49-611" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-614"><a href="#cb49-614" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb49-615"><a href="#cb49-615" aria-hidden="true" tabindex="-1"></a><span class="co">#| output-location: fragment</span></span>
+<span id="cb49-616"><a href="#cb49-616" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(df_lifetime<span class="sc">$</span>IA_FIRST_RUN_DWELL_TIME)</span>
+<span id="cb49-617"><a href="#cb49-617" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb49-618"><a href="#cb49-618" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb49-619"><a href="#cb49-619" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-620"><a href="#cb49-620" aria-hidden="true" tabindex="-1"></a>::: {.column width=&quot;33%&quot;}</span>
+<span id="cb49-621"><a href="#cb49-621" aria-hidden="true" tabindex="-1"></a>Scatterplot</span>
+<span id="cb49-622"><a href="#cb49-622" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-625"><a href="#cb49-625" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb49-626"><a href="#cb49-626" aria-hidden="true" tabindex="-1"></a><span class="co">#| output-location: fragment</span></span>
+<span id="cb49-627"><a href="#cb49-627" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df_lifetime<span class="sc">$</span>IA_FIRST_RUN_DWELL_TIME)</span>
+<span id="cb49-628"><a href="#cb49-628" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb49-629"><a href="#cb49-629" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb49-630"><a href="#cb49-630" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-631"><a href="#cb49-631" aria-hidden="true" tabindex="-1"></a>::::</span>
 <span id="cb49-632"><a href="#cb49-632" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-633"><a href="#cb49-633" aria-hidden="true" tabindex="-1"></a>::::</span>
+<span id="cb49-633"><a href="#cb49-633" aria-hidden="true" tabindex="-1"></a><span class="fu">### Plotting two variables</span></span>
 <span id="cb49-634"><a href="#cb49-634" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-635"><a href="#cb49-635" aria-hidden="true" tabindex="-1"></a><span class="fu">### Plotting two variables</span></span>
+<span id="cb49-635"><a href="#cb49-635" aria-hidden="true" tabindex="-1"></a>Scatterplot</span>
 <span id="cb49-636"><a href="#cb49-636" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-637"><a href="#cb49-637" aria-hidden="true" tabindex="-1"></a>Scatterplot</span>
-<span id="cb49-638"><a href="#cb49-638" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-641"><a href="#cb49-641" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb49-642"><a href="#cb49-642" aria-hidden="true" tabindex="-1"></a><span class="co">#| output-location: fragment</span></span>
-<span id="cb49-643"><a href="#cb49-643" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df_lifetime<span class="sc">$</span>IA_FIRST_FIXATION_DURATION, df_lifetime<span class="sc">$</span>IA_FIRST_RUN_DWELL_TIME)</span>
-<span id="cb49-644"><a href="#cb49-644" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb49-639"><a href="#cb49-639" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb49-640"><a href="#cb49-640" aria-hidden="true" tabindex="-1"></a><span class="co">#| output-location: fragment</span></span>
+<span id="cb49-641"><a href="#cb49-641" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(df_lifetime<span class="sc">$</span>IA_FIRST_FIXATION_DURATION, df_lifetime<span class="sc">$</span>IA_FIRST_RUN_DWELL_TIME)</span>
+<span id="cb49-642"><a href="#cb49-642" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb49-643"><a href="#cb49-643" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-644"><a href="#cb49-644" aria-hidden="true" tabindex="-1"></a><span class="fu">### Exercise</span></span>
 <span id="cb49-645"><a href="#cb49-645" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-646"><a href="#cb49-646" aria-hidden="true" tabindex="-1"></a><span class="fu">### Exercise</span></span>
+<span id="cb49-646"><a href="#cb49-646" aria-hidden="true" tabindex="-1"></a>In your Quarto document:</span>
 <span id="cb49-647"><a href="#cb49-647" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-648"><a href="#cb49-648" aria-hidden="true" tabindex="-1"></a>In your Quarto document:</span>
-<span id="cb49-649"><a href="#cb49-649" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-650"><a href="#cb49-650" aria-hidden="true" tabindex="-1"></a><span class="ss">1.  </span>create a heading &#39;Data exploration&#39; </span>
-<span id="cb49-651"><a href="#cb49-651" aria-hidden="true" tabindex="-1"></a><span class="ss">  + </span>briefly describe the data</span>
-<span id="cb49-652"><a href="#cb49-652" aria-hidden="true" tabindex="-1"></a><span class="ss">2.  </span>For each of our depenent variables: </span>
-<span id="cb49-653"><a href="#cb49-653" aria-hidden="true" tabindex="-1"></a><span class="ss">  + </span>create a subheading</span>
-<span id="cb49-654"><a href="#cb49-654" aria-hidden="true" tabindex="-1"></a><span class="ss">  + </span>calculate the mean and standard deviation of the variable (<span class="in">`mean()`</span>, <span class="in">`sd()`</span>) + create a boxplot of the variable</span>
-<span id="cb49-655"><a href="#cb49-655" aria-hidden="true" tabindex="-1"></a><span class="ss">3.  </span>Render the document often to make sure it runs</span>
-<span id="cb49-656"><a href="#cb49-656" aria-hidden="true" tabindex="-1"></a><span class="ss">4.  </span>Upload the source file (day1-nachname_vorname.qmd) to Moodle</span>
-<span id="cb49-657"><a href="#cb49-657" aria-hidden="true" tabindex="-1"></a><span class="ss">5.  </span>download the source file below yours in the list to the same folder, and try to run it</span>
-<span id="cb49-658"><a href="#cb49-658" aria-hidden="true" tabindex="-1"></a><span class="ss">  +   </span>does it run?</span>
+<span id="cb49-648"><a href="#cb49-648" aria-hidden="true" tabindex="-1"></a><span class="ss">1.  </span>create a heading &#39;Data exploration&#39; </span>
+<span id="cb49-649"><a href="#cb49-649" aria-hidden="true" tabindex="-1"></a><span class="ss">  + </span>briefly describe the data</span>
+<span id="cb49-650"><a href="#cb49-650" aria-hidden="true" tabindex="-1"></a><span class="ss">2.  </span>For each of our depenent variables: </span>
+<span id="cb49-651"><a href="#cb49-651" aria-hidden="true" tabindex="-1"></a><span class="ss">  + </span>create a subheading</span>
+<span id="cb49-652"><a href="#cb49-652" aria-hidden="true" tabindex="-1"></a><span class="ss">  + </span>calculate the mean and standard deviation of the variable (<span class="in">`mean()`</span>, <span class="in">`sd()`</span>) + create a boxplot of the variable</span>
+<span id="cb49-653"><a href="#cb49-653" aria-hidden="true" tabindex="-1"></a><span class="ss">3.  </span>Render the document often to make sure it runs</span>
+<span id="cb49-654"><a href="#cb49-654" aria-hidden="true" tabindex="-1"></a><span class="ss">4.  </span>Upload the source file (day1-nachname_vorname.qmd) to Moodle</span>
+<span id="cb49-655"><a href="#cb49-655" aria-hidden="true" tabindex="-1"></a><span class="ss">5.  </span>download the source file below yours in the list to the same folder, and try to run it</span>
+<span id="cb49-656"><a href="#cb49-656" aria-hidden="true" tabindex="-1"></a><span class="ss">  +   </span>does it run?</span>
+<span id="cb49-657"><a href="#cb49-657" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-658"><a href="#cb49-658" aria-hidden="true" tabindex="-1"></a><span class="fu">### {.unlisted}</span></span>
 <span id="cb49-659"><a href="#cb49-659" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-660"><a href="#cb49-660" aria-hidden="true" tabindex="-1"></a><span class="fu">### {.unlisted}</span></span>
-<span id="cb49-661"><a href="#cb49-661" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-662"><a href="#cb49-662" aria-hidden="true" tabindex="-1"></a>::: callout-tip</span>
-<span id="cb49-663"><a href="#cb49-663" aria-hidden="true" tabindex="-1"></a><span class="fu">#### print options</span></span>
-<span id="cb49-664"><a href="#cb49-664" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-665"><a href="#cb49-665" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>each code chunk can have different print options:</span>
-<span id="cb49-666"><a href="#cb49-666" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span><span class="in">`eval = FALSE`</span>: do not evaluate this chunk</span>
-<span id="cb49-667"><a href="#cb49-667" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span><span class="in">`include = FALSE`</span> evaluate this chunk but don&#39;t show it or its results</span>
-<span id="cb49-668"><a href="#cb49-668" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span><span class="in">`echo = FALSE`</span> print this chunk code</span>
-<span id="cb49-669"><a href="#cb49-669" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span><span class="in">`message = FALSE`</span>/<span class="in">`warning = false`</span> don&#39;t print warnings or messages</span>
-<span id="cb49-670"><a href="#cb49-670" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span><span class="in">`error = TRUE`</span> continue rendering document even if there&#39;s an error</span>
-<span id="cb49-671"><a href="#cb49-671" aria-hidden="true" tabindex="-1"></a><span class="ss">        -   </span>do not use <span class="in">`error = TRUE`</span> for final versions! You want to make sure things work as they should</span>
-<span id="cb49-672"><a href="#cb49-672" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-673"><a href="#cb49-673" aria-hidden="true" tabindex="-1"></a><span class="in">````markdown</span></span>
-<span id="cb49-674"><a href="#cb49-674" aria-hidden="true" tabindex="-1"></a>`r &#39;&#39;````{r, eval = T, echo = T, results = &quot;asis&quot;, warning}</span>
-<span id="cb49-675"><a href="#cb49-675" aria-hidden="true" tabindex="-1"></a>code here</span>
-<span id="cb49-676"><a href="#cb49-676" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb49-677"><a href="#cb49-677" aria-hidden="true" tabindex="-1"></a><span class="in">````</span></span>
-<span id="cb49-678"><a href="#cb49-678" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-679"><a href="#cb49-679" aria-hidden="true" tabindex="-1"></a>or</span>
-<span id="cb49-680"><a href="#cb49-680" aria-hidden="true" tabindex="-1"></a><span class="in">````markdown</span></span>
-<span id="cb49-681"><a href="#cb49-681" aria-hidden="true" tabindex="-1"></a>`r &#39;&#39;````{r}</span>
-<span id="cb49-682"><a href="#cb49-682" aria-hidden="true" tabindex="-1"></a>#| eval: false</span>
-<span id="cb49-683"><a href="#cb49-683" aria-hidden="true" tabindex="-1"></a>code here</span>
-<span id="cb49-684"><a href="#cb49-684" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
-<span id="cb49-685"><a href="#cb49-685" aria-hidden="true" tabindex="-1"></a><span class="in">````</span></span>
-<span id="cb49-686"><a href="#cb49-686" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb49-660"><a href="#cb49-660" aria-hidden="true" tabindex="-1"></a>::: callout-tip</span>
+<span id="cb49-661"><a href="#cb49-661" aria-hidden="true" tabindex="-1"></a><span class="fu">#### print options</span></span>
+<span id="cb49-662"><a href="#cb49-662" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-663"><a href="#cb49-663" aria-hidden="true" tabindex="-1"></a><span class="ss">-   </span>each code chunk can have different print options:</span>
+<span id="cb49-664"><a href="#cb49-664" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span><span class="in">`eval = FALSE`</span>: do not evaluate this chunk</span>
+<span id="cb49-665"><a href="#cb49-665" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span><span class="in">`include = FALSE`</span> evaluate this chunk but don&#39;t show it or its results</span>
+<span id="cb49-666"><a href="#cb49-666" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span><span class="in">`echo = FALSE`</span> print this chunk code</span>
+<span id="cb49-667"><a href="#cb49-667" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span><span class="in">`message = FALSE`</span>/<span class="in">`warning = false`</span> don&#39;t print warnings or messages</span>
+<span id="cb49-668"><a href="#cb49-668" aria-hidden="true" tabindex="-1"></a><span class="ss">    -   </span><span class="in">`error = TRUE`</span> continue rendering document even if there&#39;s an error</span>
+<span id="cb49-669"><a href="#cb49-669" aria-hidden="true" tabindex="-1"></a><span class="ss">        -   </span>do not use <span class="in">`error = TRUE`</span> for final versions! You want to make sure things work as they should</span>
+<span id="cb49-670"><a href="#cb49-670" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-671"><a href="#cb49-671" aria-hidden="true" tabindex="-1"></a><span class="in">````markdown</span></span>
+<span id="cb49-672"><a href="#cb49-672" aria-hidden="true" tabindex="-1"></a>`r &#39;&#39;````{r, eval = T, echo = T, results = &quot;asis&quot;, warning}</span>
+<span id="cb49-673"><a href="#cb49-673" aria-hidden="true" tabindex="-1"></a>code here</span>
+<span id="cb49-674"><a href="#cb49-674" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb49-675"><a href="#cb49-675" aria-hidden="true" tabindex="-1"></a><span class="in">````</span></span>
+<span id="cb49-676"><a href="#cb49-676" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-677"><a href="#cb49-677" aria-hidden="true" tabindex="-1"></a>or</span>
+<span id="cb49-678"><a href="#cb49-678" aria-hidden="true" tabindex="-1"></a><span class="in">````markdown</span></span>
+<span id="cb49-679"><a href="#cb49-679" aria-hidden="true" tabindex="-1"></a>`r &#39;&#39;````{r}</span>
+<span id="cb49-680"><a href="#cb49-680" aria-hidden="true" tabindex="-1"></a>#| eval: false</span>
+<span id="cb49-681"><a href="#cb49-681" aria-hidden="true" tabindex="-1"></a>code here</span>
+<span id="cb49-682"><a href="#cb49-682" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb49-683"><a href="#cb49-683" aria-hidden="true" tabindex="-1"></a><span class="in">````</span></span>
+<span id="cb49-684"><a href="#cb49-684" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb49-685"><a href="#cb49-685" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-686"><a href="#cb49-686" aria-hidden="true" tabindex="-1"></a><span class="fu"># Session Info {.unlisted .unnumbered visibility=&quot;uncounted&quot;}</span></span>
 <span id="cb49-687"><a href="#cb49-687" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-688"><a href="#cb49-688" aria-hidden="true" tabindex="-1"></a><span class="fu"># Session Info {.unlisted .unnumbered visibility=&quot;uncounted&quot;}</span></span>
-<span id="cb49-689"><a href="#cb49-689" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-692"><a href="#cb49-692" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb49-693"><a href="#cb49-693" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
-<span id="cb49-694"><a href="#cb49-694" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: &quot;Show Session Info&quot;</span></span>
-<span id="cb49-695"><a href="#cb49-695" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span>
-<span id="cb49-696"><a href="#cb49-696" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb49-690"><a href="#cb49-690" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
+<span id="cb49-691"><a href="#cb49-691" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-fold: true</span></span>
+<span id="cb49-692"><a href="#cb49-692" aria-hidden="true" tabindex="-1"></a><span class="co">#| code-summary: &quot;Show Session Info&quot;</span></span>
+<span id="cb49-693"><a href="#cb49-693" aria-hidden="true" tabindex="-1"></a><span class="fu">sessionInfo</span>()</span>
+<span id="cb49-694"><a href="#cb49-694" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
+<span id="cb49-695"><a href="#cb49-695" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb49-696"><a href="#cb49-696" aria-hidden="true" tabindex="-1"></a><span class="fu"># References {.unlisted .unnumbered visibility=&quot;uncounted&quot;}</span></span>
 <span id="cb49-697"><a href="#cb49-697" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-698"><a href="#cb49-698" aria-hidden="true" tabindex="-1"></a><span class="fu"># References {.unlisted .unnumbered visibility=&quot;uncounted&quot;}</span></span>
-<span id="cb49-699"><a href="#cb49-699" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb49-700"><a href="#cb49-700" aria-hidden="true" tabindex="-1"></a>::: {#refs custom-style=&quot;Bibliography&quot;}</span>
-<span id="cb49-701"><a href="#cb49-701" aria-hidden="true" tabindex="-1"></a>:::</span>
+<span id="cb49-698"><a href="#cb49-698" aria-hidden="true" tabindex="-1"></a>::: {#refs custom-style=&quot;Bibliography&quot;}</span>
+<span id="cb49-699"><a href="#cb49-699" aria-hidden="true" tabindex="-1"></a>:::</span>
 </code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div></div></div></div></div>
 </div> <!-- /content -->

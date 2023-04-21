@@ -39,7 +39,6 @@ format:
   html:
     self-contained: true
     output-file: sheet-data_viz.html
-    theme: [dark]
     number-sections: true
     toc: true
     code-overflow: wrap
@@ -55,6 +54,14 @@ editor_options:
 bibliography: references/references.json
 csl: references/apa.csl
 ---
+
+```{r}
+knitr::opts_chunk$set(eval = T, # evaluate chunks
+                      echo = T, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F, # stop when error encountered
+                      warning = F) # don't print warnings
+```
 
 ```{r}
 ## play sound if error encountered
@@ -77,14 +84,6 @@ options(error = function(){    # Beep on error
 rbbt::bbt_update_bib("_data_viz.qmd")
 ```
 
-```{r}
-knitr::opts_chunk$set(eval = T, # change this to 'eval = T' to reproduce the analyses; make sure to comment out
-                      echo = T, # 'print code chunk?'
-                      message = F, # 'print messages (e.g., warnings)?'
-                      error = F,
-                      warning = F)
-```
-
 # Data communication
 
 ## Load packages and data
@@ -97,10 +96,10 @@ library(tidyverse)
 df_lifetime <- readr::read_csv(here::here("data/tidy_data_lifetime_pilot.csv"), 
                                # for special characters
                                locale = readr::locale(encoding = "latin1") 
-                               ) |> 
+                               ) |>
   mutate_if(is.character,as.factor) |> # all character variables as factor
   filter(type == "critical", # only critical trials
-         px != "px7") # this participant had lots of 0's for some reason
+         px != "px3") # this participant had lots of 0's for some reason
 ```
 
 ## Tables
@@ -136,6 +135,8 @@ summary_ff <- df_lifetime |>
 
 ```{r}
 #| output-location: fragment
+
+# install.packages("knitr") # if not yet installed
 knitr::kable(summary_ff, digits=1,
              caption = "Table with summmary statistics for first-fixation duration at the verb region")
 ```
@@ -143,7 +144,9 @@ knitr::kable(summary_ff, digits=1,
 ### Exercise
 
 1. install the `knitr` package (`install.packages("knitr")`)
-2. create an object with some summary statistics
+2. create an object with some summary statistics of the variable `rt`
+  + call it `summary_rt`
+3. use `kable()` from `knitr` to print a table
 
 ```{r}
 #| echo: false
@@ -161,18 +164,18 @@ knitr::kable(summary_rt, digits=1,
              caption = "Summary of reaction times (ms) per condition")
 ```
 
-# Plots with `ggplot2`
-
-- `ggplot2` is part of the tidyverse (like `dplyr`)
-  + uses a *layered grammar of graphics*
-  + i.e., we build layers
-
 # Plotting reading times
 
 - reading times are (usually) continuous variables
   + as are e.g., reaction times
 - they are truncated at 0, meaning they cannot have negative values
   + because of this, they tend to have a *skewed distribution*
+
+# Plots with `ggplot2`
+
+- `ggplot2` is part of the tidyverse (like `dplyr`)
+  + uses a *layered grammar of graphics*
+  + i.e., we build layers
 
 # An example: histogram
 
@@ -197,7 +200,7 @@ df_lifetime |> ggplot(aes(ff)) # aes = 'aesthetic'
 ```{r}
 #| output-location: column
 df_lifetime |> ggplot(aes(ff)) + 
-  labs(title = "Histogram of first fixataion times",
+  labs(title = "Histogram of first fixation times",
        x = "First fixation times (ms)")
 ```
 
@@ -287,7 +290,7 @@ df_lifetime |>
   ggplot(aes(ff)) + 
   labs(title = "Histogram of first fixataion times",
        x = "First fixation times (ms)") +
-  geom_density(alpha=.5) +
+  geom_density() +
   theme_minimal()
 ```
 
@@ -313,7 +316,7 @@ df_lifetime |>
 - there are a lot of overlapping density curves, let's try to separate them with `facet_grid(x~y)`
 
 ```{r, fig.cap="Distribution of first fixation times at the verb region (raw milliseconds)."}
-#| code-line-numbers: "|2|6|"
+#| code-line-numbers: "|4|"
 #| output-location: column-fragment
 df_lifetime |> 
   filter(ff > 0) |> 
@@ -336,7 +339,8 @@ df_lifetime |>
 ```{r}
 #| output-location: column-fragment
 df_lifetime <- df_lifetime %>%
-  mutate(region = factor(region, levels = c("verb-1","verb","verb+1","verb+2","verb+3","verb+4")))
+  mutate(region = factor(region, 
+                         levels = c("verb-1","verb","verb+1","verb+2","verb+3","verb+4")))
 
 summary(df_lifetime$region)
 ```
@@ -350,7 +354,7 @@ summary(df_lifetime$region)
 - you can decide if you want to use facets or to have the density curves overlayed
 - your plot should look something like A or B:
 
-```{r, out.width="100", fig.pos="center", echo = F}
+```{r, echo = F}
 #| output-location: fragment
 
 # with facet
@@ -364,7 +368,9 @@ p_dens1 <- df_lifetime |>
        y = "Density",
        fill = "Condition") +
   geom_density(alpha = .5) +
-  theme_bw()
+  theme_bw() +
+  theme(title = element_text(size=10),
+        axis.text.x = element_text(angle = 45))
 
 # without facet
 p_dens2 <- df_lifetime |>
@@ -372,7 +378,8 @@ p_dens2 <- df_lifetime |>
          region == "verb") |>
   ggplot(aes(ff, fill = condition)) +
   # facet_grid(.~condition) +
-  labs(title = "Density plot of first fixataion times (verb region)",
+  labs(title = "Density plot of first fixataion times
+(verb region)",
        x = "First fixation times (ms)",
        y = "Density",
        fill = "Condition") +
@@ -409,7 +416,7 @@ p_tense_life <- df_lifetime |>
   labs(title = "Density plot of first fixataion times (verb region)",
        x = "First fixation times (ms)") +
   geom_density(alpha=.5) +
-  theme_bw()
+  theme_bw() 
 
 p_tense <- df_lifetime |> 
   filter(ff > 0,
@@ -419,7 +426,8 @@ p_tense <- df_lifetime |>
   labs(title = "Density plot of first fixataion times (verb region)",
        x = "First fixation times (ms)") +
   geom_density(alpha=.5) +
-  theme_bw() 
+  theme_bw() +
+  theme(title = element_text(size=8))
 
 p_lifetime <- df_lifetime |> 
   filter(ff > 0,
@@ -429,7 +437,8 @@ p_lifetime <- df_lifetime |>
   labs(title = "Density plot of first fixataion times (verb region)",
        x = "First fixation times (ms)") +
   geom_density(alpha=.5) +
-  theme_bw()
+  theme_bw() +
+  theme(title = element_text(size=8))
 
 ggpubr::ggarrange(
   ggpubr::ggarrange(p_tense, p_lifetime,
@@ -446,8 +455,8 @@ ggpubr::ggarrange(
 ## Scatterplots
 
 - histograms and density plots plot a **single variable** along the x-axis
-  + in most other plots the dependent (measure) variable is plotted along the y-axis
-- scatterplots plots the relationship between **two variables**
+  + in most other plots the dependent (measure) variable is plotted along the y-axis by convention
+- scatterplots plot the relationship between **two variables**
 
 ```{r}
 #| output-location: column-fragment
@@ -483,7 +492,7 @@ and reaction times (critical sentence)",
 #### Exercise
 
 1. Generate a scatterplot of total reading times and reaction times, with:
-  - colour and shape set to condition
+    - colour and shape set to condition
     + tip: these both belong in `aes()`
 2. What information does this plot suggest?
 
@@ -505,6 +514,15 @@ colour = "Condition", shape = "Condition") +
 
 # Summary statistics
 
+- measures of location: mean, median, mode
+- measures of spread: (interquartile) range, standard deviation
+
+::: {.content-visible when-format="revealjs"}
+::: notes
+IQR: middle 50% of data
+:::
+:::
+
 ## Boxplots
 
 - boxplots provide information about the distribution of a *continuous* variable
@@ -522,6 +540,36 @@ iris |>
        y = "Continuous variable") +
   geom_boxplot()
 ```
+
+## Boxplot explained
+
+::: {.content-visible when-format="revealjs"}
+```{r echo = F, fig.align = "center"}
+#| fig-cap: "Image source: @winter_statistics_2019 (all rights reserved)"
+#| fig-cap-location: bottom
+
+# invert colours for dark mode in slides
+library(magick)
+y <- magick::image_read(here::here("media/Winter_2019_boxplot.png"))
+
+magick::image_negate(y)
+```
+:::
+
+::: {.content-visible unless-format="revealjs"}
+```{r echo = F, fig.align = "center"}
+#| fig-cap: "Image source: @winter_statistics_2019 (all rights reserved)"
+#| fig-cap-location: bottom
+magick::image_read(here::here("media/Winter_2019_boxplot.png"))
+```
+:::
+
+::: {.content-visible when-format="revealjs"}
+::: notes
+whiskers: 1.5*IQR from Q1 (lower whisker) or Q3 (upper whisker)
+outliers: outside that range
+:::
+:::
 
 ## Boxplots
 
@@ -583,12 +631,25 @@ df_lifetime |>
 - we'll need our summary table to plot an interaction plot
 :::
 
+::: {.content-hidden when-format="pdf"}
 ::: {.column width="50%"}
 ```{r}
 #| echo: false
 knitr::kable(summary_ff, digits = 1) |> 
   kableExtra::kable_styling(font_size = 20)
 ```
+:::
+:::
+
+::: {.content-visible when-format="pdf"}
+::: {.column width="50%"}
+```{r}
+#| echo: false
+
+# smaller font for PDF output
+knitr::kable(summary_ff, digits = 1)
+```
+:::
 :::
 
 ::::
@@ -695,11 +756,11 @@ df_lifetime |>
 ### Exercise
 
 1. Generate a grouped bar plot (i.e., `dodge`) with:
-  - a facet grid for `tense`
-  - plots `lifetime` on the x-axis
-  - and fills the bars based on `accept`
-  - change the labels accordingly
-  - customise as you like
+    - a facet grid for `tense`
+    - plots `lifetime` on the x-axis
+    - and fills the bars based on `accept`
+    - change the labels accordingly
+    - customise as you like
   
 ```{r, eval = F}
 df_lifetime |> 
@@ -707,23 +768,79 @@ df_lifetime |>
   ggplot(aes(x = lifetime, fill = as.factor(accept))) +
   facet_grid(.~tense) +
   labs(title = "Binary responses",
-       x = "Liftime",
+       x = "Lifetime",
        fill = "Response") +
   geom_bar(position = "dodge") +
   theme_bw()
 ```
 
-# Count data
+## Grouped bar plots
 
-```{r, eval = F}
+```{r, eval = T}
 df_lifetime |> 
   distinct(px,trial,.keep_all=T) |> 
   ggplot(aes(x = lifetime, fill = as.factor(accept))) +
   facet_grid(.~tense) +
-  labs(title = "Binary responses",
-       x = "Liftime",
+  labs(title = "Grouped and faceted barplot",
+       x = "Lifetime",
        fill = "Response") +
   geom_bar(position = "dodge") +
+  theme_bw()
+```
+
+## Stacked bar plots
+
+```{r, eval = T}
+#| code-line-numbers: "8"
+df_lifetime |> 
+  distinct(px,trial,.keep_all=T) |> 
+  ggplot(aes(x = lifetime, fill = as.factor(accept))) +
+  facet_grid(.~tense) +
+  labs(title = "Stacked and faceted barplot",
+       x = "Lifetime",
+       fill = "Response") +
+  geom_bar(position = "stack") +
+  theme_bw()
+```
+
+### Exercise
+
+1. Choose the barplot you like best for binary data
+2. Reproduce that barplot, but with `reg_in` at the `verb1` region
+
+```{r}
+#| echo: false
+#| eval: true
+#| code-line-numbers: "8"
+df_lifetime |> 
+  filter(region=="verb") |> 
+  ggplot(aes(x = lifetime, fill = as.factor(reg_in))) +
+  facet_grid(.~tense) +
+  labs(title = "Regressions in (yes/no, verb region)",
+       x = "Lifetime",
+       fill = "Regressions in (yes/no)") +
+  geom_bar(position = "stack") +
+  theme_bw()
+```
+
+### Extra exercise
+
+1. Create another bar plot, but for `reg_out` for all sentence regions
+2. Use `facet_grid()`
+  + to have facets by region (columns) and by tense (in 2 rows)
+
+```{r}
+#| echo: false
+#| eval: true
+#| code-line-numbers: "8"
+df_lifetime |> 
+  # filter(region=="verb") |> 
+  ggplot(aes(x = lifetime, fill = as.factor(reg_out))) +
+  facet_grid(tense~region) +
+  labs(title = "Regressions in (yes/no, verb region)",
+       x = "Lifetime",
+       fill = "Regressions out (yes/no)") +
+  geom_bar(position = "stack") +
   theme_bw()
 ```
 

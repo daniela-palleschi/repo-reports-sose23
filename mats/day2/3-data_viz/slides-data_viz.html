@@ -432,48 +432,66 @@ Daniela Palleschi
 </section><section id="TOC"><nav role="doc-toc"><h2 id="toc-title">Topics</h2>
 <ul>
 <li class="fragment"><a href="#/data-communication" id="/toc-data-communication">Data communication</a></li>
-<li class="fragment"><a href="#/plots-with-ggplot2" id="/toc-plots-with-ggplot2">Plots with <code>ggplot2</code></a></li>
 <li class="fragment"><a href="#/plotting-reading-times" id="/toc-plotting-reading-times">Plotting reading times</a></li>
+<li class="fragment"><a href="#/plots-with-ggplot2" id="/toc-plots-with-ggplot2">Plots with <code>ggplot2</code></a></li>
 <li class="fragment"><a href="#/an-example-histogram" id="/toc-an-example-histogram">An example: histogram</a></li>
 <li class="fragment"><a href="#/distributions" id="/toc-distributions">Distributions</a></li>
 <li class="fragment"><a href="#/summary-statistics" id="/toc-summary-statistics">Summary statistics</a></li>
 <li class="fragment"><a href="#/summary-statistics-1" id="/toc-summary-statistics-1">Summary statistics</a></li>
 <li class="fragment"><a href="#/binomial-data" id="/toc-binomial-data">Binomial data</a></li>
-<li class="fragment"><a href="#/count-data" id="/toc-count-data">Count data</a></li>
 <li class="fragment"><a href="#/resources" id="/toc-resources">Resources</a></li>
-</ul></nav></section><section><section id="data-communication" class="title-slide slide level1 center"><h1>Data communication</h1>
+</ul></nav></section><section class="slide level4"><div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="do">## play sound if error encountered</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="do">### from: https://sejohnston.com/2015/02/24/make-r-beep-when-r-markdown-finishes-or-when-it-fails/</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="fu">options</span>(<span class="at">error =</span> <span class="cf">function</span>(){    <span class="co"># Beep on error</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a>  beepr<span class="sc">::</span><span class="fu">beep</span>(<span class="at">sound =</span> <span class="st">"wilhelm"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5"></a>  <span class="fu">Sys.sleep</span>(<span class="dv">2</span>) <span class="co"># </span></span>
+<span id="cb1-6"><a href="#cb1-6"></a>  }</span>
+<span id="cb1-7"><a href="#cb1-7"></a> )</span>
+<span id="cb1-8"><a href="#cb1-8"></a><span class="do">## and when knitting is complete</span></span>
+<span id="cb1-9"><a href="#cb1-9"></a>.Last <span class="ot">&lt;-</span> <span class="cf">function</span>() {          <span class="co"># Beep on exiting session</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a>  beepr<span class="sc">::</span><span class="fu">beep</span>(<span class="at">sound =</span> <span class="st">"ping"</span>)</span>
+<span id="cb1-11"><a href="#cb1-11"></a>  <span class="fu">Sys.sleep</span>(<span class="dv">6</span>) <span class="co"># allow to play for 6 seconds</span></span>
+<span id="cb1-12"><a href="#cb1-12"></a>  }</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Create references.json file based on the citations in this script</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="co"># make sure you have 'bibliography: references.json' in the YAML</span></span>
+<span id="cb2-3"><a href="#cb2-3"></a>rbbt<span class="sc">::</span><span class="fu">bbt_update_bib</span>(<span class="st">"_data_viz.qmd"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section><section><section id="data-communication" class="title-slide slide level1 center"><h1>Data communication</h1>
 
 </section><section id="load-packages-and-data" class="title-slide slide level2 center"><h2>Load packages and data</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># load tidyverse</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-3"><a href="#cb1-3"></a></span>
-<span id="cb1-4"><a href="#cb1-4"></a><span class="co"># load data</span></span>
-<span id="cb1-5"><a href="#cb1-5"></a>df_lifetime <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data/tidy_data_lifetime_pilot.csv"</span>), </span>
-<span id="cb1-6"><a href="#cb1-6"></a>                               <span class="co"># for special characters</span></span>
-<span id="cb1-7"><a href="#cb1-7"></a>                               <span class="at">locale =</span> readr<span class="sc">::</span><span class="fu">locale</span>(<span class="at">encoding =</span> <span class="st">"latin1"</span>) </span>
-<span id="cb1-8"><a href="#cb1-8"></a>                               ) <span class="sc">|&gt;</span> </span>
-<span id="cb1-9"><a href="#cb1-9"></a>  <span class="fu">mutate_if</span>(is.character,as.factor) <span class="sc">|&gt;</span> <span class="co"># all character variables as factor</span></span>
-<span id="cb1-10"><a href="#cb1-10"></a>  <span class="fu">filter</span>(type <span class="sc">==</span> <span class="st">"critical"</span>, <span class="co"># only critical trials</span></span>
-<span id="cb1-11"><a href="#cb1-11"></a>         px <span class="sc">!=</span> <span class="st">"px7"</span>) <span class="co"># this participant had lots of 0's for some reason</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># load tidyverse</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb3-3"><a href="#cb3-3"></a></span>
+<span id="cb3-4"><a href="#cb3-4"></a><span class="co"># load data</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a>df_lifetime <span class="ot">&lt;-</span> readr<span class="sc">::</span><span class="fu">read_csv</span>(here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data/tidy_data_lifetime_pilot.csv"</span>), </span>
+<span id="cb3-6"><a href="#cb3-6"></a>                               <span class="co"># for special characters</span></span>
+<span id="cb3-7"><a href="#cb3-7"></a>                               <span class="at">locale =</span> readr<span class="sc">::</span><span class="fu">locale</span>(<span class="at">encoding =</span> <span class="st">"latin1"</span>) </span>
+<span id="cb3-8"><a href="#cb3-8"></a>                               ) <span class="sc">|&gt;</span> </span>
+<span id="cb3-9"><a href="#cb3-9"></a>  <span class="fu">mutate_if</span>(is.character,as.factor) <span class="sc">|&gt;</span> <span class="co"># all character variables as factor</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a>  <span class="fu">filter</span>(type <span class="sc">==</span> <span class="st">"critical"</span>, <span class="co"># only critical trials</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a>         px <span class="sc">!=</span> <span class="st">"px3"</span>) <span class="co"># this participant had lots of 0's for some reason</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section><section id="tables" class="title-slide slide level2 center"><h2>Tables</h2>
 <ul>
 <li class="fragment">we can create summaries of our data</li>
 </ul>
 <div class="cell">
-<details><summary>Code</summary><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># compute summary </span></span>
-<span id="cb2-2"><a href="#cb2-2"></a>summary_ff <span class="ot">&lt;-</span> df_lifetime <span class="sc">|&gt;</span> </span>
-<span id="cb2-3"><a href="#cb2-3"></a>  <span class="fu">filter</span>(region<span class="sc">==</span><span class="st">"verb"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb2-4"><a href="#cb2-4"></a>  <span class="fu">group_by</span>(condition,lifetime,tense) <span class="sc">%&gt;%</span></span>
-<span id="cb2-5"><a href="#cb2-5"></a>  <span class="fu">summarise</span>(<span class="at">N =</span> <span class="fu">n</span>(),</span>
-<span id="cb2-6"><a href="#cb2-6"></a>            <span class="at">mean.ff =</span> <span class="fu">mean</span>(ff, <span class="at">na.rm =</span> T),</span>
-<span id="cb2-7"><a href="#cb2-7"></a>            <span class="at">sd =</span> <span class="fu">sd</span>(ff, <span class="at">na.rm =</span> T)) <span class="sc">%&gt;%</span></span>
-<span id="cb2-8"><a href="#cb2-8"></a>  <span class="co"># compute standard error, confidence intervals, and lower/upper ci bounds</span></span>
-<span id="cb2-9"><a href="#cb2-9"></a>  <span class="fu">mutate</span>(<span class="at">se =</span> sd <span class="sc">/</span> <span class="fu">sqrt</span>(N),</span>
-<span id="cb2-10"><a href="#cb2-10"></a>         <span class="at">ci =</span> <span class="fu">qt</span>(<span class="dv">1</span> <span class="sc">-</span> (<span class="fl">0.05</span> <span class="sc">/</span> <span class="dv">2</span>), N <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> se,</span>
-<span id="cb2-11"><a href="#cb2-11"></a>         <span class="at">lower.ci =</span> mean.ff <span class="sc">-</span> <span class="fu">qt</span>(<span class="dv">1</span> <span class="sc">-</span> (<span class="fl">0.05</span> <span class="sc">/</span> <span class="dv">2</span>), N <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> se,</span>
-<span id="cb2-12"><a href="#cb2-12"></a>         <span class="at">upper.ci =</span> mean.ff <span class="sc">+</span> <span class="fu">qt</span>(<span class="dv">1</span> <span class="sc">-</span> (<span class="fl">0.05</span> <span class="sc">/</span> <span class="dv">2</span>), N <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> se)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Code</summary><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># compute summary </span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>summary_ff <span class="ot">&lt;-</span> df_lifetime <span class="sc">|&gt;</span> </span>
+<span id="cb4-3"><a href="#cb4-3"></a>  <span class="fu">filter</span>(region<span class="sc">==</span><span class="st">"verb"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb4-4"><a href="#cb4-4"></a>  <span class="fu">group_by</span>(condition,lifetime,tense) <span class="sc">%&gt;%</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>  <span class="fu">summarise</span>(<span class="at">N =</span> <span class="fu">n</span>(),</span>
+<span id="cb4-6"><a href="#cb4-6"></a>            <span class="at">mean.ff =</span> <span class="fu">mean</span>(ff, <span class="at">na.rm =</span> T),</span>
+<span id="cb4-7"><a href="#cb4-7"></a>            <span class="at">sd =</span> <span class="fu">sd</span>(ff, <span class="at">na.rm =</span> T)) <span class="sc">%&gt;%</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a>  <span class="co"># compute standard error, confidence intervals, and lower/upper ci bounds</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a>  <span class="fu">mutate</span>(<span class="at">se =</span> sd <span class="sc">/</span> <span class="fu">sqrt</span>(N),</span>
+<span id="cb4-10"><a href="#cb4-10"></a>         <span class="at">ci =</span> <span class="fu">qt</span>(<span class="dv">1</span> <span class="sc">-</span> (<span class="fl">0.05</span> <span class="sc">/</span> <span class="dv">2</span>), N <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> se,</span>
+<span id="cb4-11"><a href="#cb4-11"></a>         <span class="at">lower.ci =</span> mean.ff <span class="sc">-</span> <span class="fu">qt</span>(<span class="dv">1</span> <span class="sc">-</span> (<span class="fl">0.05</span> <span class="sc">/</span> <span class="dv">2</span>), N <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> se,</span>
+<span id="cb4-12"><a href="#cb4-12"></a>         <span class="at">upper.ci =</span> mean.ff <span class="sc">+</span> <span class="fu">qt</span>(<span class="dv">1</span> <span class="sc">-</span> (<span class="fl">0.05</span> <span class="sc">/</span> <span class="dv">2</span>), N <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> se)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <ul>
@@ -484,8 +502,9 @@ Daniela Palleschi
 </li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(summary_ff, <span class="at">digits=</span><span class="dv">1</span>,</span>
-<span id="cb3-2"><a href="#cb3-2"></a>             <span class="at">caption =</span> <span class="st">"Table with summmary statistics for first-fixation duration at the verb region"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># install.packages("knitr") # if not yet installed</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(summary_ff, <span class="at">digits=</span><span class="dv">1</span>,</span>
+<span id="cb5-3"><a href="#cb5-3"></a>             <span class="at">caption =</span> <span class="st">"Table with summmary statistics for first-fixation duration at the verb region"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
@@ -521,48 +540,48 @@ Daniela Palleschi
 <td style="text-align: left;">dead</td>
 <td style="text-align: left;">PP</td>
 <td style="text-align: right;">140</td>
-<td style="text-align: right;">171.3</td>
-<td style="text-align: right;">87.1</td>
-<td style="text-align: right;">7.4</td>
-<td style="text-align: right;">14.5</td>
-<td style="text-align: right;">156.7</td>
-<td style="text-align: right;">185.8</td>
+<td style="text-align: right;">198.9</td>
+<td style="text-align: right;">57.9</td>
+<td style="text-align: right;">4.9</td>
+<td style="text-align: right;">9.7</td>
+<td style="text-align: right;">189.2</td>
+<td style="text-align: right;">208.6</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">deadSF</td>
 <td style="text-align: left;">dead</td>
 <td style="text-align: left;">SF</td>
 <td style="text-align: right;">139</td>
-<td style="text-align: right;">167.1</td>
-<td style="text-align: right;">92.5</td>
-<td style="text-align: right;">7.8</td>
-<td style="text-align: right;">15.5</td>
-<td style="text-align: right;">151.6</td>
-<td style="text-align: right;">182.6</td>
+<td style="text-align: right;">194.6</td>
+<td style="text-align: right;">67.9</td>
+<td style="text-align: right;">5.8</td>
+<td style="text-align: right;">11.4</td>
+<td style="text-align: right;">183.2</td>
+<td style="text-align: right;">205.9</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">livingPP</td>
 <td style="text-align: left;">living</td>
 <td style="text-align: left;">PP</td>
 <td style="text-align: right;">140</td>
-<td style="text-align: right;">167.8</td>
-<td style="text-align: right;">98.9</td>
-<td style="text-align: right;">8.4</td>
-<td style="text-align: right;">16.5</td>
-<td style="text-align: right;">151.2</td>
-<td style="text-align: right;">184.3</td>
+<td style="text-align: right;">194.2</td>
+<td style="text-align: right;">77.3</td>
+<td style="text-align: right;">6.5</td>
+<td style="text-align: right;">12.9</td>
+<td style="text-align: right;">181.3</td>
+<td style="text-align: right;">207.1</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">livingSF</td>
 <td style="text-align: left;">living</td>
 <td style="text-align: left;">SF</td>
 <td style="text-align: right;">140</td>
-<td style="text-align: right;">160.2</td>
-<td style="text-align: right;">85.4</td>
-<td style="text-align: right;">7.2</td>
-<td style="text-align: right;">14.3</td>
-<td style="text-align: right;">146.0</td>
-<td style="text-align: right;">174.5</td>
+<td style="text-align: right;">186.0</td>
+<td style="text-align: right;">57.6</td>
+<td style="text-align: right;">4.9</td>
+<td style="text-align: right;">9.6</td>
+<td style="text-align: right;">176.4</td>
+<td style="text-align: right;">195.6</td>
 </tr>
 </tbody>
 </table>
@@ -571,11 +590,19 @@ Daniela Palleschi
 </section><section id="exercise" class="title-slide slide level3 center"><h3>Exercise</h3>
 <ol type="1">
 <li class="fragment">install the <code>knitr</code> package (<code>install.packages("knitr")</code>)</li>
-<li class="fragment">create an object with some summary statistics</li>
+<li class="fragment">create an object with some summary statistics of the variable <code>rt</code>
+</li>
+</ol>
+<ul>
+<li class="fragment">call it <code>summary_rt</code>
+</li>
+</ul>
+<ol start="3" type="1">
+<li class="fragment">use <code>kable()</code> from <code>knitr</code> to print a table</li>
 </ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(summary_rt, <span class="at">digits=</span><span class="dv">1</span>,</span>
-<span id="cb4-2"><a href="#cb4-2"></a>             <span class="at">caption =</span> <span class="st">"Summary of reaction times (ms) per condition"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(summary_rt, <span class="at">digits=</span><span class="dv">1</span>,</span>
+<span id="cb6-2"><a href="#cb6-2"></a>             <span class="at">caption =</span> <span class="st">"Summary of reaction times (ms) per condition"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell fragment">
 <div class="cell-output-display">
@@ -595,49 +622,38 @@ Daniela Palleschi
 <td style="text-align: left;">PP</td>
 <td style="text-align: left;">deadPP</td>
 <td style="text-align: right;">140</td>
-<td style="text-align: right;">3395.6</td>
-<td style="text-align: right;">2891.6</td>
+<td style="text-align: right;">3530.5</td>
+<td style="text-align: right;">2915.8</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">dead</td>
 <td style="text-align: left;">SF</td>
 <td style="text-align: left;">deadSF</td>
 <td style="text-align: right;">139</td>
-<td style="text-align: right;">1643.5</td>
-<td style="text-align: right;">920.4</td>
+<td style="text-align: right;">1747.0</td>
+<td style="text-align: right;">1153.4</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">living</td>
 <td style="text-align: left;">PP</td>
 <td style="text-align: left;">livingPP</td>
 <td style="text-align: right;">140</td>
-<td style="text-align: right;">2287.3</td>
-<td style="text-align: right;">1446.1</td>
+<td style="text-align: right;">2257.7</td>
+<td style="text-align: right;">1346.3</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">living</td>
 <td style="text-align: left;">SF</td>
 <td style="text-align: left;">livingSF</td>
 <td style="text-align: right;">140</td>
-<td style="text-align: right;">2468.6</td>
-<td style="text-align: right;">1652.1</td>
+<td style="text-align: right;">2578.1</td>
+<td style="text-align: right;">1958.7</td>
 </tr>
 </tbody>
 </table>
 </div>
 </div>
-</section></section><section id="plots-with-ggplot2" class="title-slide slide level1 center"><h1>Plots with <code>ggplot2</code>
-</h1>
-<ul>
-<li class="fragment">
-<code>ggplot2</code> is part of the tidyverse (like <code>dplyr</code>)
-<ul>
-<li class="fragment">uses a <em>layered grammar of graphics</em>
-</li>
-<li class="fragment">i.e., we build layers</li>
-</ul>
-</li>
-</ul></section><section id="plotting-reading-times" class="title-slide slide level1 center"><h1>Plotting reading times</h1>
+</section></section><section id="plotting-reading-times" class="title-slide slide level1 center"><h1>Plotting reading times</h1>
 <ul>
 <li class="fragment">reading times are (usually) continuous variables
 <ul>
@@ -650,14 +666,25 @@ Daniela Palleschi
 </li>
 </ul>
 </li>
+</ul></section><section id="plots-with-ggplot2" class="title-slide slide level1 center"><h1>Plots with <code>ggplot2</code>
+</h1>
+<ul>
+<li class="fragment">
+<code>ggplot2</code> is part of the tidyverse (like <code>dplyr</code>)
+<ul>
+<li class="fragment">uses a <em>layered grammar of graphics</em>
+</li>
+<li class="fragment">i.e., we build layers</li>
+</ul>
+</li>
 </ul></section><section><section id="an-example-histogram" class="title-slide slide level1 center"><h1>An example: histogram</h1>
 <div class="cell columns column-output-location">
 <div class="column">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>iris <span class="sc">|&gt;</span> </span>
-<span id="cb5-2"><a href="#cb5-2"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>Sepal.Length)) <span class="sc">+</span></span>
-<span id="cb5-3"><a href="#cb5-3"></a>  <span class="fu">geom_histogram</span>() <span class="sc">+</span></span>
-<span id="cb5-4"><a href="#cb5-4"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"A histogram"</span>,</span>
-<span id="cb5-5"><a href="#cb5-5"></a>       <span class="at">x =</span> <span class="st">"variable"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>iris <span class="sc">|&gt;</span> </span>
+<span id="cb7-2"><a href="#cb7-2"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>Sepal.Length)) <span class="sc">+</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a>  <span class="fu">geom_histogram</span>() <span class="sc">+</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"A histogram"</span>,</span>
+<span id="cb7-5"><a href="#cb7-5"></a>       <span class="at">x =</span> <span class="st">"variable"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="column fragment">
 <div class="cell-output-display">
@@ -668,7 +695,7 @@ Daniela Palleschi
 </section><section id="start-layering" class="title-slide slide level2 center"><h2>Start layering</h2>
 <div class="cell columns column-output-location">
 <div class="column">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>df_lifetime <span class="sc">|&gt;</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(ff)) <span class="co"># aes = 'aesthetic'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>df_lifetime <span class="sc">|&gt;</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(ff)) <span class="co"># aes = 'aesthetic'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div><div class="column">
 <div class="cell-output-display">
 <p><img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-11-1.png" width="960"></p>
@@ -678,9 +705,9 @@ Daniela Palleschi
 </section><section id="add-labels" class="title-slide slide level2 center"><h2>Add labels</h2>
 <div class="cell columns column-output-location">
 <div class="column">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>df_lifetime <span class="sc">|&gt;</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(ff)) <span class="sc">+</span> </span>
-<span id="cb7-2"><a href="#cb7-2"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Histogram of first fixataion times"</span>,</span>
-<span id="cb7-3"><a href="#cb7-3"></a>       <span class="at">x =</span> <span class="st">"First fixation times (ms)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>df_lifetime <span class="sc">|&gt;</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(ff)) <span class="sc">+</span> </span>
+<span id="cb9-2"><a href="#cb9-2"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Histogram of first fixataion times"</span>,</span>
+<span id="cb9-3"><a href="#cb9-3"></a>       <span class="at">x =</span> <span class="st">"First fixation times (ms)"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div><div class="column">
 <div class="cell-output-display">
 <p><img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-12-1.png" width="960"></p>
@@ -690,10 +717,10 @@ Daniela Palleschi
 </section><section id="add" class="title-slide slide level2 center"><h2>Add</h2>
 <div class="cell columns column-output-location">
 <div class="column">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>df_lifetime <span class="sc">|&gt;</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(ff)) <span class="sc">+</span> </span>
-<span id="cb8-2"><a href="#cb8-2"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Histogram of first fixataion times"</span>,</span>
-<span id="cb8-3"><a href="#cb8-3"></a>       <span class="at">x =</span> <span class="st">"First fixation times (ms)"</span>) <span class="sc">+</span></span>
-<span id="cb8-4"><a href="#cb8-4"></a>  <span class="fu">geom_histogram</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>df_lifetime <span class="sc">|&gt;</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(ff)) <span class="sc">+</span> </span>
+<span id="cb10-2"><a href="#cb10-2"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Histogram of first fixataion times"</span>,</span>
+<span id="cb10-3"><a href="#cb10-3"></a>       <span class="at">x =</span> <span class="st">"First fixation times (ms)"</span>) <span class="sc">+</span></span>
+<span id="cb10-4"><a href="#cb10-4"></a>  <span class="fu">geom_histogram</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div><div class="column">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -707,10 +734,10 @@ Daniela Palleschi
 </section><section id="add-condition" class="title-slide slide level2 center"><h2>Add condition</h2>
 <div class="cell columns column-output-location">
 <div class="column">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>df_lifetime <span class="sc">|&gt;</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(ff, <span class="at">fill =</span> condition)) <span class="sc">+</span> </span>
-<span id="cb9-2"><a href="#cb9-2"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"First fixataion times at the verb region"</span>,</span>
-<span id="cb9-3"><a href="#cb9-3"></a>       <span class="at">x =</span> <span class="st">"First fixation times (ms)"</span>) <span class="sc">+</span></span>
-<span id="cb9-4"><a href="#cb9-4"></a>  <span class="fu">geom_histogram</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>df_lifetime <span class="sc">|&gt;</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(ff, <span class="at">fill =</span> condition)) <span class="sc">+</span> </span>
+<span id="cb11-2"><a href="#cb11-2"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"First fixataion times at the verb region"</span>,</span>
+<span id="cb11-3"><a href="#cb11-3"></a>       <span class="at">x =</span> <span class="st">"First fixation times (ms)"</span>) <span class="sc">+</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a>  <span class="fu">geom_histogram</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div><div class="column">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -752,11 +779,11 @@ Daniela Palleschi
 <div id="tabset-1-1">
 <div class="cell columns column-output-location">
 <div class="column">
-<div class="sourceCode cell-code" id="cb10" data-code-line-numbers="|4|5|"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>df_lifetime <span class="sc">|&gt;</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(ff, <span class="at">fill =</span> condition)) <span class="sc">+</span> </span>
-<span id="cb10-2"><a href="#cb10-2"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Histogram of first fixataion times"</span>,</span>
-<span id="cb10-3"><a href="#cb10-3"></a>       <span class="at">x =</span> <span class="st">"First fixation times (ms)"</span>) <span class="sc">+</span></span>
-<span id="cb10-4"><a href="#cb10-4"></a>  <span class="fu">geom_histogram</span>(<span class="at">alpha=</span>.<span class="dv">5</span>) <span class="sc">+</span></span>
-<span id="cb10-5"><a href="#cb10-5"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12" data-code-line-numbers="|4|5|"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>df_lifetime <span class="sc">|&gt;</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(ff, <span class="at">fill =</span> condition)) <span class="sc">+</span> </span>
+<span id="cb12-2"><a href="#cb12-2"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Histogram of first fixataion times"</span>,</span>
+<span id="cb12-3"><a href="#cb12-3"></a>       <span class="at">x =</span> <span class="st">"First fixation times (ms)"</span>) <span class="sc">+</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a>  <span class="fu">geom_histogram</span>(<span class="at">alpha=</span>.<span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb12-5"><a href="#cb12-5"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div><div class="column">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -771,11 +798,11 @@ Daniela Palleschi
 <div id="tabset-1-2">
 <div class="cell columns column-output-location">
 <div class="column">
-<div class="sourceCode cell-code" id="cb11" data-code-line-numbers="5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>df_lifetime <span class="sc">|&gt;</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(ff, <span class="at">fill =</span> condition)) <span class="sc">+</span> </span>
-<span id="cb11-2"><a href="#cb11-2"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Histogram of first fixataion times"</span>,</span>
-<span id="cb11-3"><a href="#cb11-3"></a>       <span class="at">x =</span> <span class="st">"First fixation times (ms)"</span>) <span class="sc">+</span></span>
-<span id="cb11-4"><a href="#cb11-4"></a>  <span class="fu">geom_histogram</span>(<span class="at">alpha=</span>.<span class="dv">5</span>) <span class="sc">+</span></span>
-<span id="cb11-5"><a href="#cb11-5"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13" data-code-line-numbers="5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>df_lifetime <span class="sc">|&gt;</span> <span class="fu">ggplot</span>(<span class="fu">aes</span>(ff, <span class="at">fill =</span> condition)) <span class="sc">+</span> </span>
+<span id="cb13-2"><a href="#cb13-2"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Histogram of first fixataion times"</span>,</span>
+<span id="cb13-3"><a href="#cb13-3"></a>       <span class="at">x =</span> <span class="st">"First fixation times (ms)"</span>) <span class="sc">+</span></span>
+<span id="cb13-4"><a href="#cb13-4"></a>  <span class="fu">geom_histogram</span>(<span class="at">alpha=</span>.<span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div><div class="column">
 <div class="cell-output-display">
 <div class="quarto-figure quarto-figure-center">
@@ -803,11 +830,11 @@ Daniela Palleschi
 </ul>
 <div class="cell columns column-output-location">
 <div class="column">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>iris <span class="sc">|&gt;</span> </span>
-<span id="cb12-2"><a href="#cb12-2"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>Sepal.Length)) <span class="sc">+</span></span>
-<span id="cb12-3"><a href="#cb12-3"></a>  <span class="fu">geom_density</span>() <span class="sc">+</span></span>
-<span id="cb12-4"><a href="#cb12-4"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"A density plot"</span>,</span>
-<span id="cb12-5"><a href="#cb12-5"></a>       <span class="at">x =</span> <span class="st">"variable"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>iris <span class="sc">|&gt;</span> </span>
+<span id="cb14-2"><a href="#cb14-2"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>Sepal.Length)) <span class="sc">+</span></span>
+<span id="cb14-3"><a href="#cb14-3"></a>  <span class="fu">geom_density</span>() <span class="sc">+</span></span>
+<span id="cb14-4"><a href="#cb14-4"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"A density plot"</span>,</span>
+<span id="cb14-5"><a href="#cb14-5"></a>       <span class="at">x =</span> <span class="st">"variable"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="column fragment">
 <div class="cell-output-display">
@@ -826,13 +853,13 @@ Daniela Palleschi
 </ul>
 <div class="cell columns column-output-location">
 <div class="column">
-<div class="sourceCode cell-code" id="cb13" data-code-line-numbers="|2|6|"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>df_lifetime <span class="sc">|&gt;</span> </span>
-<span id="cb13-2"><a href="#cb13-2"></a>  <span class="fu">filter</span>(ff <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb13-3"><a href="#cb13-3"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(ff)) <span class="sc">+</span> </span>
-<span id="cb13-4"><a href="#cb13-4"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Histogram of first fixataion times"</span>,</span>
-<span id="cb13-5"><a href="#cb13-5"></a>       <span class="at">x =</span> <span class="st">"First fixation times (ms)"</span>) <span class="sc">+</span></span>
-<span id="cb13-6"><a href="#cb13-6"></a>  <span class="fu">geom_density</span>(<span class="at">alpha=</span>.<span class="dv">5</span>) <span class="sc">+</span></span>
-<span id="cb13-7"><a href="#cb13-7"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb15" data-code-line-numbers="|2|6|"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>df_lifetime <span class="sc">|&gt;</span> </span>
+<span id="cb15-2"><a href="#cb15-2"></a>  <span class="fu">filter</span>(ff <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb15-3"><a href="#cb15-3"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(ff)) <span class="sc">+</span> </span>
+<span id="cb15-4"><a href="#cb15-4"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Histogram of first fixataion times"</span>,</span>
+<span id="cb15-5"><a href="#cb15-5"></a>       <span class="at">x =</span> <span class="st">"First fixation times (ms)"</span>) <span class="sc">+</span></span>
+<span id="cb15-6"><a href="#cb15-6"></a>  <span class="fu">geom_density</span>() <span class="sc">+</span></span>
+<span id="cb15-7"><a href="#cb15-7"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="column fragment">
 <div class="cell-output-display">
@@ -854,13 +881,13 @@ Daniela Palleschi
 </ul>
 <div class="cell columns column-output-location">
 <div class="column">
-<div class="sourceCode cell-code" id="cb14" data-code-line-numbers="|2|6|"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>df_lifetime <span class="sc">|&gt;</span> </span>
-<span id="cb14-2"><a href="#cb14-2"></a>  <span class="fu">filter</span>(ff <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb14-3"><a href="#cb14-3"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(ff, <span class="at">fill =</span> region)) <span class="sc">+</span> </span>
-<span id="cb14-4"><a href="#cb14-4"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Histogram of first fixataion times"</span>,</span>
-<span id="cb14-5"><a href="#cb14-5"></a>       <span class="at">x =</span> <span class="st">"First fixation times (ms)"</span>) <span class="sc">+</span></span>
-<span id="cb14-6"><a href="#cb14-6"></a>  <span class="fu">geom_density</span>(<span class="at">alpha=</span>.<span class="dv">5</span>) <span class="sc">+</span></span>
-<span id="cb14-7"><a href="#cb14-7"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16" data-code-line-numbers="|2|6|"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>df_lifetime <span class="sc">|&gt;</span> </span>
+<span id="cb16-2"><a href="#cb16-2"></a>  <span class="fu">filter</span>(ff <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb16-3"><a href="#cb16-3"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(ff, <span class="at">fill =</span> region)) <span class="sc">+</span> </span>
+<span id="cb16-4"><a href="#cb16-4"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Histogram of first fixataion times"</span>,</span>
+<span id="cb16-5"><a href="#cb16-5"></a>       <span class="at">x =</span> <span class="st">"First fixation times (ms)"</span>) <span class="sc">+</span></span>
+<span id="cb16-6"><a href="#cb16-6"></a>  <span class="fu">geom_density</span>(<span class="at">alpha=</span>.<span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb16-7"><a href="#cb16-7"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="column fragment">
 <div class="cell-output-display">
@@ -879,14 +906,14 @@ Daniela Palleschi
 </ul>
 <div class="cell columns column-output-location">
 <div class="column">
-<div class="sourceCode cell-code" id="cb15" data-code-line-numbers="|2|6|"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>df_lifetime <span class="sc">|&gt;</span> </span>
-<span id="cb15-2"><a href="#cb15-2"></a>  <span class="fu">filter</span>(ff <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb15-3"><a href="#cb15-3"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(ff, <span class="at">fill =</span> region)) <span class="sc">+</span> </span>
-<span id="cb15-4"><a href="#cb15-4"></a>  <span class="fu">facet_grid</span>(.<span class="sc">~</span>region) <span class="sc">+</span></span>
-<span id="cb15-5"><a href="#cb15-5"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Density plot of first fixataion times by region"</span>,</span>
-<span id="cb15-6"><a href="#cb15-6"></a>       <span class="at">x =</span> <span class="st">"First fixation times (ms)"</span>) <span class="sc">+</span></span>
-<span id="cb15-7"><a href="#cb15-7"></a>  <span class="fu">geom_density</span>(<span class="at">alpha=</span>.<span class="dv">5</span>) <span class="sc">+</span></span>
-<span id="cb15-8"><a href="#cb15-8"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17" data-code-line-numbers="|4|"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>df_lifetime <span class="sc">|&gt;</span> </span>
+<span id="cb17-2"><a href="#cb17-2"></a>  <span class="fu">filter</span>(ff <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb17-3"><a href="#cb17-3"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(ff, <span class="at">fill =</span> region)) <span class="sc">+</span> </span>
+<span id="cb17-4"><a href="#cb17-4"></a>  <span class="fu">facet_grid</span>(.<span class="sc">~</span>region) <span class="sc">+</span></span>
+<span id="cb17-5"><a href="#cb17-5"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Density plot of first fixataion times by region"</span>,</span>
+<span id="cb17-6"><a href="#cb17-6"></a>       <span class="at">x =</span> <span class="st">"First fixation times (ms)"</span>) <span class="sc">+</span></span>
+<span id="cb17-7"><a href="#cb17-7"></a>  <span class="fu">geom_density</span>(<span class="at">alpha=</span>.<span class="dv">5</span>) <span class="sc">+</span></span>
+<span id="cb17-8"><a href="#cb17-8"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="column fragment">
 <div class="cell-output-display">
@@ -912,10 +939,11 @@ Daniela Palleschi
 </ul>
 <div class="cell columns column-output-location">
 <div class="column">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>df_lifetime <span class="ot">&lt;-</span> df_lifetime <span class="sc">%&gt;%</span></span>
-<span id="cb16-2"><a href="#cb16-2"></a>  <span class="fu">mutate</span>(<span class="at">region =</span> <span class="fu">factor</span>(region, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"verb-1"</span>,<span class="st">"verb"</span>,<span class="st">"verb+1"</span>,<span class="st">"verb+2"</span>,<span class="st">"verb+3"</span>,<span class="st">"verb+4"</span>)))</span>
-<span id="cb16-3"><a href="#cb16-3"></a></span>
-<span id="cb16-4"><a href="#cb16-4"></a><span class="fu">summary</span>(df_lifetime<span class="sc">$</span>region)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>df_lifetime <span class="ot">&lt;-</span> df_lifetime <span class="sc">%&gt;%</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a>  <span class="fu">mutate</span>(<span class="at">region =</span> <span class="fu">factor</span>(region, </span>
+<span id="cb18-3"><a href="#cb18-3"></a>                         <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"verb-1"</span>,<span class="st">"verb"</span>,<span class="st">"verb+1"</span>,<span class="st">"verb+2"</span>,<span class="st">"verb+3"</span>,<span class="st">"verb+4"</span>)))</span>
+<span id="cb18-4"><a href="#cb18-4"></a></span>
+<span id="cb18-5"><a href="#cb18-5"></a><span class="fu">summary</span>(df_lifetime<span class="sc">$</span>region)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="column fragment">
 <div class="cell-output cell-output-stdout">
@@ -934,7 +962,7 @@ Daniela Palleschi
 <li class="fragment">your plot should look something like A or B:</li>
 </ul>
 
-<img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-22-1.png" width="100" class="r-stretch quarto-figure-center"></section><section id="extra-exercise" class="slide level4"><h4>Extra exercise</h4>
+<img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-22-1.png" width="960" class="r-stretch"></section><section id="extra-exercise" class="slide level4"><h4>Extra exercise</h4>
 <ol start="2" type="1">
 <li class="fragment">Can you produce these plots?</li>
 </ol>
@@ -943,20 +971,20 @@ Daniela Palleschi
 <ul>
 <li class="fragment">histograms and density plots plot a <strong>single variable</strong> along the x-axis
 <ul>
-<li class="fragment">in most other plots the dependent (measure) variable is plotted along the y-axis</li>
+<li class="fragment">in most other plots the dependent (measure) variable is plotted along the y-axis by convention</li>
 </ul>
 </li>
-<li class="fragment">scatterplots plots the relationship between <strong>two variables</strong>
+<li class="fragment">scatterplots plot the relationship between <strong>two variables</strong>
 </li>
 </ul>
 <div class="cell columns column-output-location">
 <div class="column">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a>iris <span class="sc">|&gt;</span> </span>
-<span id="cb18-2"><a href="#cb18-2"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>Sepal.Length, <span class="at">y=</span>Sepal.Width)) <span class="sc">+</span></span>
-<span id="cb18-3"><a href="#cb18-3"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb18-4"><a href="#cb18-4"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"A scatterplot"</span>,</span>
-<span id="cb18-5"><a href="#cb18-5"></a>       <span class="at">x =</span> <span class="st">"variable X"</span>,</span>
-<span id="cb18-6"><a href="#cb18-6"></a>       <span class="at">y =</span> <span class="st">"variable Y"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>iris <span class="sc">|&gt;</span> </span>
+<span id="cb20-2"><a href="#cb20-2"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>Sepal.Length, <span class="at">y=</span>Sepal.Width)) <span class="sc">+</span></span>
+<span id="cb20-3"><a href="#cb20-3"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb20-4"><a href="#cb20-4"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"A scatterplot"</span>,</span>
+<span id="cb20-5"><a href="#cb20-5"></a>       <span class="at">x =</span> <span class="st">"variable X"</span>,</span>
+<span id="cb20-6"><a href="#cb20-6"></a>       <span class="at">y =</span> <span class="st">"variable Y"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="column fragment">
 <div class="cell-output-display">
@@ -975,16 +1003,16 @@ Daniela Palleschi
 </ul>
 <div class="cell columns column-output-location">
 <div class="column">
-<div class="sourceCode cell-code" id="cb19" data-code-line-numbers="4,7,8,9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>df_lifetime <span class="sc">|&gt;</span></span>
-<span id="cb19-2"><a href="#cb19-2"></a>  <span class="fu">filter</span>(ff <span class="sc">&gt;</span> <span class="dv">0</span>,</span>
-<span id="cb19-3"><a href="#cb19-3"></a>         region <span class="sc">==</span> <span class="st">"verb"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb19-4"><a href="#cb19-4"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> tt, <span class="at">y =</span> rt)) <span class="sc">+</span></span>
-<span id="cb19-5"><a href="#cb19-5"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Scatter plot of total reading times (verb region)</span></span>
-<span id="cb19-6"><a href="#cb19-6"></a><span class="st">and reaction times (critical sentence)"</span>,</span>
-<span id="cb19-7"><a href="#cb19-7"></a>       <span class="at">x =</span> <span class="st">"Total reading time (ms)"</span>,</span>
-<span id="cb19-8"><a href="#cb19-8"></a>       <span class="at">y =</span> <span class="st">"Reaction time (ms)"</span>) <span class="sc">+</span></span>
-<span id="cb19-9"><a href="#cb19-9"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> .<span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb19-10"><a href="#cb19-10"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb21" data-code-line-numbers="4,7,8,9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a>df_lifetime <span class="sc">|&gt;</span></span>
+<span id="cb21-2"><a href="#cb21-2"></a>  <span class="fu">filter</span>(ff <span class="sc">&gt;</span> <span class="dv">0</span>,</span>
+<span id="cb21-3"><a href="#cb21-3"></a>         region <span class="sc">==</span> <span class="st">"verb"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb21-4"><a href="#cb21-4"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> tt, <span class="at">y =</span> rt)) <span class="sc">+</span></span>
+<span id="cb21-5"><a href="#cb21-5"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Scatter plot of total reading times (verb region)</span></span>
+<span id="cb21-6"><a href="#cb21-6"></a><span class="st">and reaction times (critical sentence)"</span>,</span>
+<span id="cb21-7"><a href="#cb21-7"></a>       <span class="at">x =</span> <span class="st">"Total reading time (ms)"</span>,</span>
+<span id="cb21-8"><a href="#cb21-8"></a>       <span class="at">y =</span> <span class="st">"Reaction time (ms)"</span>) <span class="sc">+</span></span>
+<span id="cb21-9"><a href="#cb21-9"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> .<span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb21-10"><a href="#cb21-10"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="column fragment">
 <div class="cell-output-display">
@@ -994,25 +1022,35 @@ Daniela Palleschi
 </div>
 </section><section id="exercise-2" class="slide level4"><h4>Exercise</h4>
 <ol type="1">
-<li class="fragment">Generate a scatterplot of total reading times and reaction times, with:</li>
-</ol>
+<li class="fragment">Generate a scatterplot of total reading times and reaction times, with:
 <ul>
-<li class="fragment">colour and shape set to condition
-<ul>
+<li class="fragment">colour and shape set to condition</li>
 <li class="fragment">tip: these both belong in <code>aes()</code>
 </li>
 </ul>
 </li>
-</ul>
-<ol start="2" type="1">
 <li class="fragment">What information does this plot suggest?</li>
 </ol>
 <div class="cell">
 
 </div>
 </section></section><section><section id="summary-statistics" class="title-slide slide level1 center"><h1>Summary statistics</h1>
-
-</section><section id="boxplots" class="title-slide slide level2 center"><h2>Boxplots</h2>
+<ul>
+<li class="fragment">measures of location: mean, median, mode</li>
+<li class="fragment">measures of spread: (interquartile) range, standard deviation</li>
+</ul>
+<aside class="notes"><p>IQR: middle 50% of data</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside></section><section id="boxplots" class="title-slide slide level2 center"><h2>Boxplots</h2>
 <ul>
 <li class="fragment">boxplots provide information about the distribution of a <em>continuous</em> variable
 <ul>
@@ -1029,12 +1067,12 @@ Daniela Palleschi
 </ul>
 <div class="cell columns column-output-location">
 <div class="column">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>iris <span class="sc">|&gt;</span> </span>
-<span id="cb20-2"><a href="#cb20-2"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Species, <span class="at">y =</span> Sepal.Length)) <span class="sc">+</span></span>
-<span id="cb20-3"><a href="#cb20-3"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"A scatterplot"</span>,</span>
-<span id="cb20-4"><a href="#cb20-4"></a>       <span class="at">x =</span> <span class="st">"Categorical variable"</span>,</span>
-<span id="cb20-5"><a href="#cb20-5"></a>       <span class="at">y =</span> <span class="st">"Continuous variable"</span>) <span class="sc">+</span></span>
-<span id="cb20-6"><a href="#cb20-6"></a>  <span class="fu">geom_boxplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>iris <span class="sc">|&gt;</span> </span>
+<span id="cb22-2"><a href="#cb22-2"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> Species, <span class="at">y =</span> Sepal.Length)) <span class="sc">+</span></span>
+<span id="cb22-3"><a href="#cb22-3"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"A scatterplot"</span>,</span>
+<span id="cb22-4"><a href="#cb22-4"></a>       <span class="at">x =</span> <span class="st">"Categorical variable"</span>,</span>
+<span id="cb22-5"><a href="#cb22-5"></a>       <span class="at">y =</span> <span class="st">"Continuous variable"</span>) <span class="sc">+</span></span>
+<span id="cb22-6"><a href="#cb22-6"></a>  <span class="fu">geom_boxplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="column fragment">
 <div class="cell-output-display">
@@ -1046,44 +1084,57 @@ Daniela Palleschi
 </div>
 </div>
 </div>
-</section><section id="boxplots-1" class="title-slide slide level2 center"><h2>Boxplots</h2>
+</section><section id="boxplot-explained" class="title-slide slide level2 center"><h2>Boxplot explained</h2>
+
+<img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-28-1.png" width="648" class="r-stretch quarto-figure-center"><p class="caption">Image source: <span class="citation" data-cites="winter_statistics_2019">(<a href="#/references" role="doc-biblioref" onclick=""><strong>winter_statistics_2019?</strong></a>)</span> (all rights reserved)</p><aside class="notes"><p>whiskers: 1.5*IQR from Q1 (lower whisker) or Q3 (upper whisker) outliers: outside that range</p>
+<style type="text/css">
+        span.MJX_Assistive_MathML {
+          position:absolute!important;
+          clip: rect(1px, 1px, 1px, 1px);
+          padding: 1px 0 0 0!important;
+          border: 0!important;
+          height: 1px!important;
+          width: 1px!important;
+          overflow: hidden!important;
+          display:block!important;
+      }</style></aside></section><section id="boxplots-1" class="title-slide slide level2 center"><h2>Boxplots</h2>
 <ul>
 <li class="fragment">let’s change our scatterplot to a boxplot</li>
 </ul>
 <div class="cell columns column-output-location">
 <div class="column">
-<div class="sourceCode cell-code" id="cb21" data-code-line-numbers="4,"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a>df_lifetime <span class="sc">|&gt;</span></span>
-<span id="cb21-2"><a href="#cb21-2"></a>  <span class="fu">filter</span>(ff <span class="sc">&gt;</span> <span class="dv">0</span>,</span>
-<span id="cb21-3"><a href="#cb21-3"></a>         region <span class="sc">==</span> <span class="st">"verb"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb21-4"><a href="#cb21-4"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> tense, <span class="at">y =</span> ff)) <span class="sc">+</span></span>
-<span id="cb21-5"><a href="#cb21-5"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"First-fixation duration (verb region)"</span>,</span>
-<span id="cb21-6"><a href="#cb21-6"></a>       <span class="at">x =</span> <span class="st">"Tense"</span>,</span>
-<span id="cb21-7"><a href="#cb21-7"></a>       <span class="at">y =</span> <span class="st">"First-fixation duration (ms)"</span>) <span class="sc">+</span></span>
-<span id="cb21-8"><a href="#cb21-8"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> .<span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb21-9"><a href="#cb21-9"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23" data-code-line-numbers="4,"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>df_lifetime <span class="sc">|&gt;</span></span>
+<span id="cb23-2"><a href="#cb23-2"></a>  <span class="fu">filter</span>(ff <span class="sc">&gt;</span> <span class="dv">0</span>,</span>
+<span id="cb23-3"><a href="#cb23-3"></a>         region <span class="sc">==</span> <span class="st">"verb"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb23-4"><a href="#cb23-4"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> tense, <span class="at">y =</span> ff)) <span class="sc">+</span></span>
+<span id="cb23-5"><a href="#cb23-5"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"First-fixation duration (verb region)"</span>,</span>
+<span id="cb23-6"><a href="#cb23-6"></a>       <span class="at">x =</span> <span class="st">"Tense"</span>,</span>
+<span id="cb23-7"><a href="#cb23-7"></a>       <span class="at">y =</span> <span class="st">"First-fixation duration (ms)"</span>) <span class="sc">+</span></span>
+<span id="cb23-8"><a href="#cb23-8"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> .<span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb23-9"><a href="#cb23-9"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="column fragment">
 <div class="cell-output-display">
-<p><img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-28-1.png" width="960"></p>
+<p><img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-30-1.png" width="960"></p>
 </div>
 </div>
 </div>
 </section><section id="grouped-boxplots" class="title-slide slide level3 center"><h3>Grouped boxplots</h3>
 <div class="cell columns column-output-location">
 <div class="column">
-<div class="sourceCode cell-code" id="cb22" data-code-line-numbers="4,"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>df_lifetime <span class="sc">|&gt;</span></span>
-<span id="cb22-2"><a href="#cb22-2"></a>  <span class="fu">filter</span>(ff <span class="sc">&gt;</span> <span class="dv">0</span>,</span>
-<span id="cb22-3"><a href="#cb22-3"></a>         region <span class="sc">==</span> <span class="st">"verb"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb22-4"><a href="#cb22-4"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> tense, <span class="at">y =</span> ff, <span class="at">colour =</span> lifetime)) <span class="sc">+</span></span>
-<span id="cb22-5"><a href="#cb22-5"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"First-fixation duration (verb region)"</span>,</span>
-<span id="cb22-6"><a href="#cb22-6"></a>       <span class="at">x =</span> <span class="st">"Tense"</span>,</span>
-<span id="cb22-7"><a href="#cb22-7"></a>       <span class="at">y =</span> <span class="st">"First-fixation duration (ms)"</span>) <span class="sc">+</span></span>
-<span id="cb22-8"><a href="#cb22-8"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> .<span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb22-9"><a href="#cb22-9"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24" data-code-line-numbers="4,"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>df_lifetime <span class="sc">|&gt;</span></span>
+<span id="cb24-2"><a href="#cb24-2"></a>  <span class="fu">filter</span>(ff <span class="sc">&gt;</span> <span class="dv">0</span>,</span>
+<span id="cb24-3"><a href="#cb24-3"></a>         region <span class="sc">==</span> <span class="st">"verb"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb24-4"><a href="#cb24-4"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> tense, <span class="at">y =</span> ff, <span class="at">colour =</span> lifetime)) <span class="sc">+</span></span>
+<span id="cb24-5"><a href="#cb24-5"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"First-fixation duration (verb region)"</span>,</span>
+<span id="cb24-6"><a href="#cb24-6"></a>       <span class="at">x =</span> <span class="st">"Tense"</span>,</span>
+<span id="cb24-7"><a href="#cb24-7"></a>       <span class="at">y =</span> <span class="st">"First-fixation duration (ms)"</span>) <span class="sc">+</span></span>
+<span id="cb24-8"><a href="#cb24-8"></a>  <span class="fu">geom_boxplot</span>(<span class="at">alpha =</span> .<span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb24-9"><a href="#cb24-9"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="column fragment">
 <div class="cell-output-display">
-<p><img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-29-1.png" width="960"></p>
+<p><img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-31-1.png" width="960"></p>
 </div>
 </div>
 </div>
@@ -1139,48 +1190,48 @@ Daniela Palleschi
 <td style="text-align: left;">dead</td>
 <td style="text-align: left;">PP</td>
 <td style="text-align: right;">140</td>
-<td style="text-align: right;">171.3</td>
-<td style="text-align: right;">87.1</td>
-<td style="text-align: right;">7.4</td>
-<td style="text-align: right;">14.5</td>
-<td style="text-align: right;">156.7</td>
-<td style="text-align: right;">185.8</td>
+<td style="text-align: right;">198.9</td>
+<td style="text-align: right;">57.9</td>
+<td style="text-align: right;">4.9</td>
+<td style="text-align: right;">9.7</td>
+<td style="text-align: right;">189.2</td>
+<td style="text-align: right;">208.6</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">deadSF</td>
 <td style="text-align: left;">dead</td>
 <td style="text-align: left;">SF</td>
 <td style="text-align: right;">139</td>
-<td style="text-align: right;">167.1</td>
-<td style="text-align: right;">92.5</td>
-<td style="text-align: right;">7.8</td>
-<td style="text-align: right;">15.5</td>
-<td style="text-align: right;">151.6</td>
-<td style="text-align: right;">182.6</td>
+<td style="text-align: right;">194.6</td>
+<td style="text-align: right;">67.9</td>
+<td style="text-align: right;">5.8</td>
+<td style="text-align: right;">11.4</td>
+<td style="text-align: right;">183.2</td>
+<td style="text-align: right;">205.9</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">livingPP</td>
 <td style="text-align: left;">living</td>
 <td style="text-align: left;">PP</td>
 <td style="text-align: right;">140</td>
-<td style="text-align: right;">167.8</td>
-<td style="text-align: right;">98.9</td>
-<td style="text-align: right;">8.4</td>
-<td style="text-align: right;">16.5</td>
-<td style="text-align: right;">151.2</td>
-<td style="text-align: right;">184.3</td>
+<td style="text-align: right;">194.2</td>
+<td style="text-align: right;">77.3</td>
+<td style="text-align: right;">6.5</td>
+<td style="text-align: right;">12.9</td>
+<td style="text-align: right;">181.3</td>
+<td style="text-align: right;">207.1</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">livingSF</td>
 <td style="text-align: left;">living</td>
 <td style="text-align: left;">SF</td>
 <td style="text-align: right;">140</td>
-<td style="text-align: right;">160.2</td>
-<td style="text-align: right;">85.4</td>
-<td style="text-align: right;">7.2</td>
-<td style="text-align: right;">14.3</td>
-<td style="text-align: right;">146.0</td>
-<td style="text-align: right;">174.5</td>
+<td style="text-align: right;">186.0</td>
+<td style="text-align: right;">57.6</td>
+<td style="text-align: right;">4.9</td>
+<td style="text-align: right;">9.6</td>
+<td style="text-align: right;">176.4</td>
+<td style="text-align: right;">195.6</td>
 </tr>
 </tbody>
 </table>
@@ -1190,13 +1241,13 @@ Daniela Palleschi
 </div><div class="column" style="width:50%;">
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-31-1.png" width="960"></p>
+<p><img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-34-1.png" width="960"></p>
 </div>
 </div>
 </div><div class="column" style="width:50%;">
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-32-1.png" width="960"></p>
+<p><img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-35-1.png" width="960"></p>
 </div>
 </div>
 </div>
@@ -1220,46 +1271,45 @@ Daniela Palleschi
 </ul>
 </div><div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>df_lifetime <span class="sc">|&gt;</span> </span>
-<span id="cb23-2"><a href="#cb23-2"></a>  <span class="fu">distinct</span>(px,trial,<span class="at">.keep_all=</span>T) <span class="sc">|&gt;</span> </span>
-<span id="cb23-3"><a href="#cb23-3"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.factor</span>(accept) )) <span class="sc">+</span></span>
-<span id="cb23-4"><a href="#cb23-4"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
-<span id="cb23-5"><a href="#cb23-5"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a>df_lifetime <span class="sc">|&gt;</span> </span>
+<span id="cb25-2"><a href="#cb25-2"></a>  <span class="fu">distinct</span>(px,trial,<span class="at">.keep_all=</span>T) <span class="sc">|&gt;</span> </span>
+<span id="cb25-3"><a href="#cb25-3"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.factor</span>(accept) )) <span class="sc">+</span></span>
+<span id="cb25-4"><a href="#cb25-4"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
+<span id="cb25-5"><a href="#cb25-5"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-33-1.png" width="960"></p>
+<p><img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-36-1.png" width="960"></p>
 </div>
 </div>
 </div><div class="column" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>df_lifetime <span class="sc">|&gt;</span> </span>
-<span id="cb24-2"><a href="#cb24-2"></a>  <span class="fu">distinct</span>(px,trial,<span class="at">.keep_all=</span>T) <span class="sc">|&gt;</span> </span>
-<span id="cb24-3"><a href="#cb24-3"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.factor</span>(accept), <span class="at">fill =</span> condition)) <span class="sc">+</span></span>
-<span id="cb24-4"><a href="#cb24-4"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Binary responses"</span>,</span>
-<span id="cb24-5"><a href="#cb24-5"></a>       <span class="at">x =</span> <span class="st">"Naturalness response"</span>,</span>
-<span id="cb24-6"><a href="#cb24-6"></a>       <span class="at">fill =</span> <span class="st">"Condition"</span>) <span class="sc">+</span></span>
-<span id="cb24-7"><a href="#cb24-7"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
-<span id="cb24-8"><a href="#cb24-8"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>df_lifetime <span class="sc">|&gt;</span> </span>
+<span id="cb26-2"><a href="#cb26-2"></a>  <span class="fu">distinct</span>(px,trial,<span class="at">.keep_all=</span>T) <span class="sc">|&gt;</span> </span>
+<span id="cb26-3"><a href="#cb26-3"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.factor</span>(accept), <span class="at">fill =</span> condition)) <span class="sc">+</span></span>
+<span id="cb26-4"><a href="#cb26-4"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Binary responses"</span>,</span>
+<span id="cb26-5"><a href="#cb26-5"></a>       <span class="at">x =</span> <span class="st">"Naturalness response"</span>,</span>
+<span id="cb26-6"><a href="#cb26-6"></a>       <span class="at">fill =</span> <span class="st">"Condition"</span>) <span class="sc">+</span></span>
+<span id="cb26-7"><a href="#cb26-7"></a>  <span class="fu">geom_bar</span>() <span class="sc">+</span></span>
+<span id="cb26-8"><a href="#cb26-8"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-34-1.png" width="960"></p>
+<p><img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-37-1.png" width="960"></p>
 </div>
 </div>
 </div>
 </section><section id="grouped-bar-plots" class="title-slide slide level2 center"><h2>Grouped bar plots</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a>df_lifetime <span class="sc">|&gt;</span> </span>
-<span id="cb25-2"><a href="#cb25-2"></a>  <span class="fu">distinct</span>(px,trial,<span class="at">.keep_all=</span>T) <span class="sc">|&gt;</span> </span>
-<span id="cb25-3"><a href="#cb25-3"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.factor</span>(accept), <span class="at">fill =</span> condition)) <span class="sc">+</span></span>
-<span id="cb25-4"><a href="#cb25-4"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Binary responses"</span>,</span>
-<span id="cb25-5"><a href="#cb25-5"></a>       <span class="at">x =</span> <span class="st">"Naturalness response"</span>,</span>
-<span id="cb25-6"><a href="#cb25-6"></a>       <span class="at">fill =</span> <span class="st">"Condition"</span>) <span class="sc">+</span></span>
-<span id="cb25-7"><a href="#cb25-7"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
-<span id="cb25-8"><a href="#cb25-8"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a>df_lifetime <span class="sc">|&gt;</span> </span>
+<span id="cb27-2"><a href="#cb27-2"></a>  <span class="fu">distinct</span>(px,trial,<span class="at">.keep_all=</span>T) <span class="sc">|&gt;</span> </span>
+<span id="cb27-3"><a href="#cb27-3"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fu">as.factor</span>(accept), <span class="at">fill =</span> condition)) <span class="sc">+</span></span>
+<span id="cb27-4"><a href="#cb27-4"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Binary responses"</span>,</span>
+<span id="cb27-5"><a href="#cb27-5"></a>       <span class="at">x =</span> <span class="st">"Naturalness response"</span>,</span>
+<span id="cb27-6"><a href="#cb27-6"></a>       <span class="at">fill =</span> <span class="st">"Condition"</span>) <span class="sc">+</span></span>
+<span id="cb27-7"><a href="#cb27-7"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
+<span id="cb27-8"><a href="#cb27-8"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 </div>
-<img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-35-1.png" width="960" class="r-stretch"></section><section id="exercise-4" class="title-slide slide level3 center"><h3>Exercise</h3>
+<img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-38-1.png" width="960" class="r-stretch"></section><section id="exercise-4" class="title-slide slide level3 center"><h3>Exercise</h3>
 <ol type="1">
-<li class="fragment">Generate a grouped bar plot (i.e., <code>dodge</code>) with:</li>
-</ol>
+<li class="fragment">Generate a grouped bar plot (i.e., <code>dodge</code>) with:
 <ul>
 <li class="fragment">a facet grid for <code>tense</code>
 </li>
@@ -1269,30 +1319,62 @@ Daniela Palleschi
 <li class="fragment">change the labels accordingly</li>
 <li class="fragment">customise as you like</li>
 </ul>
+</li>
+</ol>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>df_lifetime <span class="sc">|&gt;</span> </span>
-<span id="cb26-2"><a href="#cb26-2"></a>  <span class="fu">distinct</span>(px,trial,<span class="at">.keep_all=</span>T) <span class="sc">|&gt;</span> </span>
-<span id="cb26-3"><a href="#cb26-3"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> lifetime, <span class="at">fill =</span> <span class="fu">as.factor</span>(accept))) <span class="sc">+</span></span>
-<span id="cb26-4"><a href="#cb26-4"></a>  <span class="fu">facet_grid</span>(.<span class="sc">~</span>tense) <span class="sc">+</span></span>
-<span id="cb26-5"><a href="#cb26-5"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Binary responses"</span>,</span>
-<span id="cb26-6"><a href="#cb26-6"></a>       <span class="at">x =</span> <span class="st">"Liftime"</span>,</span>
-<span id="cb26-7"><a href="#cb26-7"></a>       <span class="at">fill =</span> <span class="st">"Response"</span>) <span class="sc">+</span></span>
-<span id="cb26-8"><a href="#cb26-8"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
-<span id="cb26-9"><a href="#cb26-9"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a>df_lifetime <span class="sc">|&gt;</span> </span>
+<span id="cb28-2"><a href="#cb28-2"></a>  <span class="fu">distinct</span>(px,trial,<span class="at">.keep_all=</span>T) <span class="sc">|&gt;</span> </span>
+<span id="cb28-3"><a href="#cb28-3"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> lifetime, <span class="at">fill =</span> <span class="fu">as.factor</span>(accept))) <span class="sc">+</span></span>
+<span id="cb28-4"><a href="#cb28-4"></a>  <span class="fu">facet_grid</span>(.<span class="sc">~</span>tense) <span class="sc">+</span></span>
+<span id="cb28-5"><a href="#cb28-5"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Binary responses"</span>,</span>
+<span id="cb28-6"><a href="#cb28-6"></a>       <span class="at">x =</span> <span class="st">"Liftime"</span>,</span>
+<span id="cb28-7"><a href="#cb28-7"></a>       <span class="at">fill =</span> <span class="st">"Response"</span>) <span class="sc">+</span></span>
+<span id="cb28-8"><a href="#cb28-8"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
+<span id="cb28-9"><a href="#cb28-9"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-</section></section><section id="count-data" class="title-slide slide level1 center"><h1>Count data</h1>
+</section><section id="grouped-bar-plots-1" class="title-slide slide level2 center"><h2>Grouped bar plots</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a>df_lifetime <span class="sc">|&gt;</span> </span>
-<span id="cb27-2"><a href="#cb27-2"></a>  <span class="fu">distinct</span>(px,trial,<span class="at">.keep_all=</span>T) <span class="sc">|&gt;</span> </span>
-<span id="cb27-3"><a href="#cb27-3"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> lifetime, <span class="at">fill =</span> <span class="fu">as.factor</span>(accept))) <span class="sc">+</span></span>
-<span id="cb27-4"><a href="#cb27-4"></a>  <span class="fu">facet_grid</span>(.<span class="sc">~</span>tense) <span class="sc">+</span></span>
-<span id="cb27-5"><a href="#cb27-5"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Binary responses"</span>,</span>
-<span id="cb27-6"><a href="#cb27-6"></a>       <span class="at">x =</span> <span class="st">"Liftime"</span>,</span>
-<span id="cb27-7"><a href="#cb27-7"></a>       <span class="at">fill =</span> <span class="st">"Response"</span>) <span class="sc">+</span></span>
-<span id="cb27-8"><a href="#cb27-8"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
-<span id="cb27-9"><a href="#cb27-9"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1"></a>df_lifetime <span class="sc">|&gt;</span> </span>
+<span id="cb29-2"><a href="#cb29-2"></a>  <span class="fu">distinct</span>(px,trial,<span class="at">.keep_all=</span>T) <span class="sc">|&gt;</span> </span>
+<span id="cb29-3"><a href="#cb29-3"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> lifetime, <span class="at">fill =</span> <span class="fu">as.factor</span>(accept))) <span class="sc">+</span></span>
+<span id="cb29-4"><a href="#cb29-4"></a>  <span class="fu">facet_grid</span>(.<span class="sc">~</span>tense) <span class="sc">+</span></span>
+<span id="cb29-5"><a href="#cb29-5"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Grouped and faceted barplot"</span>,</span>
+<span id="cb29-6"><a href="#cb29-6"></a>       <span class="at">x =</span> <span class="st">"Liftime"</span>,</span>
+<span id="cb29-7"><a href="#cb29-7"></a>       <span class="at">fill =</span> <span class="st">"Response"</span>) <span class="sc">+</span></span>
+<span id="cb29-8"><a href="#cb29-8"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">"dodge"</span>) <span class="sc">+</span></span>
+<span id="cb29-9"><a href="#cb29-9"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
 </div>
-</section><section id="resources" class="title-slide slide level1 center"><h1>Resources</h1>
+<img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-40-1.png" width="960" class="r-stretch"></section><section id="stacked-bar-plots" class="title-slide slide level2 center"><h2>Stacked bar plots</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30" data-code-line-numbers="8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a>df_lifetime <span class="sc">|&gt;</span> </span>
+<span id="cb30-2"><a href="#cb30-2"></a>  <span class="fu">distinct</span>(px,trial,<span class="at">.keep_all=</span>T) <span class="sc">|&gt;</span> </span>
+<span id="cb30-3"><a href="#cb30-3"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> lifetime, <span class="at">fill =</span> <span class="fu">as.factor</span>(accept))) <span class="sc">+</span></span>
+<span id="cb30-4"><a href="#cb30-4"></a>  <span class="fu">facet_grid</span>(.<span class="sc">~</span>tense) <span class="sc">+</span></span>
+<span id="cb30-5"><a href="#cb30-5"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Stacked and faceted barplot"</span>,</span>
+<span id="cb30-6"><a href="#cb30-6"></a>       <span class="at">x =</span> <span class="st">"Liftime"</span>,</span>
+<span id="cb30-7"><a href="#cb30-7"></a>       <span class="at">fill =</span> <span class="st">"Response"</span>) <span class="sc">+</span></span>
+<span id="cb30-8"><a href="#cb30-8"></a>  <span class="fu">geom_bar</span>(<span class="at">position =</span> <span class="st">"stack"</span>) <span class="sc">+</span></span>
+<span id="cb30-9"><a href="#cb30-9"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-41-1.png" width="960" class="r-stretch"></section><section id="exercise-5" class="title-slide slide level3 center"><h3>Exercise</h3>
+<ol type="1">
+<li class="fragment">Choose the barplot you like best for binary data</li>
+<li class="fragment">Reproduce that barplot, but with <code>reg_in</code> at the <code>verb1</code> region</li>
+</ol>
+
+<img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-42-1.png" width="960" class="r-stretch"></section><section id="extra-exercise-1" class="title-slide slide level3 center"><h3>Extra exercise</h3>
+<ol type="1">
+<li class="fragment">Create another bar plot, but for <code>reg_out</code> for all sentence regions</li>
+<li class="fragment">Use <code>facet_grid()</code>
+</li>
+</ol>
+<ul>
+<li class="fragment">to have facets by region (columns) and by tense (in 2 rows)</li>
+</ul>
+
+<img data-src="_data_viz_files/figure-revealjs/unnamed-chunk-43-1.png" width="960" class="r-stretch"></section></section><section id="resources" class="title-slide slide level1 center"><h1>Resources</h1>
 <p><span class="citation" data-cites="nordmann_data_2022">Nordmann et al. (<a href="#/references" role="doc-biblioref" onclick="">2022</a>)</span></p>
 <p><span class="citation" data-cites="nordmann_applied_2022">Nordmann &amp; DeBruine (<a href="#/references" role="doc-biblioref" onclick="">2022</a>)</span></p>
 <p><span class="citation" data-cites="wickham_r_nodate">Wickham et al. (<a href="#/references" role="doc-biblioref" onclick="">n.d.</a>)</span>, <a href="https://r4ds.hadley.nz/data-visualize.html">Chapter 2</a></p>

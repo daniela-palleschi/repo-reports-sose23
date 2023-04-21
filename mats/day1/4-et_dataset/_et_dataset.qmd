@@ -508,8 +508,7 @@ df_lifetime %>%
 #| output-location: fragment
 # change yes_press to factor
 df_lifetime %>%
-  mutate(yes_press = as_factor(yes_press)) %>%
-  summary()
+  mutate(yes_press = as_factor(yes_press))
 ```
 
 ### multiple arguments in a verb
@@ -520,8 +519,7 @@ df_lifetime %>%
 # change ROI & label to factor
 df_lifetime %>%
   mutate(KeyPress = as_factor(KeyPress),
-         item_id = as_factor(item_id)) %>%
-  summary()
+         item_id = as_factor(item_id))
 ```
 
 ### Pop quiz
