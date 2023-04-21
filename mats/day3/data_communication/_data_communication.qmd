@@ -1,0 +1,279 @@
+---
+title: "Describe trends in your data"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+footer: "Data Visualisation"
+lang: en
+date: 2023-04-13
+format:
+  revealjs: 
+    output-file: slides-data_communication.html
+    theme: [dark]
+    width: 1600
+    height: 900
+    progress: true
+    # smaller: true
+    scrollable: true
+    slide-number: c/t
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    # logo: logos/hu_logo.png
+    # css: logo.css
+    incremental: true
+    # number-sections: true
+    toc: true
+    toc-depth: 1
+    toc-title: 'Topics'
+    navigation-mode: linear
+    controls-layout: bottom-right
+    fig-cap-location: top
+    font-size: 0.6em
+    slide-level: 4
+    chalkboard: true
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+  html:
+    self-contained: true
+    output-file: sheet-data_communication.html
+    number-sections: true
+    toc: true
+    code-overflow: wrap
+    code-tools: true
+  pdf:
+    output-file: pdf-data_communication.pdf
+    toc: true
+    number-sections: false
+    colorlinks: true
+    code-overflow: wrap
+editor_options: 
+  chunk_output_type: console
+bibliography: references.json
+csl: references/apa.csl
+---
+
+```{r}
+knitr::opts_chunk$set(eval = T, # evaluate chunks
+                      echo = T, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F, # stop when error encountered
+                      warning = F) # don't print warnings
+```
+
+```{r, eval = T, cache = F}
+# Create references.json file based on the citations in this script
+# make sure you have 'bibliography: references.json' in the YAML
+# rbbt::bbt_update_bib("_data_communication.qmd")
+```
+
+# Load in dataset
+
+```{r}
+# load tidyverse
+library(tidyverse)
+
+# load data
+df_lifetime <- readr::read_csv(here::here("data/tidy_data_lifetime_pilot.csv"), 
+                               # for special characters
+                               locale = readr::locale(encoding = "latin1") 
+                               ) |>
+  mutate_if(is.character,as.factor) |> # all character variables as factor
+  filter(type == "critical", # only critical trials
+         px != "px3", # this participant had lots of 0's for some reason
+         region=="verb")
+```
+
+# Data collection
+
+## Participants
+
+Data was collected from `r length(unique(df_lifetime$px))` participants.
+Data was collected from native speakers of English (*n* = `r length(unique(df_lifetime$px))`, female = `r length(unique(df_lifetime$px[df_lifetime$gender=="female"]))`).
+
+# Results
+
+## Reading times
+
+### First-fixation time
+
+Useful functions for descriptive statistics:
+
+- `mean(x)`: mean of x
+- `sd(x)`: standard deviation of x
+- `round(x,3)`: round x to 3 decimal points
+
+```{r}
+# save overall mean and sd as objects
+mean_ff <- mean(df_lifetime$ff)
+sd_ff <- sd(df_lifetime$ff)
+```
+
+The mean first-fixation time at the critical verb region was `r round(mean_ff,1)` milliseconds (ms), and the standard deviation was `r round(sd_ff,1)` ms.
+
+### Main effect of lifetime (dead vs. living)
+
+```{r}
+#| echo: false
+summary_ff_lifetime <- df_lifetime |> 
+  filter(region=="verb") |> 
+  group_by(lifetime) %>%
+  summarise(N = n(),
+            mean.ff = mean(ff, na.rm = T),
+            sd = sd(ff, na.rm = T))
+
+knitr::kable(summary_ff_lifetime, digits=1,
+             caption = "Table with summmary statistics for first-fixation duration at the verb region")
+```
+
+The living condition elicited similar, but slightly shorter, first fixation times (mean = `r round(summary_ff_lifetime$mean.ff[summary_ff_lifetime$lifetime=="living"],1)`, sd = `r round(summary_ff_lifetime$sd[summary_ff_lifetime$lifetime=="living"],1)`) than the dead condition (mean = `r round(summary_ff_lifetime$mean.ff[summary_ff_lifetime$lifetime=="dead"],1)`, sd = `r round(summary_ff_lifetime$sd[summary_ff_lifetime$lifetime=="dead"],1)`) conditions.
+
+
+### Main effect of tense (PP vs. SF)
+
+
+```{r}
+#| echo: false
+#| 
+summary_ff_tense <- df_lifetime |> 
+  filter(region=="verb") |> 
+  group_by(tense) %>%
+  summarise(N = n(),
+            mean.ff = mean(ff, na.rm = T),
+            sd = sd(ff, na.rm = T))
+
+knitr::kable(summary_ff_tense, digits=1,
+             caption = "Table with summmary statistics for first-fixation duration at the verb region")
+```
+
+The Simple Future condition (mean = `r round(summary_ff_tense$mean.ff[summary_ff_tense$tense=="SF"],1)`, sd = `r round(summary_ff_tense$sd[summary_ff_tense$tense=="SF"],1)`) elicited similar, but slightly shorter, first fixation times than the Present Perfect condition (mean = `r round(summary_ff_tense$mean.ff[summary_ff_tense$tense=="PP"],1)`, sd = `r round(summary_ff_tense$sd[summary_ff_tense$tense=="PP"],1)`).
+
+### Nested effects (lifetime within each level of tense)
+
+```{r}
+summary_ff <- df_lifetime |> 
+  filter(region=="verb") |> 
+  group_by(condition,lifetime,tense) %>%
+  summarise(N = n(),
+            mean.ff = mean(ff, na.rm = T),
+            sd = sd(ff, na.rm = T))
+
+knitr::kable(summary_ff, digits=1,
+             caption = "Table with summmary statistics for first-fixation duration at the verb region")
+```
+
+In the present perfect condition, the dead (mean = `r round(summary_ff$mean.ff[summary_ff$condition=="deadPP"],1)`, sd = `r round(summary_ff$sd[summary_ff$condition=="deadPP"],1)`) elicited longer reading times than the living (mean = `r round(summary_ff$mean.ff[summary_ff$condition=="livingPP"],1)`, sd = `r round(summary_ff$sd[summary_ff$condition=="livingPP"],1)`) conditions.
+
+Alternatively:
+
+```{r}
+deadPP_ff <- df_lifetime |> 
+  filter(region=="verb",
+         condition=="deadPP") |> 
+  summarise(N = n(),
+            mean.ff = mean(ff, na.rm = T),
+            sd = sd(ff, na.rm = T))
+```
+
+`r deadPP_ff$mean.ff`
+
+- number of observations, number of participants
+
+- printing tables
+- in-line code
+
+# Describing plots
+
+## Main effect of lifetime
+
+```{r}
+#| echo: false
+plot_inter_lifetime <- df_lifetime |> 
+  filter(region == "verb") |> 
+  ggplot(aes(x = lifetime, y = ff, 
+                     shape = lifetime,
+                     group = lifetime,
+                     color = lifetime)) +
+  labs(title="Mean first-fixation time by lifetime",
+       x = "Lifetime",
+       y = "First fix (ms)",
+       shape = "Lifetime", group = "Lifetime", color = "Lifetime", linetype = "Lifetime") +
+    stat_summary(fun = "mean", geom = "line", position = position_dodge(0.2), aes(group=1), color = "black") +
+  stat_summary(fun = "mean", geom = "point", size = 3, position = position_dodge(0.2)) +
+  stat_summary(fun.data = "mean_cl_normal", geom = "errorbar", width = .2
+               , position = position_dodge(0.2)) +
+  theme_bw()
+```
+
+## Main effect of tense
+
+```{r}
+#| echo: false
+plot_inter_tense <- df_lifetime |> 
+  filter(region == "verb") |> 
+  ggplot(aes(x = tense, y = ff, 
+                     shape = tense,
+                     group = tense,
+                     color = tense)) +
+  labs(title="Mean first-fixation time by tense",
+       x = "Tense",
+       y = "First fix (ms)",
+       shape = "Tense", group = "Tense", color = "Tense", linetype = "Tense") +
+    stat_summary(fun = "mean", geom = "line", position = position_dodge(0.2), aes(group=1), color = "black") +
+  stat_summary(fun = "mean", geom = "point", size = 3, position = position_dodge(0.2)) +
+  stat_summary(fun.data = "mean_cl_normal", geom = "errorbar", width = .2
+               , position = position_dodge(0.2)) +
+  theme_bw()
+```
+
+## Nested effects
+
+```{r}
+#| label: fig-inter-conditions
+
+plot_inter_condition <- df_lifetime |> 
+  filter(region == "verb") |> 
+  ggplot(aes(x = lifetime, y = ff, 
+                     shape = tense,
+                     group = tense,
+                     color = tense)) +
+  labs(title="Mean first-fixation time by condition",
+       x = "Lifetime",
+       y = "First fix (ms)",
+       shape = "Tense", group = "Tense", color = "Tense", linetype = "Tense") +
+  stat_summary(fun = "mean", geom = "point", size = 3, position = position_dodge(0.2)) +
+  stat_summary(fun = "mean", geom = "line", position = position_dodge(0.2), aes(linetype=tense)) +
+  stat_summary(fun.data = "mean_cl_normal", geom = "errorbar", width = .2
+               , position = position_dodge(0.2)) +
+  theme_bw()
+```
+
+```{r}
+ggpubr::ggarrange(plot_inter_lifetime,
+                  plot_inter_tense,
+                  plot_inter_condition,
+                  nrow = 1, # keep plots in a single row
+                  labels = c("A","B","C") # label plots A B and C
+                  )
+```
+
+
+The figure shows the mean first fixation times for each condition.
+
+@winter_statistics_2019
+
+As stated in @winter_linear_2013, linear models are models.
+
+# Session Info
+
+```{r}
+sessionInfo()
+```
+
+
+# References {.unlisted .unnumbered visibility="uncounted"}
+
+::: {#refs custom-style="Bibliography"}
+:::
+
