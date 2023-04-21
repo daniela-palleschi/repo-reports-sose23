@@ -1,0 +1,218 @@
+---
+title: "Reproducible Workflow"
+subtitle: "Loading and eye-balling a dataset"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+lang: en
+date: 2023-04-12
+format:
+  revealjs: 
+  # all docs:
+    output-file: slide-workflow.html
+  # revealjs and html:
+    # toc
+    # code
+    toc: true
+    toc-depth: 1
+    toc-title: 'Overview'
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    css: styles.css
+  # revealjs specific:
+    theme: [dark]
+    width: 1600
+    height: 900
+    progress: true
+    font-size: 0.6em
+    slide-level: 4
+    slide-number: c/t
+    navigation-mode: linear
+    # smaller: true
+    incremental: true
+    scrollable: true
+    controls-layout: bottom-right
+    fig-cap-location: top
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+    # to add drawings:
+    # chalkboard:
+    #   src: drawings/day1-drawings.json
+    embed-resources: true
+    # logo: logos/hu_logo.png
+    # css: logo.css
+    # number-sections: true
+  html:
+    output-file: sheet-workflow.html
+    embed-resources: true
+    toc: true
+    toc-depth: 2
+    toc-title: 'Overview'
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    number-sections: false
+  pdf:
+    output-file: pdf-workflow.pdf
+    toc: true
+    number-sections: false
+    colorlinks: true
+    code-overflow: wrap
+editor_options: 
+  chunk_output_type: console
+bibliography: references/references.json
+csl: references/apa.csl
+---
+
+
+# Set-up {.unlisted .unnumbered visibility="uncounted"}
+
+```{r}
+knitr::opts_chunk$set(eval = T, # evaluate = T for REPRODUCIBLE analyses
+                      echo = T, # 'print code chunk?'
+                      message = F, # print messages?
+                      error = T, # render even if errors encountered?
+                      warning = F) # print warnings?
+```
+
+```{r}
+library(beepr) # beeps when code runs or fails
+library(rbbt) # zotero plugin
+library(magick) # to invert images
+```
+
+```{r}
+#| code-fold: true
+#| code-summary: beep code
+## play sound if error encountered
+### from: https://sejohnston.com/2015/02/24/make-r-beep-when-r-markdown-finishes-or-when-it-fails/
+options(error = function(){    # Beep on error
+  beepr::beep(sound = "wilhelm")
+  Sys.sleep(2) # 
+  }
+ )
+## and when knitting is complete
+.Last <- function() {          # Beep on exiting session
+  beepr::beep(sound = "ping")
+  Sys.sleep(6) # allow to play for 6 seconds
+  }
+```
+
+```{r, eval = T, cache = F}
+#| code-fold: true
+#| code-summary: rbbt code
+#| 
+# Create references.json file based on the citations in this script:
+# 1. make sure you have 'bibliography: references/references.json' in the YAML
+# 2. create a new folder called 'references'
+# 3. run:
+rbbt::bbt_update_bib("_workflow.qmd")
+```
+
+# Workflow bare minimum
+
+- self-contained project
+  + everything available in one folder
+  + e.g., RProjects
+- README file
+  + a markdown (.md) file
+  + describing the folder/analysis structure
+  
+::: footnote
+@winter_statistics_2019
+:::
+
+# RProjects
+
+- a folder containing
+  + an `.RProj` file (which opens RStudio)
+  + all folders/files required for a project
+- `File > New Project > New Directory > New Project > New Project > Create Project`
+
+## README
+
+- to create an `.md` file: `File > New File > Markdown File`
+- create informative heading
+  + describe project purpose
+  + describe folders/scripts as they currently are
+- save/Preview as `README.md` in the project folder
+
+## `here`
+
+- `here` package
+  + will always access the project folder
+  + try running `here()` from within a project; what's the output?
+  
+## Project folder structure
+
+::: {.content-visible when-format="revealjs"}
+```{r eval = T, fig.env = "figure",out.width="100%", fig.align = "center", set.cap.width=T, fig.cap="Image source: @winter_statistics_2019"}
+#| echo: false
+
+# invert colours for dark mode in slides
+magick::image_negate(magick::image_read(here::here("media/Winter_2019_project-folder.png")))
+```
+:::
+
+::: {.content-visible when-format="html"}
+```{r eval = T, fig.env = "figure",out.width="100%", fig.align = "center", set.cap.width=T, fig.cap="Image source: @winter_statistics_2019"}
+#| echo: false
+
+library(magick)
+magick::image_read(here::here("media/Winter_2019_project-folder.png"))
+```
+:::
+
+::: {.content-visible when-format="pdf"}
+```{r eval = T, fig.env = "figure",out.width="100%", fig.align = "center", set.cap.width=T, fig.cap="Image source: @winter_statistics_2019"}
+#| echo: false
+library(magick)
+magick::image_read(here::here("media/Winter_2019_project-folder.png"))
+```
+:::
+
+
+# Reproducible code
+
+- is located within a project
+  + which also contains all relevant data/files
+- runs linearly (from top to bottom)
+  + loads all required packages at the top
+  + uses file paths relative to its project
+  + is created/edited after running `Session > Restart R`
+- at the very least, ends with a section (e.g., `# Session Info`) containing `sessionInfo()`
+  + but other options: `renv` package, `targets` package, `docker` for environment containers
+
+# Checklist
+
+::: {.column width="50%"}
+**RProject**
+
+  + `.RProj`
+  + `README.md`
+  + `data/`
+  + `notes/` (a folder for your qmd files)
+:::
+
+::: {.column width="50%"}
+**Scripts** (`.qmd`/`.Rmd`)
+
+  + load libraries at beginning
+  + `sessionInfo()` at the end
+  + chunks run linearly (top-to-bottom)
+:::
+
+# Session Info
+
+```{r}
+#| code-fold: true
+#| code-summary: "Show code"
+sessionInfo()
+```
+
+# References {.unlisted .unnumbered visibility="uncounted"}
+
+::: {#refs custom-style="Bibliography"}
+:::
