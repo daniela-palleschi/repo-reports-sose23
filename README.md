@@ -53,3 +53,8 @@ Day 3:
 - first session was used to catch-up on Data Viz (individual work-through of mats)
 - Lin Reg1 (simple reg):
 - Lin Reg2 (multiple reg):
+
+Report assignment
+
+- too much for 1LP, changed it to be worth 2LP (and only assignment)
+- next time either make it shorter, or keep it as only assignment
