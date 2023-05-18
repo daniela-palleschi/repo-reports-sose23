@@ -1,0 +1,124 @@
+---
+title: "Setting up R and RStudio"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+lang: en
+date: 2023-04-12
+format:
+  html:
+    output-file: sheet-setup.html
+    toc: true
+    toc-depth: 2
+    toc-title: 'Overview'
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    number-sections: true
+    self-contained: true
+  pdf:
+    output-file: pdf-setup.pdf
+    toc: true
+    number-sections: false
+    colorlinks: true
+    code-overflow: wrap
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, echo = F}
+knitr::opts_chunk$set(eval = F, # evaluate = T for REPRODUCIBLE analyses
+                      echo = T, # 'print code chunk?'
+                      message = F, # print messages?
+                      error = F, # render even if errors encountered?
+                      warning = F) # print warnings?
+```
+
+This document outlines the steps required to set up our reproducible workflow. @sec-R provides an overview of installing R, RStudio, and required packages. These steps are required. @sec-tinytex describes how to install TinyTex, which is required to render LaTeX-style documents (i.e., PDFs) in R.
+
+@sec-zotero provides tips on installing Zotero and related addins for integrations with R and RStudio. This is optional, and slightly more advanced.
+
+# R and RStudio {#sec-R}
+
+Download R [here](https://cran.r-project.org/).
+
+Download RStudio [here](https://www.rstudio.com/products/rstudio/download/).
+
+You must first download R, then RStudio.
+
+## Packages {#sec-packages}
+
+R packages available on the Comprehensive R Archive Network, commonly known as CRAN repository, can be easily installed using the command `isntall.packages("packageName")`. Some packages we will be needing are:
+
+- `here` package
+- `tidyverse` family of packages
+  -  will automatically include packages we need, like `dplyr` and `ggplot2`
+  
+To download multiple packages at once, use the 'concatenate' function in r (`c()`) inside `install.packages()`:
+
+```{r, eval = F}
+install.packages(c("here", "tidyverse"))
+```
+
+## Developer packages (optional)
+
+Not all packages are available on CRAN. You will need to install them directly through the developer. Two packages that are commonly used to do this are `remotes` and `devools`. Let's try installing `remotes` and then installing the `rbbt`, an addin for Zotero (discussed below).
+
+```{r}
+if(!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
+```
+
+```{r}
+remotes::install_github("paleolimbot/rbbt")
+```
+
+## RStudio Global options (optional)
+
+Here are my preferred global options (RStudio > Tools > Global options). I highly recommend following the settings for 'workspace' and 'R Sessions' to ensure reproducibility. The other settings you can play around with to find what you like.
+
+  - General > Basic
+    - **Workspace** (for reproducibile workflow!!!)
+        + uncheck 'Restore .RData into workshapce at startup'
+        + Save workspace to .RData on exit: ***Never***
+    - **R Sessions**
+        + uncheck 'Restore previously open source documents at startup'
+  - Code > Display
+    - General
+      + Show white space characters
+      + Allow scroll past end of document
+      + highlight selected line
+  - Appearance
+    - Editor theme: Cobalt
+
+# tinyTex {#sec-tinytex}
+
+To render PDF documents with LaTeX under the hood, we need to install [tinytex](https://yihui.org/tinytex/). There are different ways to do this:
+
+- run the following in the *terminal*: `quarto install tinytex`
+- or in the console: `tinytex::install_tinytex()`
+
+# Zotero (optional) {#sec-zotero}
+
+Zotero is a very useful PDF reader/annotator tool that is helpful even if not integrated with R/RStudio. I suggest downloading it and reading all your PDFs in Zotero in the future. You can download Zotero here: https://www.zotero.org/download/
+
+## `rbbts`: Citations with Zotero
+
+There is a Zotero addin for RStudio that allows you to directly read-in your citations. To use the `rbbt` package installed above, we need to have Zotero installed (and Better BibTex).
+
+```{r}
+# Install rbbt Addin from GitHub to use Zotero
+remotes::install_github("paleolimbot/rbbt")
+```
+
+To set-up a citation entry shortcut: RStudio > Tools > Modify Keyboard Shortcuts > enter 'Zotero' in the search > choose 'Insert Zotero Citations' > add a shortcut (I like Ctrl+K)
+
+
+### Better BibTex
+
+Install from the [website](https://retorque.re/zotero-better-bibtex/installation/).
+
+- then in Zotero: Tools > Add-ins > Settings wheel > choose downloaded file > Restart Zotero
+
+- set your citation keys: Zotero > Settings > Better BibTex > Citation key formula > (I like "zotero.clean")
+  + if you need to update the BibTex key in your docs: 
+      + highlight all your files in the Zotero Library, right-click > Better BibTex > Refresh BibTex key
+

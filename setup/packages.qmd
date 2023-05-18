@@ -1,0 +1,45 @@
+---
+title: "Student set-up sheet"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+format:
+  html:
+    self-contained: true
+    output-file: sheet-wrangling.html
+    theme: [dark]
+    number-sections: true
+    toc: true
+    code-overflow: wrap
+    code-tools: true
+---
+
+This document keeps track of all packages installed for a certain project. The purpose is to document steps taken to be able to run the scripts contained in this project. This is not the only (or necessarily the best) method to keep a project reproducible, but is a good first step. The idea is that any collaborator (or future you) that is working on a different machine/system can check this document and install any packages required to run a script *in one place*.
+
+Every time you install a package for a project, update this document. Once you start working on more RProjects, it would be a wise idea to have a sort of 'master' document like this saved somewhere outside of a certain project, so that you can keep track of which packages you have available on your system (and so that whenever you update R or get a new machine) you can install all the packages you need.
+
+# CRAN packages
+
+These are packages available on the CRAN repository. Install them only once (this code chunk is set to `eval = F` so that it doesn't run when you knit)
+
+```{r, eval = FALSE}
+install.packages("tidyverse") # family of useful packages, e.g., dplyr, ggplot2, readr, magrittr, etc.
+install.packages("here") # to use top-level project folder as working directory
+```
+
+# Developer packages
+
+These are packages not available on the CRAN repository.
+
+# Alternatives for reproducibility
+
+## `renv` package
+
+You can also keep track of a project's pacakges using the `renv` package (short for R-environment). Using `renv` will 'isolate' your project from your machine, so the project will not have access to the packages installed on your computer. Rather, you will need to re-install all the packges within a project, and `renv` will keep track of the packages and versions. 
+
+Here's some [info about `renv`] (https://rstudio.github.io/renv/articles/renv.html).
+
+## Docker
+
+Docker creates containers that also include your system's environment at a certain point in time. This means your operating system, RStudio version, etc. This is a more involved/advanced process that is not as common in research. 
+
+Here's a nice [blog post](https://colinfay.me/docker-r-reproducibility/) about Docker for R.

@@ -1,0 +1,146 @@
+---
+title: "Data description"
+subtitle: "Reproducible Analyses (SoSe23)"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+lang: en
+date: 2023-04-12
+format:
+  html:
+    output-file: sheet-data_description.html
+    toc: true
+    toc-depth: 2
+    toc-title: 'Overview'
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    number-sections: true
+    self-contained: true
+  pdf:
+    output-file: pdf-data_description.pdf
+    toc: true
+    number-sections: false
+    colorlinks: true
+    code-overflow: wrap
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, echo = F}
+knitr::opts_chunk$set(eval = T, # evaluate = T for REPRODUCIBLE analyses
+                      echo = F, # 'print code chunk?'
+                      message = F, # print messages?
+                      error = T, # render even if errors encountered?
+                      warning = F) # print warnings?
+```
+
+# Lifetime pilot data
+
+The following table gives a brief description of the variables (columns) from the dataset `data/data_lifetime_pilot.csv`.
+
+```{r}
+#| echo: false
+#| eval: true
+
+library(tidyverse)
+
+# this was copied from my_eyes_only
+vars <-
+  c(
+    RECORDING_SESSION_LABEL = "participant ID",
+    TRIAL_INDEX = "trial number",
+    EYE_USED = "which eye was tracked",
+    IA_DWELL_TIME = "total reading time",
+    IA_FIRST_FIXATION_DURATION = "first fixation duration",
+    IA_FIRST_RUN_DWELL_TIME = "first-pass reading time",
+    IA_FIXATION_COUNT = "number of fixations",
+    IA_ID = "ROI number",
+    IA_LABEL = "ROI text",
+    IA_REGRESSION_IN = "whether the ROI had any regression(s) in",
+    IA_REGRESSION_IN_COUNT = "number of regressions in",
+    IA_REGRESSION_OUT = "whether the ROI had any regression(s) out",
+    IA_REGRESSION_OUT_COUNT = "number of regressions out",
+    IA_REGRESSION_PATH_DURATION = "regression path duration",
+    KeyPress = "binary naturalness judgement key press value (4 or 5)",
+    rt = "reaction time from beginning of critical sentence to button press",
+    bio = "lifetime-context sentence text",
+    critical = "critical sentence text",
+    gender = "referent gender",
+    item_id = "item number",
+    list = "list number",
+    match = "whether filler items matched or not",
+    condition = "critical condition (or 'filler' for fillers)",
+    name = "referent name",
+    name_vital_status = "referent lifetime",
+    tense = "tense (Present Perfect or Simple Future, or 'filler' for fillers)",
+    type = "critical or filler",
+    yes_press = "the key press value that corresponded to 'yes' in the experimental set-up. This was counterbalanced between participants (left-key: 4, right-key: 5)"
+  )
+```
+
+```{r}
+#| echo: false
+
+# print vars (as data frame)
+
+knitr::kable(data.frame(vars),
+             col.names = "Description",
+             caption = "Variable names and descriptions for dataset 'data\\_lifetime\\_pilot.csv'") %>% 
+  kableExtra::kable_styling(full_width = T,
+                            font_size = 12)
+```
+
+# Tidy lifetime pilot data
+
+After our Data Wrangling session, your data should have the following variables (with different names, if you prefer) after our data wrangling session. This should be saved as `data_tidy_lifetime_pilot.csv` (or another name if you prefer).
+
+```{r}
+#| echo: false
+#| eval: true
+vars <-
+  c(
+    px = "participant ID",
+    trial = "trial number",
+    region = "ROI name",
+    region_n = "ROI number",
+    region_text = "ROI text",
+    eye = "which eye was tracked",
+    ff = "first fixation duration",
+    fp = "first-pass reading time",
+    rpd = "regression path duration",
+    tt = "total reading time",
+    fix_count = "number of fixations",
+    reg_in = "whether the ROI had any regression(s) in",
+    reg_in_count = "number of regressions in",
+    reg_out = "whether the ROI had any regression(s) out",
+    reg_out_count = "number of regressions in",
+    rt = "reaction time from beginning of critical sentence to button press",
+    bio = "lifetime-context sentence text",
+    critical = "critical sentence text",
+    gender = "referent gender",
+    item_id = "item number",
+    list = "list number",
+    match = "whether filler items matched or not",
+    condition = "critical condition (or 'filler' for fillers)",
+    name = "referent name",
+    lifetime = "referent lifetime",
+    tense = "tense (Present Perfect or Simple Future, or 'filler' for fillers)",
+    type = "critical or filler",
+    yes_press = "the key press value that corresponded to 'yes' in the experimental set-up. This was counterbalanced between participants (left-key: 4, right-key: 5)",
+    KeyPress = "binary naturalness judgement key press value (4 or 5)",
+    accept = "whether KeyPress equaled the participant's 'yes' button, meaning a 'yes' naturalness judgement",
+    accuracy = "whether 'accept' matched the 'congruence' level",
+    px_accuracy = "participant's average accuracy across all items (critical and filler)"
+  )
+```
+
+```{r}
+#| echo: false
+
+# print vars (as data frame)
+knitr::kable(data.frame(vars),
+             col.names = "Description",
+             caption = "Variable names and descriptions for dataset `data/data\\_tidy\\_lifetime\\_pilot.csv`") %>% 
+  kableExtra::kable_styling()
+```
+
