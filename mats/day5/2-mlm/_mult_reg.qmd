@@ -1,0 +1,636 @@
+---
+title: "Multiple Regression"
+subtitle: "Models with more than one predictor"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+footer: "Multiple Regression"
+lang: en
+date: "`r Sys.Date()`"
+format:
+  revealjs: 
+    output-file: slides-mult_reg.html
+    theme: [dark]
+    width: 1600
+    height: 900
+    progress: true
+    # smaller: true
+    scrollable: true
+    slide-number: c/t
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    code-annotations: below
+    # logo: logos/hu_logo.png
+    # css: logo.css
+    incremental: true
+    # number-sections: true
+    toc: true
+    toc-depth: 1
+    toc-title: 'Topics'
+    navigation-mode: linear
+    controls-layout: bottom-right
+    fig-cap-location: top
+    font-size: 0.6em
+    slide-level: 4
+    chalkboard: true
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+  html:
+    self-contained: true
+    output-file: sheet-mult_reg.html
+    theme: [dark]
+    number-sections: true
+    toc: true
+    code-overflow: wrap
+    code-tools: true
+  pdf:
+    output-file: pdf-mult_reg.pdf
+    toc: true
+    number-sections: false
+    colorlinks: true
+    code-overflow: wrap
+editor_options: 
+  chunk_output_type: console
+bibliography: references/references.json
+csl: references/apa.csl
+execute:
+  warning: false
+  message: fal
+---
+
+```{r}
+#| echo: false
+## play sound if error encountered
+### from: https://sejohnston.com/2015/02/24/make-r-beep-when-r-markdown-finishes-or-when-it-fails/
+options(error = function(){    # Beep on error
+  beepr::beep(sound = "wilhelm")
+  Sys.sleep(2) # 
+  }
+ )
+## and when knitting is complete
+.Last <- function() {          # Beep on exiting session
+  beepr::beep(sound = "ping")
+  Sys.sleep(6) # allow to play for 6 seconds
+  }
+```
+
+```{r, eval = T, cache = F}
+#| echo: false
+# Create references.json file based on the citations in this script
+# make sure you have 'bibliography: references.json' in the YAML
+# rbbt::bbt_update_bib("_mult_reg.qmd")
+```
+
+```{r}
+#| echo: false
+knitr::opts_chunk$set(eval = T, # change this to 'eval = T' to reproduce the analyses; make sure to comment out
+                      echo = T, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F,
+                      warning = F)
+```
+
+# Learning Objectives {.unnumbered}
+
+Today we will learn...
+
+- what multiple regression is
+- fit a model with multiple predictors
+- learn to interpret interactions
+
+# Set-up environment  {.unnumbered}
+
+```{r}
+# suppress scientific notation
+options(scipen=999)
+```
+
+## Packages {.unnumbered}
+
+Run this in the Console:
+
+```{r}
+#| eval: false
+install.packages("devtools")
+devtools::install_github("strengejacke/sjPlot")
+```
+
+Then copy this into your script:
+
+```{r}
+# load libraries
+pacman::p_load(
+  tidyverse,
+  here,
+  knitr,
+  kableExtra,
+  gt,
+  broom,
+  Rmisc,
+  patchwork,
+  sjPlot
+)
+```
+
+
+
+
+## Data {.unnumbered}
+
+```{r}
+# read in data
+df_crit_verb <- readr::read_csv(here::here("data/tidy_data_lifetime_pilot.csv"), 
+                               # for special characters
+                               locale = readr::locale(encoding = "latin1") 
+                               ) |> 
+  mutate_if(is.character,as.factor) |> # all character variables as factor
+  filter(type == "critical", # only critical trials
+         px != "px3",
+         region == "verb") |>
+  droplevels()
+```
+
+# Resources {.unnumbered}
+
+Chapters 6 and 7 in @winter_statistics_2019
+
+# Review: Linear Regression
+
+- let's re-run our simple linear model: `fp ~ lifetime`
+
+## Set contrasts
+
+Let's stick to sum contrast coding (+/-0.5).
+
+```{r}
+# order factor levels
+df_crit_verb$lifetime <- factor(df_crit_verb$lifetime, levels = c("living","dead"))
+# or using the tidyverse
+df_crit_verb <-
+  df_crit_verb %>% 
+  mutate(lifetime = fct_relevel(lifetime, "living", "dead"))
+```
+
+```{r}
+# set contrasts
+contrasts(df_crit_verb$lifetime) <- c(-0.5,+0.5)
+```
+
+```{r}
+contrasts(df_crit_verb$lifetime)
+```
+
+## Fit model
+
+```{r}
+# fit simple linear model
+fit_fp_lifetime <- df_crit_verb %>%
+  filter(fp > 0) %>%
+  lm(fp ~ lifetime, data = .)
+```
+
+```{r}
+# check our contrasts
+coef(fit_fp_lifetime)
+```
+
+## Lifetime Effect
+
+- recall that we found a significant effect of `lifetime`
+  + the `dead` conditions elicited longer first-pass reading times than the `living` conditions
+- but we also had two tenses: the Present Perfect (`PP`) and the Simple Future (`SF`)
+  + how can we also check for an effect of `tense`?
+  
+## Another linear model
+
+- we could run a second model with `tense` as the predictor instead of `lifetime`
+
+```{r}
+df_crit_verb <-
+  df_crit_verb %>% 
+  mutate(tense = fct_relevel(tense, "PP", "SF"))
+```
+
+```{r}
+contrasts(df_crit_verb$tense) <- c(-0.5,+0.5)
+```
+
+```{r}
+contrasts(df_crit_verb$tense)
+```
+
+```{r}
+# fit simple linear model
+fit_fp_tense <-
+  df_crit_verb %>%
+  filter(fp > 0) %>%
+  lm(fp ~ tense, data = .)
+```
+
+---
+
+- what does the summary tell us?
+
+```{r}
+summary(fit_fp_tense)
+```
+
+# Multiple regression
+
+- a simple linear model is essentially just modelling the mean
+- so is multiple regression, but takes more conditions into account:
+
+$$
+y = b_0 + b_1x + b_2x + ... + e
+$$
+
+- the slope index ($b_1$, $b_2$) differentiates between predictors
+
+$$
+fp = b_0 + (b_1\times lifetime) + (b_2\times tense) + ... + e
+$$
+
+## Adding another predictor
+
+- in our experimental design we were interested in the effect of *lifetime* on the processing of two different *tenses*: the Present Perfect and Simple Future
+  + in other words, we had two fixed factors: lifetime and tense
+
+- multiple regression is not the same as running separate simple linear models, rather each coefficient becomes a *partial* regression coefficient
+
+## Fit model
+
++ we can use `+` to indicate we have another fixed effect, and that we want to look at the **main effect** of this predictor
+
+```{r}
+# multiple regression
+fit_fp <-
+  df_crit_verb %>%
+  filter(fp > 0) %>% 
+  lm(fp ~ lifetime + tense, data = .)
+```
+
+### Model summary
+
+```{r}
+summary(fit_fp)
+```
+
+## Comparing summaries {.smaller}
+
+
+```{r}
+#| label: tbl-lifetime
+#| tbl-cap: Coefficients for fit_fp_lifetime (fp ~ lifetime)
+tidy(fit_fp_lifetime) %>% kable() %>% kable_styling()
+```
+
+```{r}
+#| label: tbl-tense
+#| tbl-cap: Coefficients for fit_fp_tense (fp ~ tense)
+tidy(fit_fp_tense) %>% kable() %>% kable_styling()
+```
+
+```{r}
+#| label: tbl-mlm
+#| tbl-cap: Coefficients for fit_fp (fp ~ lifetime + tense)
+tidy(fit_fp) %>% kable() %>% kable_styling()
+```
+
+
+## Partial regression coefficients
+
+- in multiple regression, each predictor becomes a *partial* regression coefficient
+  + the effect of one predictor while holding all other predictors constant
+  
+$$
+\begin{align}
+fp &= 309.1 + (31.5\times lifetime) + (-12.8\times tense)\\
+fp_{dead-PP} &= 309.1 + (31.5\times 0.5) + (-12.8\times -0.5)
+\end{align}
+$$
+
+## Exploring the model: fixed effects {-}
+
+- what were our coefficients?
+```{r}
+#| output-location: fragment
+coef(fit_fp)
+```
+
+- what is the mean of `lifetime` coded as `-0.5` (`living`)?
+```{r}
+#| output-location: fragment
+coef(fit_fp)['(Intercept)'] + coef(fit_fp)['lifetime1'] * -0.5
+```
+
+- ignore the `(Intercept)` label here, `R` just takes the first label when performing an operation on 2 vectors
+
+- what is the mean of `lifetime` coded as `+0.5` (`dead`)?
+```{r}
+#| output-location: fragment
+coef(fit_fp)['(Intercept)'] + coef(fit_fp)['lifetime1'] * 0.5
+```
+
+### Exercise
+
+- do the same for `tense`:
+  - find the fitted value for `PP` and for `SF`
+
+## Exploring the model: predicting fp
+
+:::: columns
+
+::: {.column width="50%"}
+```{r}
+#| echo: false
+#| label: tbl-estimates
+#| tbl-cap: Coefficient estimates
+tidy(fit_fp) %>% 
+  select(term,estimate) %>% 
+  mutate(`*0.5` = estimate*.5) %>% 
+  kable(digits = 1) %>% 
+  kable_styling()
+  # fmt_number(decimals = 5)
+```
+:::
+::: {.column width="50%"}
+```{r}
+#| echo: false
+#| label: tbl-fitted
+#| tbl-cap: Fitted values per condition
+augment(fit_fp, data = df_crit_verb[df_crit_verb$fp > 0,]) %>% 
+  dplyr::summarise(fp = mean(fp),
+            .by = c(lifetime,tense,.fitted)) %>% 
+  mutate(mean_diff = fp-.fitted) %>% 
+  arrange(lifetime) %>% 
+  kable(digits = 1) %>% 
+  kable_styling()
+```
+:::
+::::
+
+### Calculating fitted values by hand
+
+$$
+fp = b_0 + (b_1\times lifetime) + (b_2\times tense) + e
+$$
+
+```{r}
+# living-PP
+coef(fit_fp)['(Intercept)'] + 
+  coef(fit_fp)['lifetime1'] * -0.5 + coef(fit_fp)['tense1'] * -0.5 
+```
+```{r}
+# living-SF
+coef(fit_fp)['(Intercept)'] + 
+  coef(fit_fp)['lifetime1'] * -0.5 + coef(fit_fp)['tense1'] * 0.5 
+```
+```{r}
+# dead-PP
+coef(fit_fp)['(Intercept)'] + 
+  coef(fit_fp)['lifetime1'] * 0.5 + coef(fit_fp)['tense1'] * -0.5 
+```
+```{r}
+# dead-SF
+coef(fit_fp)['(Intercept)'] + 
+  coef(fit_fp)['lifetime1'] * 0.5 + coef(fit_fp)['tense1'] * 0.5 
+```
+
+
+## Exploring the model: residuals {-}
+
+- recall that residuals = the difference between our *fitted* (model) values and our *observed* (data) values
+
+```{r}
+#| output-location: fragment
+# what do our FITTED values look like?
+head(fitted(fit_fp))
+```
+
+```{r}
+#| output-location: fragment
+# what do our OBSERVED values look like?
+head(df_crit_verb$fp)
+```
+
+```{r}
+#| output-location: fragment
+# what is the difference between the FITTED and OBSERVED values?
+head(df_crit_verb$fp) - head(fitted(fit_fp))
+```
+
+```{r}
+#| output-location: fragment
+# what are our RESIDUALS?
+head(residuals(fit_fp))
+```
+
+
+
+## Plotting our effects
+
+- based on these plots, it seems like the effects of `lifetime` and `tense` differed
+  + the slant in figure A (effect of `lifetime`) looks steeper for the `PP` than the `SF`
+- this could reflect an interaction effect
+
+```{r}
+#| echo: false
+fig_error_lifetime <-
+  df_crit_verb %>% 
+  filter(fp > 0) %>% 
+  summarySEwithin(measurevar="fp", withinvars=c("lifetime"), idvar="px") %>% 
+  mutate(upper = fp+ci,
+         lower = fp-ci) %>% 
+  ggplot(aes(x = lifetime, y = fp, colour = lifetime)) + 
+  labs(title = "Mean first-pass reading times (with 95% CIs)") +
+  geom_point(position = position_dodge(0.2), size = 2) +
+  geom_line(group=1,position = position_dodge(0.2), colour = "grey") +
+  geom_errorbar(aes(ymin=lower,ymax=upper), position = position_dodge(0.2), width = .2) +
+  theme_bw() +
+  theme(text = element_text(size=8))
+
+fig_scatter_lifetime <-
+  df_crit_verb %>% 
+  filter(fp > 0) %>% 
+  ggplot(aes(x = lifetime, y = fp, colour = lifetime, shape = lifetime, fill = lifetime)) + 
+  labs(title = "Distribution of first-pass reading times") +
+  geom_point(position = position_jitterdodge(jitter.width = 0.3), size = 2, alpha = .5) +
+  geom_violin(alpha = .4) +
+  theme_bw()+
+  theme(text = element_text(size=8))
+
+```
+
+```{r}
+#| echo: false
+fig_error_tense <-
+  df_crit_verb %>% 
+  filter(fp > 0) %>% 
+  summarySEwithin(measurevar="fp", withinvars=c("tense"), idvar="px") %>% 
+  mutate(upper = fp+ci,
+         lower = fp-ci) %>% 
+  ggplot(aes(x = tense, y = fp, colour = tense)) + 
+  labs(title = "Mean first-pass reading times (with 95% CIs)") +
+  geom_point(position = position_dodge(0.2), size = 2) +
+  geom_line(group=1,position = position_dodge(0.2), colour = "grey") +
+  geom_errorbar(aes(ymin=lower,ymax=upper), position = position_dodge(0.2), width = .2) +
+  theme_bw() +
+  theme(text = element_text(size=8))
+
+fig_scatter_tense <-
+  df_crit_verb %>% 
+  filter(fp > 0) %>% 
+  ggplot(aes(x = tense, y = fp, colour = tense, shape = tense, fill = tense)) + 
+  labs(title = "Distribution of first-pass reading times") +
+  geom_point(position = position_jitterdodge(jitter.width = 0.3), size = 2, alpha = .5) +
+  geom_violin(alpha = .4) +
+  theme_bw()+
+  theme(text = element_text(size=8))
+```
+
+
+```{r}
+#| echo: false
+#| label: fig-main
+#| fig-cap: Plotting our two predictors
+#| out-width: "100%"
+(fig_error_lifetime + fig_scatter_lifetime) /
+  (fig_error_tense + fig_scatter_tense) + plot_annotation(tag_levels = "A")
+```
+
+```{r}
+#| eval: false
+#| echo: false
+augment(fit_fp, data = df_crit_verb[df_crit_verb$fp > 0,]) %>% 
+  dplyr::summarise(fp = mean(fp),
+            .by = c(lifetime,tense,.fitted)) %>% 
+  arrange(lifetime)  %>% 
+  ggplot(aes(x = lifetime, y = .fitted, colour = tense)) +
+  geom_point(position = position_dodge(0.2)) +
+  geom_line(aes(group=tense), position = position_dodge(0.2))
+  
+```
+
+### Plotting coefficients with `sjPlot`
+
+```{r}
+plot_model(fit_fp) +
+  geom_hline(yintercept=0) +
+  theme_bw()
+```
+
+
+
+# Interactions
+
+- interactions are when the effect of a predictor on an outcome depends on another predictor
+  + an example from @mcelreath_statistical_nodate: plant growth cannot be predicted solely by sun exposure or water exposure, but rather the two
+  + the influence of the sun is dependent on water, and vice versa
+
+- the equation for multiple regression with an interaction effect is as follows:
+
+$$
+y = b_0 + b_1x_1 + b_2x_2 + b_3(x_1*x_2) + e
+$$
+
+- where $b_0, b_1, b_2$ equal the intercept, and the slopes ($b_1, b_2$) of two variables ($x_1, x_2$)
+- the interaction ($b_3$) is the multiplication of $x_1$ and $x_2$
+
+## Fitting an interaction term to our model
+
+- to add an interaction, we can use a colon to separate two variables
+  + `lifetime:tense`
+- however, it's common to use an asterisk instead, which means "fit main effects of these variables *and* their interaction*
+  + `lifetime:tense`
+  
+```{r}
+# multiple regression
+fit_fp_inter <-
+  df_crit_verb %>%
+  filter(fp > 0) %>% 
+  lm(fp ~ lifetime*tense, data = .)
+```
+
+```{r}
+#| output-location: slide
+summary(fit_fp_inter)
+```
+
+## Plotting an interaction
+
+
+```{r}
+#| echo: false
+fig_error <-
+  df_crit_verb %>% 
+  filter(fp > 0) %>% 
+  summarySEwithin(measurevar="fp", withinvars=c("lifetime", "tense"), idvar="px") %>% 
+  mutate(upper = fp+ci,
+         lower = fp-ci) %>% 
+  ggplot(aes(x = lifetime, y = fp, colour = tense, shape = tense)) + 
+  labs(title = "Mean first-pass reading times (with 95% CIs)") +
+  geom_point(position = position_dodge(0.2), size = 2) +
+  geom_line(position = position_dodge(0.2), aes(group=tense)) +
+  geom_errorbar(aes(ymin=lower,ymax=upper), position = position_dodge(0.2), width = .2) +
+  theme_bw() +
+  theme(text = element_text(size=8))
+
+fig_scatter <-
+  df_crit_verb %>% 
+  filter(fp > 0) %>% 
+  ggplot(aes(x = tense, y = fp, colour = lifetime, shape = lifetime, fill = lifetime)) + 
+  labs(title = "Distribution of first-pass reading times") +
+  geom_point(position = position_jitterdodge(jitter.width = 0.3), size = 2, alpha = .5) +
+  introdataviz::geom_split_violin(alpha = .4) +
+  theme_bw()+
+  theme(text = element_text(size=8))
+
+```
+
+
+
+```{r}
+#| echo: false
+#| label: fig-inter
+#| fig-cap: Plotting our two predictors
+#| out-width: "100%"
+fig_error + fig_scatter + plot_annotation(tag_levels = "A")
+```
+
+### Plotting an interaction with `sjPlot`
+
+```{r}
+fig_sjplot_coef <- plot_model(fit_fp_inter) +
+  geom_hline(yintercept=0) +
+  theme_bw()
+
+fig_sjplot_int <- plot_model(fit_fp_inter, type = "int") +
+  geom_hline(yintercept=0) +
+  geom_line(group=1) +
+  theme_bw()
+```
+
+```{r}
+#| label: fig-sjplot-int
+#| fig-cap: Plotting model coefficients (A) and  interactions (B) with the sjPlot package
+fig_sjplot_coef + fig_sjplot_int + plot_annotation(tag_levels = "A")
+```
+
+
+# Exercise
+
+1.Run a model with main and interaction effects for `tense` and `lifetime` on `total reading time` at the `verb` region.
+
+2. Print the summary and try to interpret it.
+
+3. Plot the main and interaction effects, and the coefficients.
+
+
+
+
+# References {.unlisted .unnumbered visibility="uncounted"}
+
+::: {#refs custom-style="Bibliography"}
+:::

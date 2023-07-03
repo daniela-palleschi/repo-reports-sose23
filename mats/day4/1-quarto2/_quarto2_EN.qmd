@@ -1,0 +1,472 @@
+---
+title: "Quarto for Writing"
+subtitle: "Cross-referencing und Code Chunk Options"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+footer: "Quarto for Writing" 
+lang: en
+date: "`r Sys.Date()`"
+format: 
+  html:
+    output-file: quarto2_sheet.html
+    include-after-body: custom.html
+    number-sections: true
+    number-depth: 3
+    toc: true
+    toc-title: "Topics covered"
+    code-overflow: wrap
+    code-tools: true
+    self-contained: true
+  revealjs: 
+    output-file: quarto2_slides.html
+    include-after-body: custom.html
+    theme: [dark]
+    width: 1600
+    height: 900
+    progress: true
+    # smaller: true
+    scrollable: true
+    slide-number: c/t
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    # logo: logos/hu_logo.png
+    # css: logo.css
+    incremental: true
+    number-depth: 1
+    toc: true
+    toc-depth: 1
+    toc-title: 'Überblick'
+    navigation-mode: linear
+    controls-layout: bottom-right
+    fig-cap-location: top
+    font-size: 0.6em
+    slide-level: 4
+    self-contained: true
+    # chalkboard: true
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+  pdf:
+    output-file: quarto2.pdf
+    toc: true
+    number-sections: true
+    colorlinks: true
+    code-overflow: wrap
+bibliography: references/references.bib
+csl: references/apa.csl
+---
+
+```{r}
+#| echo: false
+#| label: setup
+knitr::opts_chunk$set(eval = T, # evaluate chunks
+                      echo = T, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F, # stop when error encountered
+                      warning = F) # don't print warnings
+```
+
+
+```{r, eval = T, cache = F}
+#| echo: false
+#| label: rbbt
+# Create references.json file based on the citations in this script
+# make sure you have 'bibliography: references.json' in the YAML
+# rbbt::bbt_update_bib("_quarto2.qmd")
+```
+
+# Heutige Ziele {.unnumbered}
+
+Today we will learn how to...
+
+- use code chunk options
+- control figure sizes
+- add figure captions
+- print formatted tables
+- cross-reference
+
+## More info {.unnumbered}
+
+- Ch. 29 ([Quarto](https://r4ds.hadley.nz/quarto.html)) @wickham_r_nodate
+  - Section 29.5 ([Code Chunks](https://r4ds.hadley.nz/quarto.html#code-chunks))
+  - Section 29.6 ([Figures](https://r4ds.hadley.nz/quarto.html#sec-figures))
+  - Section 29.7 ([Tables](https://r4ds.hadley.nz/quarto.html#tables))
+
+# Set-up
+
+1. New folder for topic
+2. New Quarto document
+3. Update YAML
+3. Load packages
+  - `tidyverse`
+  - `knitr` (new)
+  
+```{r}
+#| label: packages
+pacman::p_load(tidyverse,
+               knitr,
+               nycflights13)
+```
+
+# Code chunks
+
+Shortcuts:
+
+  - `Cmd/Strg+Alt+I`: insert new chunk
+  - `Cmd/Strg+Enter`: run single line of code
+  - `Cmd/Strg+Shift+Enter`: run whole code chunk
+  
+- code chunks should be relatively self-contained
+  + and focussed on a single task
+
+## Chunk labels
+
+- we can give each code chunk specifications using `#|` *directly* under  ```{r} 
+  - `#| label: simple-math` will label the chunk 'simple-math'
+  
+```{r}
+#| echo: fenced
+#| label: simple-math
+
+4 + 4
+```
+
+### Advantages of using chunk labels
+
+1. We can navigate to specific code chunks using the drop-down menu in the script editor
+2. Graphics (i.e., plots) produced by chunks will have useful names that make it easier to find them later (more on this soon)
+
+---
+
+### Chunk labels should...
+
+  + be short and informative
+  + contain no spaces (use `-` or `_`)
+  + be *unique* in a document (not repeated)
+  
+---
+
+::: {.callout-note}
+### Unique chunk labels
+
+Chunk labels must *always* be unique within a script!
+
+- if not, you will get an error message when rendering and the document will not render
+- you will get a informative error message in the 'Background jobs' pane if you have duplicate chunk labels, so ***always read the error message***!! They can be very helpful for debugging.
+
+```{r}
+#| label: fig-duplicate-chunk-error
+#| fig-cap: "Error message when multiple code chunks have the same label `simple-math`"
+#| out-width: "70%"
+#| echo: false
+knitr::include_graphics(here::here("media", "Screenshot_duplicateChunk.png"))
+```
+
+:::
+
+::: {.content-visible when-format="revealjs"}
+## Exercise {.unlisted .unnumbered}
+:::
+
+::: callout-tip
+
+### [Exercise @exm-chunk-labels]: Chunk labels
+::: {#exm-chunk-labels .custom}
+::: nonincremental
+1. Add a chunk label to your code chunk where you loaded packages
+1. Add a code chunk using the keyboard shortcut `Cmd/Strg-Alt-I`, and add some simple math
+2. Add a chunk label
+4. Try out the chunk navigation bar at the bottom of the source window to jump between code chunks
+5. Render
+:::
+:::
+:::
+
+## Chunk options
+
+- chunk output can be formatted with **options** that tell R what to do with code when rendering your document
+  + there are almost 60 options
+  + the most important options control if your code chunk is executed when rendering and what results are printed in the output report:
+
+- `eval: false` prevents code from being *printed* in rendered output
+- `include: false` runs the code, but doesn't *show* the code or results in the final document
+- `echo: false` prevents code, but not the output, from appearing in the rendered output
+- `message: false` or `warning: false` prevents messages or warnings from appearing in the rendered output
+- `results: hide` hides printed output; `fig-show: false` hides plots
+- `error: true` renders the document even if errors are encountered
+
+---
+
+Will the following code chunk appear in the rendered output?
+Will the code be run?
+
+```{r}
+#| echo: fenced
+#| eval: true
+#| label: df-flights1
+#| message: false
+
+df_flights <- flights
+```
+
+---
+
+Will the following code chunk appear in the rendered output?
+Will the code be run?
+
+```{r}
+#| echo: fenced
+#| eval: false
+#| label: df-flights2
+#| message: false
+
+fig_flights <- read_csv(here::here("daten", "flights.csv")) %>% 
+  filter(month == 12) %>% 
+  ggplot(aes(x = dep_delay, y = arr_delay, colour = carrier)) +
+  geom_point() +
+  theme_minimal()
+```
+
+---
+
+The following table summarizes which types of output each option suppresses:
+
+| Option           | Run code | Show code | Output | Plots | Messages | Warnings |
+|------------------|:--------:|:---------:|:------:|:-----:|:--------:|:--------:|
+| `eval: false`    |    X     |           |   X    |   X   |    X     |    X     |
+| `include: false` |          |     X     |   X    |   X   |    X     |    X     |
+| `echo: false`    |          |     X     |        |       |          |          |
+| `results: hide`  |          |           |   X    |       |          |          |
+| `fig-show: hide` |          |           |        |   X   |          |          |
+| `message: false` |          |           |        |       |    X     |          |
+| `warning: false` |          |           |        |       |          |    X     |
+
+---
+
+- for the rest of the course, we will only use `eval`, `echo`, `include`, and `message`
+
+## Global options
+
+- the chunk options just mentioned can also be set *globally* for your whole document by adding them to your YAML under `excute:`
+
+```{r}
+#| eval: false
+title: "My report"
+execute:
+  echo: false
+```
+
+- and then subsequent code chunks can override the global setting in a case-by-case basis
+
+::: {.content-visible when-format="revealjs"}
+## Exercise {.unlisted .unnumbered}
+:::
+
+::: callout-tip
+
+### [Exercise @exm-chunk-options]: Chunk options
+::: {#exm-chunk-options .custom}
+::: nonincremental
+1. Add a new code chunk
+3. Give it a label
+3. Change the `eval: false` and `echo: true`
+4. Render
+:::
+:::
+:::
+
+# Figures
+
+## Figure label
+
+- `label`s for code chunks that *print* a figure need to start with `fig-`
+  + the figure will then have a number when printed
+
+```{r}
+#| echo: false
+fig_flights <- df_flights %>%
+  filter(month == 12) %>%
+  ggplot(aes(x = dep_delay, y = arr_delay, colour = carrier)) +
+  geom_point() +
+  labs(
+    title = "December departure and arrival delay",
+    x = "Departure delay (mins)",
+    y = "Arrival delay (mins)",
+    colour = "Airline"
+  ) +   theme_minimal()
+```
+
+```{r}
+#| label: fig-flights-dec120
+#| echo: fenced
+
+fig_flights
+```
+
+
+## Figure caption
+
+- `fig-cap:` adds a figure caption which will appear in the rendered document
+  + always wrap the caption with quotation marks! `fig-cap: "..."`
+    + this isn't always necessary, but if you have some special characters (like `:`) the document won't render
+
+```{r}
+#| label: fig-flights-dec120-2
+#| fig-cap: "Departure delay by arrival delay for December 2013. Airline is indicated via point colour."
+#| echo: fenced
+
+fig_flights
+```
+
+## Figure sizing
+
+- a big challenge of graphics in Quarto is getting the figures the right size and shape
+- five main chunk options that can be helpful:
+  + `fig-width:` sets the width of the figure in inches (e.g., `fig-width = 4`)
+  + `fig-height:` sets the height of the figure in inches (e.g., `fig-height = 4`)
+  + `fig-asp:` sets the aspect-ratio of your figure (if you set only height or width; e.g., `fig-asp = 0.618`)
+  + `out-width:` sets the width of the figure in percentage to line width (e.g., `out-width = "70%"`)
+  + `out-height:` sets the height of the figure in percentage to line width (e.g., `out-height = "30%"`)
+  + `fig-align: centre` centres the figure on the output page
+  
+---
+
+```{r}
+#| label: fig-flights-dec120-3
+#| fig-cap: "Departure delay by arrival delay for December 2013. Airline is indicated via point colour."
+#| out-width: "70%"
+#| fig-asp: .618
+#| fig-align: center
+#| echo: fenced
+#| output-location: fragment
+
+fig_flights
+```
+
+
+
+# Tables
+
+- we can print tables as we see them in the console
+- we can also add further formatting using the `kable()` function from the `knitr` package
+
+:::: columns
+
+::: {.column width="40%"}
+
+```{r}
+#| output-location: fragment
+df_flights %>% 
+  select(1:5) %>% 
+  head()
+```
+:::
+
+::: {.column width="60%"}
+
+```{r}
+#| output-location: fragment
+df_flights %>% 
+  select(1:5) %>% 
+  head() %>% 
+  knitr::kable()
+```
+:::
+
+::::
+
+## Table captions
+
+- we can also add a caption to the table using by adding a `label` and `tbl-cap`
+
+```{r}
+#| echo: fenced
+#| output-location: fragment
+#| label: tbl-flights
+#| tbl-cap: "A table made with `knitr`. The first 6 rows of the first 5 columns from the flights.csv dataset are printed."
+df_flights %>% 
+  select(1:5) %>% 
+  head() %>% 
+  knitr::kable(
+  )
+```
+
+## Column names
+
+- lastly, let's  fix the column names
+
+```{r}
+#| echo: fenced
+#| output-location: fragment
+#| label: tbl-flights2
+#| tbl-cap: "A table made with `knitr`. The first 6 rows of the first 5 columns from the flights.csv dataset are printed."
+df_flights %>% 
+  select(1:5) %>% 
+  head() %>% 
+  knitr::kable(
+    col.names = c("Year", "Month", "Day", "Dep. Time", "Sched. Dep. Time")
+  )
+```
+
+# Cross-referencing
+
+- we can also refer to plots or tables in-text by typing `@` followed by the `label`
+  - e.g., This is some text describing `@fig-flights-dec120`.
+
+--- 
+
+So the text:
+
+> `@fig-flights-dec120-3` shows the departure and arrive delays for December 2013.  `@fig-flights-dec120` also shows this data, but doesn't have a caption. `@fig-flights-dec120-2` also shows this data, and does have a caption, but is not sized.
+
+Will print:
+
+> @fig-flights-dec120-3 shows the departure and arrive delays for December 2013.  @fig-flights-dec120 also shows this data, but doesn't have a caption. @fig-flights-dec120-2 also shows this data, and does have a caption, but is not sized.
+
+# Exercises {.smaller}
+
+Open a previous script from this class that you wrote, and:
+
+1. Change the ***global chunk*** options (in the YAML) so that messages and code are not printed in the output file by default.
+    + hint: you do this with `execute` and `include: false`
+3. Change the ***global chunk*** options (in the YAML) so that all figures have `fig-out: 6` and `fig-align: center`
+4. Use `knitr::kable()` to print tables of whichever summary you printed.
+    + add a `label` and `tbl-caption`
+3. Change the ***code-chunk settings*** code chunks that produced your barplot and scatterplot, so that:
+    + the code is printed
+    + the plots have `label`s and `caption`s
+5. Refer to the barplot you created in-text using `@`. When you render the document, does it say `Figure 1`?
+
+# Today's goals 🏁 {.unnumbered .unlisted}
+
+Today we learned how to...
+
+- use code chunk options  ✅
+- control figure sizes   ✅
+- add figure captions   ✅
+- print formatted tables   ✅
+- cross-reference  ✅
+
+# Session Info {.unnumbered}
+
+```{r}
+#| label: RStudio-version
+#| eval: false
+#| echo: false
+RStudio.Version()$version
+```
+
+
+Developed with `r R.version.string` (`r R.version$nickname`) and RStudio Version 2023.3.0.386 (Cherry Blossom).
+
+```{r}
+#| label: sessionInfo
+sessionInfo()
+```
+
+# References {.unlisted .unnumbered visibility="uncounted"}
+
+::: {#refs custom-style="Bibliography"}
+:::

@@ -1,0 +1,295 @@
+---
+title: "Simple linear regression model"
+format: 
+  html:
+    toc: true
+    code-tools: true
+editor_options: 
+  chunk_output_type: console
+---
+
+# Set-up
+
+```{r}
+# suppress scientific notation
+options(scipen=999)
+```
+
+## packages
+
+```{r}
+pacman::p_load(tidyverse,
+               broom,
+               knitr,
+               kableExtra,
+               lme4,
+               lmerTest,
+               patchwork)
+```
+
+## data
+
+```{r}
+# load in dataset
+df_crit_verb <-
+  readr::read_csv(
+    here::here("data/tidy_data_lifetime_pilot.csv"),
+    # for special characters
+    locale = readr::locale(encoding = "latin1")
+  ) |>
+  mutate_if(is.character, as.factor) |> # all character variables as factor
+  # mutate(lifetime = fct_relevel(lifetime, "living", "dead"),
+  #        tense = fct_relevel(tense, "PP", "SF")) |>
+  filter(type == "critical", # only critical trials
+         px != "px3", # px3 had a lot of missing values
+         region == "verb") %>%  # critical region only
+  mutate(fp = case_when(fp == 0 ~ 0.01, TRUE ~ fp),
+         tt = case_when(tt == 0 ~ 0.01, TRUE ~ tt)) %>% 
+  droplevels() # remove any factor levels with no observations
+```
+
+```{r}
+df_crit_verb %>% 
+  # summarise(mean_fp = mean(fp),
+  #           mean_tt = mean(tt))
+  filter(fp > 0.01) %>% 
+  pull(fp) %>% 
+  mean()
+
+df_crit_verb %>% 
+  filter(fp == 0.1)
+```
+
+
+## Functions
+
+- `format_pval()` to create nicely formatted p-values
+
+```{r}
+# source: https://stackoverflow.com/questions/37470202/in-line-code-for-reporting-p-values-001-in-r-markdown
+
+pacman::p_load(broman) # for myround() function
+
+format_pval <- function(x){
+  if (x < .001) return(paste('<', '.001'))
+  if (x < .01) return(paste('<', '.01'))
+  if (x < .05) return(paste('<', '.05'))
+  paste('=', myround(x, 3))  # if above .05, print p-value to 3 decimalp points
+}
+```
+
+- `make_stars()` to add p-value indications
+
+```{r}
+make_stars <- function(pval) {
+  stars = ""
+  if(pval <= 0.001)
+    stars = "***"
+  if(pval > 0.001 & pval <= 0.01)
+    stars = "**"
+  if(pval > 0.01 & pval <= 0.05)
+    stars = "*"
+  if(pval > 0.05 & pval <= 0.1)
+     stars = "."
+  stars
+}
+```
+
+
+# Fit model
+
+## Set contrasts
+
+Print contrasts.
+
+```{r}
+contrasts(df_crit_verb$lifetime)
+```
+
+This is treatment contrasts, and with `dead` as the baseline. We want sum contrast coding, and with `living` coded as `-0.5`.
+
+### Re-order `lifetime`
+
+```{r}
+df_crit_verb <- df_crit_verb %>% 
+  mutate(lifetime = fct_relevel(lifetime, "living", "dead"))
+```
+
+Check order
+
+```{r}
+contrasts(df_crit_verb$lifetime)
+```
+
+Good, order is correct. Now set sum coding.
+
+### Sum coding
+
+```{r}
+contrasts(df_crit_verb$lifetime) <- c(-0.5,+0.5)
+```
+
+Check order.
+
+```{r}
+contrasts(df_crit_verb$lifetime)
+```
+
+Good. Let's move on to our model.
+
+
+## Fit model
+
+We fit a simple linear model with the fixed effect lifetime using sum contrast coding (living: -0.5, dead: +0.5).
+
+```{r}
+fit_tt_lifetime <- df_crit_verb %>% 
+  lm(tt ~ lifetime, data = .)
+```
+
+```{r}
+summary(fit_tt_lifetime)
+```
+
+# Results
+
+in-line code: `r 5*5`, written as code `5*5`
+
+A main effect of lifetime was found in total reading times at the verb region (*t* = `r round(coef(summary(fit_tt_lifetime))["lifetime1","t value"],1)`, *p* `r round(coef(summary(fit_tt_lifetime))["lifetime1","Pr(>|t|)"],5)`), with the *dead* condition eliciting longer reading times than the *living* condition.
+
+# Interaction models
+
+## First-pass reading time
+
+```{r}
+df_crit_verb <- df_crit_verb %>% 
+  mutate(tense = fct_relevel(tense, "PP", "SF"))
+
+contrasts(df_crit_verb$tense) <- c(-0.5,+0.5)
+```
+
+```{r}
+fit_fp_inter <- df_crit_verb %>% 
+  # filter(fp > 0) %>% 
+  lm(log(fp) ~ lifetime*tense, data = .)
+```
+
+```{r}
+summary(fit_fp_inter)
+```
+
+## Total reading time
+
+```{r}
+df_crit_verb <- df_crit_verb %>% 
+  mutate(tense = fct_relevel(tense, "PP", "SF"))
+
+contrasts(df_crit_verb$tense) <- c(-0.5,+0.5)
+```
+
+```{r}
+fit_tt_inter <- df_crit_verb %>% 
+  # filter(tt > 0) %>% 
+  lm(log(tt) ~ lifetime*tense, data = .)
+```
+
+```{r}
+summary(fit_tt_inter)
+```
+
+# Results
+
+## First-pass reading time
+
+Model summaries are provided in @tbl-
+
+***Main effect of lifetime*** A main effect of lifetime was found in first-pass reading time at the verb region (*t* = `r round(coef(summary(fit_fp_inter))["lifetime1","t value"],1)`, *p* `r format_pval(coef(summary(fit_fp_inter))["lifetime1","Pr(>|t|)"])`), with the *dead* condition eliciting longer reading times than the *living* condition.
+
+***Main effect of tense*** No effect of tense was found in first-pass reading time at the verb region (*t* = `r round(coef(summary(fit_fp_inter))["tense1","t value"],1)`, *p* `r format_pval(coef(summary(fit_fp_inter))["tense1","Pr(>|t|)"])`).
+
+***Interaction effect*** No interaction effect was found in first-pass reading time at the verb region (*t* = `r round(coef(summary(fit_fp_inter))["lifetime1:tense1","t value"],1)`, *p* `r format_pval(coef(summary(fit_fp_inter))["lifetime1:tense1","Pr(>|t|)"])`).
+
+```{r}
+#| label: tbl-fp-inter
+#| tbl-cap: "Model summaries for first-pass reading times at the verb region. Model formula was `r formula(fit_fp_inter)`. Predictors (`lifetime` and `tense`) were sum-contrast coded (living, Present Perfect: -0.5; dead, Simple Future: +0.5)"
+tidy(fit_fp_inter) %>% # take tidy coefficients table (broom package)
+  mutate(format = sapply(p.value, function(x) format_pval(x))) %>%
+  mutate(signif = sapply(p.value, function(x) make_stars(x))) %>%
+  mutate(format = str_remove(format, "= ")) %>% # remove '=' with p's > .05
+  select(-p.value) %>% 
+  kable(digits = 1,
+        col.names = c("Coefficient",
+                      "Estimate (log)",
+                      "SE",
+                      "t-value",
+                      "p-value",
+                      "sign")) %>% 
+  kable_styling()
+```
+
+## Total reading time
+
+***Main effect of lifetime*** A main effect of lifetime was found in total reading times at the verb region (*t* = `r round(coef(summary(fit_tt_inter))["lifetime1","t value"],1)`, *p* `r format_pval(coef(summary(fit_tt_inter))["lifetime1","Pr(>|t|)"])`), with the *dead* condition eliciting longer reading times than the *living* condition.
+
+***Main effect of tense*** A main effect of tense was found in total reading times at the verb region (*t* = `r round(coef(summary(fit_tt_inter))["tense1","t value"],1)`, *p* `r format_pval(coef(summary(fit_tt_inter))["tense1","Pr(>|t|)"])`), with the *Present Perfect* condition eliciting longer reading times than the *Simple Future* condition.
+
+***Interaction effect*** An interaction effect of lifetime and tense was found in total reading times at the verb region (*t* = `r round(coef(summary(fit_tt_inter))["lifetime1:tense1","t value"],1)`, *p* `r format_pval(coef(summary(fit_tt_inter))["lifetime1:tense1","Pr(>|t|)"])`).
+
+## Formatted coefficients table
+
+Model summary for total reading time at the verb region is given in @tbl-tt-inter.
+
+```{r}
+#| label: tbl-tt-inter
+#| tbl-cap: "Model summaries for total reading time at the verb region. Predictors (`lifetime` and `tense`) were sum-contrast coded (living, Present Perfect: -0.5; dead, Simple Future: +0.5)"
+tidy(fit_tt_inter) %>% # take tidy coefficients table (broom package)
+  mutate(format = sapply(p.value, function(x) format_pval(x))) %>%
+  mutate(signif = sapply(p.value, function(x) make_stars(x))) %>%
+  mutate(format = str_remove(format, "= ")) %>% # remove '=' with p's > .05
+  select(-p.value) %>% 
+  kable(digits = 10,
+        col.names = c("Coefficient",
+                      "Estimate (log)",
+                      "SE",
+                      "t-value",
+                      "p-value",
+                      "sign")) %>% 
+  kable_styling()
+```
+
+
+# Mixed model
+
+```{r}
+fit_tt_mixed <-
+df_crit_verb %>% 
+  lmer(log(tt) ~ lifetime*tense +
+         (1|px) +
+         (1|item_id),
+       data = .)
+```
+
+```{r}
+summary(fit_tt_mixed)
+```
+
+## Formatted coefficients table
+
+```{r}
+broom.mixed::tidy(fit_tt_mixed, effects = "fixed") %>% # take tidy coefficients table (broom package)
+  mutate(format = sapply(p.value, function(x) format_pval(x))) %>%
+  mutate(signif = sapply(p.value, function(x) make_stars(x))) %>%
+  mutate(format = str_remove(format, "= ")) %>% # remove '=' with p's > .05
+  select(-p.value, -effect) %>% 
+  kable(digits = 10,
+        col.names = c("Coefficient",
+                      "Estimate (log)",
+                      "SE",
+                      "t-value",
+                      "df",
+                      "p-value",
+                      "sign")) %>% 
+  kable_styling()
+```
+
+

@@ -26,7 +26,7 @@ From the course AGNES:
 
 # Notes for future self
 
-Day 1:
+Day 1 (3 lectures):
 
 - mats don't really need much work;
 - Welcome: okay
@@ -38,7 +38,7 @@ Day 1:
   + maybe introduce workflow stuff (instead of in Day 2)
   + maybe introduce magrittr pipe on Day 1 (et_dataset) instead of in Day 2 (wrangling)
 
-Day 2: 
+Day 2 (3 lectures): 
 
 - Workflow: good, but:
   + maybe should come before/during et_dataset topic on Day 1
@@ -48,13 +48,26 @@ Day 2:
 - Data Visualisation: mats could be improved for clarity/structure
   + students didn't finish materials, will continue in Day 3
 
-Day 3:
+Day 3 (3 lectures):
 
 - first session was used to catch-up on Data Viz (individual work-through of mats)
-- Lin Reg1 (simple reg):
-- Lin Reg2 (multiple reg):
+- afternoon for open questions, more advanced topics requested (e.g., Zotero)
 
 Report assignment
 
 - too much for 1LP, changed it to be worth 2LP (and only assignment)
 - next time either make it shorter, or keep it as only assignment
+
+Day 4 (2 lectures): Equation of a line/Simple regression with lm()
+
+- good, but divide slides into the 2 topics
+- more exercises (maybe as homework)
+
+Day 5 (3 lectures): MLMs, model assumptions, LMMs
+
+- topics good, but rather than a long Saturday break up into Friday afternoons
+- e.g., one Friday: MLMs and assumptions
+  - assumptions: needs a bit more for log interpretation (Section 5.5.3 in )
+- another Friday: LMMs
+- for LMMs lecture:
+  - break into 2: varying intercepts, and varying slopes

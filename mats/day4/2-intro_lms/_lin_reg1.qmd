@@ -1,0 +1,1372 @@
+---
+title: "Linear Regression 1"
+subtitle: "Simple Linear Regression"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+footer: "Simple Linear Regression"
+lang: en
+date: 2023-04-13
+format:
+  revealjs: 
+    output-file: slides-lin_reg1.html
+    theme: [dark]
+    width: 1600
+    height: 900
+    progress: true
+    # smaller: true
+    scrollable: true
+    slide-number: c/t
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    code-annotations: below
+    # logo: logos/hu_logo.png
+    # css: logo.css
+    incremental: true
+    # number-sections: true
+    toc: true
+    toc-depth: 1
+    toc-title: 'Topics'
+    navigation-mode: linear
+    controls-layout: bottom-right
+    fig-cap-location: top
+    font-size: 0.6em
+    slide-level: 4
+    chalkboard: true
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+  html:
+    self-contained: true
+    output-file: sheet-lin_reg1.html
+    theme: [dark]
+    number-sections: true
+    toc: true
+    code-overflow: wrap
+    code-tools: true
+  pdf:
+    output-file: pdf-lin_reg1.pdf
+    toc: true
+    number-sections: false
+    colorlinks: true
+    code-overflow: wrap
+editor_options: 
+  chunk_output_type: console
+execute:
+  echo: false
+bibliography: references/references.json
+csl: references/apa.csl
+---
+
+```{r, echo = T}
+#| echo: false
+knitr::opts_chunk$set(eval = T, # change this to 'eval = T' to reproduce the analyses; make sure to comment out
+                      echo = T, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F,
+                      warning = F)
+```
+
+```{r}
+#| echo: false
+## play sound if error encountered
+### from: https://sejohnston.com/2015/02/24/make-r-beep-when-r-markdown-finishes-or-when-it-fails/
+options(error = function(){    # Beep on error
+  beepr::beep(sound = "wilhelm")
+  Sys.sleep(2) # 
+  }
+ )
+## and when knitting is complete
+.Last <- function() {          # Beep on exiting session
+  beepr::beep(sound = "ping")
+  Sys.sleep(6) # allow to play for 6 seconds
+  }
+```
+
+```{r, eval = T, cache = F}
+#| echo: false
+# Create references.json file based on the citations in this script
+# make sure you have 'bibliography: references.json' in the YAML
+# rbbt::bbt_update_bib("_lin_reg1.qmd")
+```
+
+# Learning Objectives {.unnumbered}
+
+Today we will learn...
+
+- the equation of a line
+- about intercepts, slopes, and residuals
+- how to run our first linear model
+- how to interpret model output
+
+# Set-up environment  {.unnumbered}
+
+Make sure you start with a clean R Environment (Session > Restart R).
+
+## Load packages  {.unnumbered}
+
+```{r}
+# suppress scientific notation
+options(scipen=999)
+```
+
+```{r}
+# load libraries
+pacman::p_load(tidyverse,
+               broom,
+               patchwork,
+               knitr,
+               kableExtra)
+```
+
+## Load in data  {.unnumbered}
+
+  - force character variables to factors
+  - filter for the verb region from critical items only, remove participant 3, and remove values of first-fixtation that are 0
+
+```{r}
+# load in dataset
+df_crit_verb <-
+  readr::read_csv(
+    here::here("data/tidy_data_lifetime_pilot.csv"),
+    # for special characters
+    locale = readr::locale(encoding = "latin1")
+  ) |>
+  mutate_if(is.character, as.factor) |> # all character variables as factor
+  # mutate(lifetime = fct_relevel(lifetime, "living", "dead"),
+  #        tense = fct_relevel(tense, "PP", "SF")) |>
+  filter(type == "critical", # only critical trials
+         px != "px3", # px3 had a lot of missing values
+         fp > 0, # only values of fp above 0
+         region == "verb") %>% # critical region only
+  droplevels() # remove any factor levels with no observations
+```
+
+# Resources  {.unnumbered}
+
+-   these slides are based on a mix of the following resources
+
+@debruine_understanding_2021; @winter_linear_2013; @winter_very_2014; @winter_statistics_2019
+
+-   and on slides that were originally based on @field_discovering_2013, but if you're looking for a textbook I'd recommend @winter_statistics_2019
+
+# Exploratory data analysis (EDA)
+
+- what we've learned so far is essentially Exploratory Data Analysis (EDA)
+  + visualise your data
+  + generate summary (i.e., descriptive) statistics
+  + overall getting to know your data, without making any claims beyond your data
+  
+- the next step after conducting an EDA is to *model* your data, i.e., run **inferential statistics**
+  + this is where we try to generalise beyond our data
+
+# (Linear) Regression
+
+-   our data exploration has given us an idea about what our data look like
+-   but now we want to be able to make predictions about hypothetical observations, i.e., to *predict* values of our DV based on one (or more) IV(s)
+    +   so we fit a model to our data, and use it to *predict* values of our DV based on one (or more) IV(s)
+    -   i.e., *predicting* an outcome variable (dependent variable, DV) from one or more predictors (independent variable, IV)
+-   because we're making predictions, we need to take into account the variability (i.e., *error*) in our data
+
+## Types of regression
+
+```{r}
+#| echo: false
+tribble(
+  ~"regression type", ~"predictor", ~"outcome",
+  "simple regression", "Single predictor", "continuous (numerical)",
+  "multiple regression", "multiple predictor", "continuous (numerical)",
+  "hierarchical/linear mixed models/linear mixed effect models", "include random effect", "continuous (numerical)",
+  "generalised linear (mixed) models/logistic regression", "as above","binary/binomial data or count data"
+) %>% 
+  kable() %>% 
+  kable_styling()
+```
+
+## Straight lines
+
+-   *linear regression* summarises the data with a straight line
+    + we *model* our data as/fit our data to a straight line
+-   *straight lines* can be defined by
+    -   Intercept ($b_0$)
+        -   value of $Y$ when $X = 0$
+    -   Slope ($b_1$)
+        -   gradient (slope) of the regression line
+        -   direction/strength of relationship between $x$ and $y$
+        -   regression coefficient for the predictor
+-   so we need to define an intercept and a slope
+
+
+### A line = intercept and slope
+
+- a line is defined by its intercept and slope
+  + in a regression model, these two are called `coefficients`
+
+::: {.content-visible when-format="revealjs"}
+```{r echo = F, fig.align = "center"}
+#| fig-cap: "Image source: @winter_statistics_2019 (all rights reserved)"
+#| fig-cap-location: bottom
+
+# invert colours for dark mode in slides
+library(magick)
+y <- magick::image_read(here::here("media/Winter_2019_slopes-intercepts.png"))
+
+magick::image_negate(y)
+```
+:::
+
+::: {.content-hidden when-format="revealjs"}
+```{r echo = F, fig.align = "center"}
+#| fig-cap: "Image source: @winter_statistics_2019 (all rights reserved)"
+#| fig-cap-location: bottom
+magick::image_read(here::here("media/Winter_2019_slopes-intercepts.png"))
+```
+:::
+
+
+
+
+### Intercept ($b_0$)
+
+- the value of $y$ when $x = 0$
+
+```{r}
+#| echo: false
+x <- 0:9
+e <- rnorm(10,mean=2,sd=1)
+y <- x*.5+e
+# to keep it exact:
+y <- c(0.7903944 , 3.6750268 , 1.2317196 , 2.9814889 , 3.5957417 , 5.5563679 , 3.5359822 , 5.4734527 , 6.8202345 , 8.6349594)
+
+df_random <- cbind(x,y) %>% 
+  as_data_frame() %>% 
+  mutate(cor_x_y = cor(x,y))
+
+fit_random <- lm(y~x, data = df_random)
+df_random$predicted <- predict(fit_random)
+fit_random$residuals <- residuals(fit_random)
+```
+
+```{r}
+#| echo: false
+df_random %>%
+  ggplot(aes(x = x, y = y)) +
+  geom_abline(aes(intercept=coef(fit_random)["(Intercept)"],
+                  slope=coef(fit_random)["x"]),
+              colour = "blue") +
+  geom_point(aes(x=0,
+                  y=coef(fit_random)["(Intercept)"]),
+             pch=21, 
+             size=5,
+             colour="red") +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = "grey") +
+  labs(x = "Word length",
+       y = "Reading time") +
+  theme_bw() + 
+  scale_x_continuous(limits = c(0, 9), breaks = seq(0,9,by=1)) +
+  scale_y_continuous(limits = c(0, 8))
+```
+
+### Slopes ($b_1$)
+
+::: columns
+::: {.column width="70%"}
+-   slopes describe a change in $x$ ($\Delta x$) over a change in $y$ ($\Delta y$)
+    -   positive slope: as $x$ increases, $y$ increases
+    -   negative slope: as $x$ increases, $y$ decreases
+    -   if the slope is 0, there is no change in $y$ as a function of $x$
+-   or: the change in $y$ when $x$ increase by 1 unit
+    -   sometimes referred to as "rise over run": how do you 'rise' in $y$ for a given 'run' in $x$?
+:::
+
+::: {.column width="30%"}
+$$
+slope = \frac{\Delta x}{\Delta y}
+$$
+:::
+::::
+
+---
+
+::: {.column width="40%"}
+- what is the intercept of this line?
+- what is the slope of this line?
+:::
+
+::: {.column width="60%"}
+```{r}
+#| echo: false
+df_random %>%
+  ggplot(aes(x = 3*(x-3), y = 2*(y))) +
+  # geom_point(alpha = .6) +
+  geom_smooth(method = "lm", se = F, alpha = .2) +
+  labs(x = "Word length",
+       y = "Reading time") +
+  theme_bw() + theme(text = element_text(size = 20))           
+```
+:::
+
+
+
+### Error and residuals
+
+- *fixed effects* (IV/predictors): things we can understand/measure 
+- *error* (random effects): things we cannot understand/measure
+  + in biology, social sciences (and linguistic research), there will always sources of random error that we cannot account for
+  + random error is less an issue in e.g., physics (e.g., measuring gravitational pull)
+- *residuals*: the difference (vertical difference) between **observed data** and the **fitted values** (predicted values)
+
+### {.unlisted .unnumbered}
+
+::: callout-tip
+
+### Equation of a line
+
+$$
+\begin{align}
+y & = mx + c\\
+Y_i &= (b_0 + b_1X_i) + \epsilon_i\\
+outcome_i & = (model) + error_i\\
+y_i & = (intercept + slope*x_i) + error_i
+\end{align}
+$$
+:::
+
+---
+
+```{r}
+#| echo: false
+df_random %>%
+  ggplot(aes(x = x, y = y)) +
+  labs(title = "A line") +
+  # geom_point(alpha = .6) +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = "grey") +
+  geom_abline(aes(intercept=coef(fit_random)["(Intercept)"],
+                  slope=coef(fit_random)["x"]),
+              colour = "blue") +
+  labs(x = "Word length",
+       y = "Reading time") +
+  theme_bw() + 
+  scale_x_continuous(limits = c(0,9.5), breaks = seq(0,9,by=1)) +
+  scale_y_continuous(limits = c(0,9),expand = c(0, 0),breaks = seq(-2,9,by=1))
+
+
+```
+
+---
+
+```{r}
+#| echo: false
+df_random %>%
+  ggplot(aes(x = x, y = y)) +
+  labs(title = "A line with data points") +
+  geom_point(alpha = .6, shape = 17, size = 2) +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = "grey") +
+  geom_abline(aes(intercept=coef(fit_random)["(Intercept)"],
+                  slope=coef(fit_random)["x"]),
+              colour = "blue") +
+  labs(x = "Word length",
+       y = "Reading time") +
+  theme_bw() + 
+  scale_x_continuous(limits = c(0,9.5), breaks = seq(0,9,by=1)) +
+  scale_y_continuous(limits = c(0,9),expand = c(0, 0),breaks = seq(-2,9,by=1))
+```
+
+---
+
+```{r}
+#| echo: false
+
+df_random %>%
+  ggplot(aes(x = x, y = y)) +
+  labs(title = "A line with data points and regression line") +
+  geom_point(alpha = .6, shape = 17, size = 2) +
+  geom_point(aes(y = predicted), colour = "blue") +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = "grey") +
+  geom_abline(aes(intercept=coef(fit_random)["(Intercept)"],
+                  slope=coef(fit_random)["x"]),
+              colour = "blue") +
+  labs(x = "Word length",
+       y = "Reading time") +
+  geom_segment(aes(xend = x, yend = predicted), colour = "red") +
+  theme_bw() + 
+  scale_x_continuous(limits = c(0,9.5), breaks = seq(0,9,by=1)) +
+  scale_y_continuous(limits = c(0,9),expand = c(0, 0),breaks = seq(-2,9,by=1))
+```
+
+---
+
+```{r}
+#| echo: false
+df_crit_verb |>
+  mutate(predicted = predict(lm(rt~tt)),
+  residuals <- residuals(lm(rt~tt))) |>
+ggplot(aes(x = tt, y = rt)) +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = "grey") +
+  labs(title = "Total reading time x Reaction time",
+       x = "Total reading time (ms)",
+       y = "Reaction Time (ms)") +
+  geom_segment(aes(xend = tt, yend = predicted, colour = condition), alpha = .3) +
+  geom_point(aes(colour = condition, shape = condition)) +
+  geom_smooth(method="lm", se=F, fullrange=FALSE, level=0.95) +
+  theme_bw() +
+  theme(legend.position = "none",
+        text = element_text(size=18))
+```
+
+## Method of least squares
+
+- so how is any given line chosen to fit any given data?
+- the ***method of least squares***
+  + take a given line, and square all the residuals (i.e., $residual^2$)
+  + the line with the lowest ***sum of squares*** is the line with the best fit to the given data
+  + why do we square the residuals before summing them up?
+    + so all values are positive (i.e., so that negative values don't cancel out positive values)
+- this is how we find the ***line of best fit***
+  + R fits many lines to find the one with the best fit
+  
+```{r}
+#| echo: false
+
+fig_point <- df_random %>%
+  ggplot(aes(x = x, y = y)) +
+  labs(title = "Observed values") +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = "grey") +
+  # geom_smooth(method = "lm", se = F, colour = "red") +
+  # geom_segment(aes(xend = x, yend = predicted), colour = "red") +
+  # geom_segment(aes(xend = x, yend = (x*.5)+1), colour = "cadetblue2") +
+  # geom_abline(slope=.5, intercept=1, colour = "lightblue", size = 1) +
+  geom_point(alpha = .3) +
+  labs(x = "Word length",
+       y = "Reading time") +
+  theme_bw() + 
+  scale_x_continuous(breaks = seq(0,10,by=1)) +
+  scale_y_continuous(breaks = seq(-2,9,by=1))
+
+fig_red <- df_random %>%
+  ggplot(aes(x = x, y = y)) +
+  labs(title = "Line of best fit") +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = "grey") +
+  geom_smooth(method = "lm", se = F, colour = "red") +
+  geom_segment(aes(xend = x, yend = predicted), colour = "red") +
+  geom_point(alpha = .3) +
+  labs(x = "Word length",
+       y = "Reading time") +
+  theme_bw() + 
+  scale_x_continuous(breaks = seq(0,10,by=1)) +
+  scale_y_continuous(breaks = seq(-2,9,by=1))
+
+slope_blue <- 0.5
+intercept_blue <- 1.5
+
+fig_blue <- df_random %>%
+  ggplot(aes(x = x, y = y)) +
+  labs(title = "A different line") +
+  geom_vline(xintercept = 0, linetype = "dashed", colour = "grey") +
+  geom_smooth(method = "lm", se = F, colour = "pink") +
+  geom_segment(aes(xend = x, yend = (x*slope_blue)+intercept_blue), colour = "cadetblue") +
+  geom_abline(slope=slope_blue, intercept=intercept_blue, colour = "cadetblue", size = 1) +
+  geom_point(alpha = .3) +
+  labs(x = "Word length",
+       y = "Reading time") +
+  theme_bw() + 
+  scale_x_continuous(breaks = seq(0,10,by=1)) +
+  scale_y_continuous(breaks = seq(-2,9,by=1))
+```  
+
+---
+
+```{r}
+#| label: fig-least-squares
+#| fig-cap: Observed values (A), Residuals for line of best fit (B), A line of worse fit with larger residuals (C)
+#| out-width: "100%"
+#| fig-asp: .4
+#| echo: false
+fig_point + fig_red + fig_blue + plot_annotation(tag_levels = "A")
+```
+
+
+# Simple linear model: first-pass reading time ~ lifetime {.smaller}
+
+- $y \sim x$ can be read as "y as a function of x", or "y predicted by x"
+- our first model will be:
+
+$$
+fp \sim lifetime
+$$
+
+- recall that in our experiment, participants read sentences about `dead` and `living` people in either the English `Simple Future` or `Present Perfect` (2 x2 design)
+  + referents (typically) need to exist (i.e., be alive) at reference time (RT)
+    + so people who are `dead` are incongruent with the `Present Perfect` (RT = present) and the `Simple Future` (RT = future)
+- recall that linking hypotheses take longer reading times to reflect processing costs
+  + so, if we're looking at the `living` versus the `dead` overall, which condition would you hypothesise would attract longer reading times?
+
+---
+
+- first, let's plot the data
+  + I'm using `position_jitter()` so that all the observations don't lie on top of each other
+
+```{r}
+#| code-fold: true
+
+# position_jitter
+pj <- position_jitter(0.2)
+
+# plot
+df_crit_verb %>% 
+  filter(region=="verb") %>% 
+  ggplot(aes(x = lifetime, y = fp, colour = lifetime)) +
+  geom_point(position = pj) +
+  theme(legend.position = "none") +
+  theme_bw()
+```
+
+## `lm()`
+
+- the `lm()` function fits simple linear models
+  + as arguments it takes a formula and a dataset, at minimum
+  
+$$
+lm(outcome \sim 1 + predictor,\;data\;=\;df\_name)
+$$
+
+- `lm()` function formula syntax can be read as: `fp` predicted by the intercept (`1` is a placeholder for the intercept)
+  + the intercept is included by default
+  + if you omit the `1`, the intercept is still included in the formula
+  + if you wanted to remove the intercept (which you often don't), you could replace `1` with `0`
+
+### Running a model
+
+- before we add our predictor `lifetime`, let's see what our model looks like without it
+
+```{r}
+fit_fp_1 <- lm(fp ~ 1, data = df_crit_verb) 
+```
+
+### Model ouput
+
+- printing just the model gives us the formula and the coefficients
+
+```{r}
+#| output-location: fragment
+fit_fp_1
+```
+
+- recall that the `intercept` and `slope` are called `coefficients`
+  + why do we only see `Intercept`?
+
+---
+
+- we typically use the `summary()` function to print full model outputs
+
+```{r}
+summary(fit_fp_1)
+```
+
+---
+
+::: {.callout-tip}
+### `broom` package
+
+- the `broom` package has some useful functions for printing model outputs
+  + `tidy()` produces a `tibble` (type of dataframe) of the `coefficients`
+  + `glance()` produces goodness of fit measures (which we won't discuss)
+- the outputs from `tidy()` and `glance()` can be fed into `kable` and/or `kable_styling()` to create formatted tables
+
+```{r}
+#| output-location: column-fragment
+tidy(fit_fp_1)
+```
+
+```{r}
+#| output-location: column-fragment
+glance(fit_fp_1)
+``` 
+
+- `augment()` adds model values as columns to your dataframe (e.g., useful for plotting observed vs. fitted values)
+
+```{r}
+#| eval: false
+augment(fit_fp_1, data = df_crit_verb) %>% summary()
+```
+
+:::
+
+### Interpreting model output
+
+- let's take a closer look at our model summary
+
+```{r}
+#| eval: false
+summary(fit_fp_1)
+```
+
+```{r, eval = F}
+Call:
+lm(formula = fp ~ 1, data = .) #<1>
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-227.17 -106.17  -26.17   65.83  761.83   #<2>
+
+Coefficients:
+            Estimate Std. Error t value            Pr(>|t|)    #<3>
+(Intercept)   309.17       6.29   49.15 <0.0000000000000002 *** #<4>
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 #<5>
+
+Residual standard error: 146.6 on 542 degrees of freedom #<6>
+```
+
+1) formula repetition
+2) residuals: differences between observed values and those predicted by the model
+3) names for columns `Estimates`, `standard error`, `t-value`, `p-value` (`Pr(>|t|)`)
+4) Intercept ($b_0$), i.e., value of $y$ (first-pass) with a move of one unit of $x$ (lifetime)
+5) Significance codes
+6)  R$^2$, a measure of model fit (squared residuals); percentage of variance in the data shared with the predictor (higher numbers are better...this is pretty low)
+
+### Intercept
+
+- our intercept is roughly `r round(mean(df_crit_verb$fp),1)` milliseconds; what does this number represent?
+  + the intercept is essentially the *mean*
+
+```{r}
+#| output-location: column-fragment
+
+# print model intercept?
+coef(fit_fp_1)['(Intercept)']
+```
+
+```{r}
+#| output-location: column-fragment
+
+# print data mean
+mean(df_crit_verb$fp)
+```
+
+#### Intercept significance
+
+- in the output, the intercept seems to be significant (indicated with a low p-value, and ***)
+  + what does this *mean*?
+- significance pretty much tells us if a number is equal to (or not statistically significantly different from) 0
+  + so this tells us that the intercept (i.e., the mean first-pass reading time at the verb region) is different from 0
+  + most of the time, this isn't interesting or even theoretically relevant
+- the larger your t-value, the smaller your p-value
+
+---
+
+::: {.callout-tip}
+### A word on t-values and p-values
+
+*t*-values quantify the *difference* between population means. 
+
+*p*-values quantify the probability of obtaining a result equal to or greater than what was observed, given the assumption of no effect (the null hypothesis).
+
+If the null hypothesis were true, we would expect no effect (a flat line). If we have a lot of evidence/are confidence that there is an effect (the line (slope) is in fact *not* flat), then it would be unlikely that we would find such a result under the assumption that there is no effect (the line actually *is* flat) i.e., the null hypothesis. This is reflected in a small p-value.
+:::
+
+### Plotting `fp ~ 1`
+
+```{r}
+#| echo: false
+df_crit_verb <-
+  df_crit_verb %>%
+  mutate(jitter = rnorm(nrow(.), sd = .1))
+  
+fig_fp_1 <-
+  df_crit_verb %>% 
+  filter(region=="verb") %>% 
+  ggplot(aes(x = 0, y = fp)) +
+  labs(title = "fp ~ 1",
+       y = "First-pass RTs (ms)") + 
+  geom_point(alpha = .2) +
+  theme(legend.position = "none") +
+  geom_point(aes(x = 0, y=mean(fp)), colour = "red", size = 3) +
+  geom_hline(aes(yintercept=mean(fp)), colour = "red") +
+  theme_bw() +
+  scale_x_continuous(limits = c(-1,1),breaks = c(-1,-.5,.5,0,1)) +
+  theme(axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_blank(),
+        text = element_text(size=9))
+
+fig_fp_1_pj <-
+  df_crit_verb %>% 
+  filter(region=="verb") %>% 
+  ggplot(aes(x = jitter, y = fp)) +
+  labs(title = "with position_jitter(.2)",
+       y = "First-pass RTs (ms)") + 
+  geom_point(alpha = .2) +
+    theme(legend.position = "none") +
+  geom_point(aes(x = 0, y=mean(fp)), colour = "red", size = 3) +
+  geom_hline(aes(yintercept=mean(fp)), colour = "red") +
+  theme_bw() +
+  scale_x_continuous(limits = c(-1,1),breaks = c(-1,-.5,.5,0,1)) +
+  theme(axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_blank(),
+        text = element_text(size=9))
+
+fig_fp_1_pj_res <-
+df_crit_verb %>% 
+  filter(region == "verb") %>%
+  ggplot(aes(x = jitter, y = fp)) +
+  labs(title = "residuals",
+       y = "First-pass RTs (ms)") +
+  geom_linerange(aes(x = jitter, ymin = mean(fp), ymax = fp),
+                 colour = "pink") +
+  geom_point(alpha = .2) +
+  theme(legend.position = "none") +
+  geom_point(aes(x = 0, y = mean(fp)), colour = "red", size = 3) +
+  geom_hline(aes(yintercept = mean(fp)), colour = "red") +
+  theme_bw() +
+  scale_x_continuous(limits = c(-1, 1), breaks = c(-1, -.5, .5, 0, 1)) +
+  theme(axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_blank(),
+        text = element_text(size=9))
+```
+
+- @fig-fp1 shows the intercept (red dot) amongst the observed data (black dots)
+  + along the x-axis we have abstract numerical units (the values don't mean anything)
+  + what would the values of the intercept be?
+
+```{r}
+#| label: fig-fp1
+#| echo: false
+#| fig-cap: "Visualisation of 'fp ~ 1': observed values (black) and mean (intercept; red). Residuals would be the distance from each black dot to the y-value of the read dot"
+#| out-width: "100%"
+#| fig-asp: .6
+fig_fp_1 + fig_fp_1_pj + fig_fp_1_pj_res + plot_annotation(tag_levels = "A")
+```
+
+
+## Adding a fixed effect (slope)
+
+- now let's include a *slope*
+- the slope represents the change in $y$ (DV: `fp`) when we move 1-unit along $y$ (IV: `lifetime`)
+- in other words, it tells us the *effect* our IV has on the DV
+  + what is the change in first-pass reading times when we move from dead to living referents?
+- `lifetime` is categorical, how can we move 1 unit?
+    + a linear model requires $x$ and $y$ to be numerical, so it simply codes factor levels as `0` and `1` by default (in alphabetical order)
+    + so the slope represents the *difference* between categorical conditions
+
+
+## Fit model (treatment contrasts)
+
+```{r}
+# fit simple linear model
+fit_fp_lifetime_treat <- df_crit_verb %>%
+  filter(fp > 0) %>%
+  lm(fp ~ lifetime, data = .)
+```
+
+```{r}
+# alternatively
+fit_fp_lifetime_treat <- lm(fp ~ lifetime, 
+            data = df_crit_verb, subset = fp > 0)
+```
+
+### Model summary
+
+```{r}
+summary(fit_fp_lifetime_treat)
+```
+
+### Intercept
+
+```{r}
+#| output-location: column-fragment
+
+# print model intercept?
+coef(fit_fp_lifetime_treat)['(Intercept)']
+```
+
+```{r}
+#| output-location: column-fragment
+
+# print data mean
+mean(df_crit_verb$fp)
+```
+
+- our intercept is no longer the grand mean of first-pass reading times...what is it?
+
+### Intercept for treatment contrasts
+
+:::: columns
+::: {.column width="50%"}
+- what are the means of our two factor levels?
+
+```{r}
+#| output-location: fragment
+
+# print model intercept?
+coef(fit_fp_lifetime_treat)['(Intercept)']
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| code-fold: true
+#| output-location: fragment
+# compute summary 
+summary_ff_life <- df_crit_verb |> 
+  filter(region=="verb",
+         fp > 0) |> 
+  group_by(lifetime) %>%
+  summarise(N = n(),
+            mean = mean(fp, na.rm = T),
+            sd = sd(fp, na.rm = T))
+
+knitr::kable(summary_ff_life, digits=3,
+             caption = "Summmary statistics for first-pass reading times at the verb region") %>% 
+  kableExtra::kable_styling(font_size = 30,
+                            position = "left")
+```
+:::
+::::
+
+### Slope
+
+:::: columns
+::: {.column width="50%"}
+- what was our slope?
+- what does this correspond to?
+
+```{r}
+#| output-location: fragment
+
+# print model intercept?
+coef(fit_fp_lifetime_treat)['lifetimeliving']
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| code-fold: true
+#| output-location: fragment
+# compute summary 
+summary_ff_life <- df_crit_verb |> 
+  filter(region=="verb",
+         fp > 0) |> 
+  group_by(lifetime) %>%
+  summarise(N = n(),
+            mean = mean(fp, na.rm = T),
+            sd = sd(fp, na.rm = T))
+
+knitr::kable(summary_ff_life, digits=3,
+             caption = "Summmary statistics for first-pass reading time at the verb region") %>% 
+  kableExtra::kable_styling(font_size = 30,
+                            position = "left")
+```
+:::
+::::
+
+---
+
+:::: columns
+::: {.column width="50%"}
+::: {.nonincremental}
+- what was our slope?
+- what does this correspond to?
+:::
+
+```{r}
+#| echo: false
+
+df_crit_verb %>% 
+  summarise(mean = mean(fp),
+            .by = lifetime) %>% 
+  pivot_wider(
+    values_from = mean,
+    names_from = lifetime
+  ) %>% 
+  mutate(
+    diff = living - dead
+  ) %>% 
+  kable() %>% kable_styling()
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+#| code-fold: true
+# compute summary 
+summary_ff_life <- df_crit_verb |> 
+  filter(region=="verb",
+         fp > 0) |> 
+  group_by(lifetime) %>%
+  summarise(N = n(),
+            mean = mean(fp, na.rm = T),
+            sd = sd(fp, na.rm = T))
+
+knitr::kable(summary_ff_life, digits=3,
+             caption = "Summmary statistics for first-pass reading time at the verb region") %>% 
+  kableExtra::kable_styling(font_size = 30,
+                            position = "left")
+```
+:::
+::::
+
+# Contrast coding
+
+- intercept: value of $y$ when $x$ = 0
+- slope: difference in $y$ with a 1-unit change of $x$
+
+- why is the intercept now the mean of the `dead` condition?
+  + when we have a categorical predictor, we cannot calculate a slope because our $x$ is not numerical
+  + we need to code factor levels numerically
+  + these are called `contrasts`
+
+### Treatment contrasts
+
+- treatment contrasts (default), aka dummy coding: factor levels are coded as `0` and `1` (alphabetically)
+  + all levels are compared to a reference level, coded as `0`
+  + so when our predictor ($x$) = 0, this is the first alphabetical level of our factor
+  + so our intercept will be the mean `fp` for the lifetime level `dead`
+
+- to check you contrasts:
+```{r}
+contrasts(df_crit_verb$lifetime)
+```
+
+
+```{r}
+#| echo: false
+#| 
+# influence of contrast coding
+plot_nocontrasts <- df_crit_verb %>% 
+  filter(fp > 0) |> 
+  # mutate(lifetime_c = if_else(lifetime=="living",-0.5,+0.5)) |> 
+  ggplot(aes(x = lifetime, y = fp, colour = lifetime)) + 
+  labs(title = "No contrasts") +
+  # geom_vline(xintercept = 0, linetype="dashed", size = .5) +  
+  geom_point(position = position_dodge(.6)) + 
+  geom_smooth(method = 'lm', aes(group=1)) + theme_minimal() +
+  theme_bw()
+
+plot_treatment <- df_crit_verb %>% 
+  filter(fp > 0) |> 
+  # mutate(lifetime = fct_relevel(lifetime, "living", "dead")) |> 
+  mutate(lifetime_c = if_else(lifetime=="living",1,0)) |>
+  ggplot(aes(x = lifetime_c, y = fp, colour = as.factor(lifetime_c))) + 
+  labs(title = "Treatment contrasts") +
+  geom_vline(xintercept = 0, linetype="dashed", size = .5) +
+  geom_point(position = position_dodge(.6)) + 
+  geom_smooth(method = 'lm', aes(group=1)) + theme_minimal() +
+  theme_bw()
+
+
+legend_life <- cowplot::get_legend(plot_treatment + theme(legend.position = "bottom"))
+legend_life <- ggpubr::as_ggplot(legend_life)
+```
+
+```{r}
+#| echo: false
+#| fig-align: center
+
+ggpubr::ggarrange(
+  ggpubr::ggarrange(
+    plot_nocontrasts + theme(legend.position = "none"),
+    plot_treatment + theme(legend.position = "none"),
+    nrow = 1
+  ),
+  legend_life,
+  nrow = 2,
+  heights = c(.9, .1)
+)
+```
+
+## Ordering our contrasts {.smaller}
+
+-   but recall that we expected to find *longer* reading times for the `dead` condition
+  + so the `living` condition is conceptually a baseline, to which we are comparing a violation condition
+- it typically makes sense to order your factors in an order that makes the slope easy to interpret
+  + we would like a *positive* slope to indicate *longer* reading times for our violation condition
+  + so we should have `living` coded as 0, rather than `dead`
+
+-   let's order our predictor
+    - we predict longer reading times for dead versus living, so order living-dead
+
+```{r}
+# order factor levels
+df_crit_verb$lifetime <- factor(df_crit_verb$lifetime, levels = c("living","dead"))
+```
+
+- now what will our contrasts be?
+
+```{r}
+#| output-location: fragment
+contrasts(df_crit_verb$lifetime)
+```
+
+## Changing our contrasts: sum coding {.unlisted}
+
+
+- now that we know the order of our contrasts, we can also **centre** our predictor
+  + we do this because it sometimes makes more sense for the intercept to represent the *grand mean* rather than the mean of one condition (this is especially true when interpreting interactions)
+
+  + to do this, we want 0 to be between our two factor levels
+  + e.g., change the contrasts to `-0.5` and `+0.5`
+  + for categorical variables, this is called *sum coding*
+
+
+```{r}
+# set contrasts
+contrasts(df_crit_verb$lifetime) <- c(-0.5,+0.5)
+```
+
+```{r}
+#| output-location: fragment
+# print contrasts
+contrasts(df_crit_verb$lifetime)
+```
+
+
+---
+
+::: {.callout-tip}
+
+### Centring continuous predictors
+N.B., you would usually also centre *numeric* predictors. This is done by subtracting some constant from every value (usually by subtracting the mean of the predictor from each value and saving this as a new variable:
+
+```{r}
+#| eval: false
+df_example %>% 
+  mutate(predictor_c <- predictor-mean(predictor)
+```
+
+If you have interval data with a specific upper and lower bound, you could alternatively subtract the median value.
+  
+:::
+
+## Fit model (sum contrasts)
+
+- now let's fit our model with sum contrasts
+  + the syntax is exactly the same (as long as you didn't create a new variable to store the sum coding, as some people do)
+
+```{r}
+# fit simple linear model
+fit_fp_lifetime_sum <- df_crit_verb %>%
+  filter(fp > 0) %>%
+  lm(fp ~ lifetime, data = .)
+```
+
+### Coefficients table with `summary()` {.smaller}
+
+::: {.column width="50%"}
+
+```{r}
+#| eval: false
+#| echo: true
+#| code-line-numbers: false
+#| highlight-style: false
+
+> summary(fit_fp_lifetime_sum)
+
+Call:
+lm(formula = fp ~ lifetime, data = df_crit_verb, subset = fp > 0) #<1>
+
+Residuals:                                                        #<2>
+    Min      1Q  Median      3Q     Max 
+-228.99 -109.29  -26.99   58.86  777.71 
+
+Coefficients:
+             Estimate Std. Error t value Pr(>|t|)                #<3>
+(Intercept)  309.142      6.259  49.394 <0.0000000000000002 ***            #<4>
+lifetime1     31.701     12.517   2.533              0.0116 *                #<5>
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 57.46 on 541 degrees of freedom
+Multiple R-squared:  0.01172,	Adjusted R-squared:  0.00989    #<6>
+F-statistic: 6.414 on 1 and 541 DF,  p-value: 0.0116              #<7>
+```
+
+1)  formula
+2)  Residuals: differences between observed values and those predicted by the model
+3)  Names for columns Estimates, SE, t-value, p-value
+4)  Intercept ($b_0$), i.e., value of $y$ (first-pass) with a move of one unit of $x$ (lifetime)
+5)  Slope ($b_1$), i.e., change in first fixation going from `dead` to `living`
+7)  Output from an ANOVA
+:::
+
+
+::: {.column width="30%"}
+-   what is the **intercept**?
+-   is the **slope** positive or negative?
+    -   what is it's value?
+-   this is what the slope would look like:
+
+:::
+
+
+### Understanding the summary {.smaller}
+
+:::: columns
+::: {.column width="50%"}
+-   let's compute summary statistics based on *lifetime*
+    -   then compare this to the model output
+
+[Exercises]{.underline}
+
+1.  Subtract the mean first-pass reading time of `dead` from that of `living`
+    -   what does this correspond to in the model summary?
+2.  Compute the mean of `dead`+`living`
+    -   what does this correspond to in the model summary?
+3.  Divide the slope in 2. Subtract this from the mean of `dead`.
+    -   what does this correspond to?
+    
+:::
+
+::: {.column width="50%"}
+[Summary statistics]{.underline}
+
+```{r}
+#| code-fold: true
+# compute summary 
+summary_fp_life <- df_crit_verb |> 
+  filter(region=="verb",
+         fp > 0) |> 
+  group_by(lifetime) %>%
+  summarise(N = n(),
+            mean = mean(fp, na.rm = T),
+            sd = sd(fp, na.rm = T)) %>%
+  # compute standard error, confidence intervals, and lower/upper ci bounds
+  mutate(se = sd / sqrt(N),
+         ci = qt(1 - (0.05 / 2), N - 1) * se,
+         lower.ci = mean - qt(1 - (0.05 / 2), N - 1) * se,
+         upper.ci = mean + qt(1 - (0.05 / 2), N - 1) * se)
+
+knitr::kable(summary_ff_life, digits=3,
+             caption = "Summmary statistics for first-pass reading time at the verb region") %>% 
+  kableExtra::kable_styling(font_size = 24,
+                            position = "left")
+```
+
+[Model summary]{.underline}
+
+```{r}
+summary(fit_fp_lifetime_sum)
+```
+
+:::
+::::
+
+## Comparing contrasts
+
+- intercept = value of $y$ when $x = 0$
+
+- treatment contrasts: factor levels are coded as `0` and `1`
+  + intercept is mean of level that is coded as `0`
+  
+- sum contrast coding: factor levels are coded as `+`/`-0.5` (or `1`)
+  + when $x = 0$, this is the mid-way point between our two predictor levels
+  + so the intercept will be the *grand mean* of our two levels
+- our slope is unchanged, however (unless we set our sum contrasts to +/- 1, which some people do)
+
+---
+
+```{r}
+#| echo: false
+# sum contrasts
+plot_treatment <- df_crit_verb %>% 
+  filter(fp > 0) |> 
+  # mutate(lifetime = fct_relevel(lifetime, "living", "dead")) |> 
+  mutate(lifetime_c = if_else(lifetime=="dead",1,0)) |>
+  ggplot(aes(x = lifetime_c, y = fp, colour = as.factor(lifetime_c))) + 
+  labs(title = "Treatment contrasts") +
+  geom_vline(xintercept = 0, linetype="dashed", size = .5) +
+  geom_point(position = position_dodge(.6)) + 
+  geom_smooth(method = 'lm', aes(group=1)) + theme_minimal() +
+  theme_bw()
+
+plot_sum <- df_crit_verb %>% 
+  filter(fp > 0) |> 
+  mutate(lifetime = fct_relevel(lifetime, "living", "dead")) |> 
+  mutate(lifetime_c = if_else(lifetime=="living",-.5,+.5)) |> 
+  ggplot(aes(x = lifetime_c, y = fp, colour = lifetime)) + 
+  labs(title = "Sum contrasts") +
+  geom_vline(xintercept = 0, linetype="dashed", size = .5) +
+  geom_point(position = position_dodge(.6)) + 
+  geom_smooth(method = 'lm', aes(group=1)) + theme_minimal() +
+  theme_bw()
+```
+
+```{r}
+#| echo: false
+#| label: fig-contrasts
+#| fig-cap: Comparison of contrast types
+#| fig-asp: .4
+ggpubr::ggarrange(
+  ggpubr::ggarrange(
+    plot_nocontrasts + theme(legend.position = "none"),
+    plot_treatment + theme(legend.position = "none"),
+    plot_sum + theme(legend.position = "none"),
+    nrow = 1
+  )
+)
+```
+
+
+# Exploring our model
+
+-   the linear model contains *fitted* values corresponding to our *observed* values
+    -   these *fitted* values are fit to a straight line
+    -   our *observed* values are not fit to a straight line
+    -   the *residuals* are the differences along the $y$ axis from the fitted to the observed values
+
+## Exploring the model {-}
+
+```{r}
+#| output-location: column-fragment
+# how many observed values did we enter into the model?
+df_crit_verb |> 
+  filter(fp > 0) |> 
+  nrow()
+```
+
+```{r}
+#| output-location: column-fragment
+# how many observed values did we enter into the model?
+length(fitted(fit_fp_lifetime_sum))
+```
+
+## Exploring the model: residuals {-}
+
+```{r}
+#| output-location: fragment
+# what do our FITTED values look like?
+head(fitted(fit_fp_lifetime_sum))
+```
+
+```{r}
+#| output-location: fragment
+# what do our OBSERVED values look like?
+head(df_crit_verb$fp)
+```
+
+```{r}
+#| output-location: fragment
+# what is the difference between the FITTED and OBSERVED values?
+head(df_crit_verb$fp) - head(fitted(fit_fp_lifetime_sum))
+```
+
+```{r}
+#| output-location: fragment
+# what are our RESIDUALS?
+head(residuals(fit_fp_lifetime_sum))
+```
+
+## Exploring the model {-}
+
+- what were our coefficients?
+```{r}
+#| output-location: fragment
+coef(fit_fp_lifetime_sum)
+```
+
+- what is the mean of our predictor coded as `-0.5`?
+```{r}
+#| output-location: fragment
+coef(fit_fp_lifetime_sum)['(Intercept)'] + coef(fit_fp_lifetime_sum)['lifetime1'] * -0.5
+```
+
+- ignore the `(Intercept)` label here, `R` just takes the first label when performing an operation on 2 vectors
+
+- what is the mean of our predictor coded as `+0.5`?
+```{r}
+#| output-location: fragment
+coef(fit_fp_lifetime_sum)['(Intercept)'] + coef(fit_fp_lifetime_sum)['lifetime1'] * 0.5
+```
+
+---
+
+# Simple linear regression vs. t-test 
+
+- simple linear regression is equivalent to a t-test
+  + the *real* power of linear regression is coming up...multiple regression and mixed models
+
+:::: columns
+::: {.column width="50%"}
+```{r}
+df_crit_verb %>% 
+t.test(fp ~ lifetime, data = .)
+```
+:::
+::: {.column width="50%"}
+```{r}
+df_crit_verb %>% 
+lm(fp ~ lifetime, data = .) %>% 
+  tidy() %>%
+  mutate_if(is.numeric, round, 7)
+```
+:::
+::::
+---
+
+::: {.content-visible when-format="revealjs"}
+```{r echo = F, fig.align = "center"}
+#| fig-cap: "Image source: @winter_statistics_2019 (all rights reserved)"
+#| fig-cap-location: bottom
+
+# invert colours for dark mode in slides
+library(magick)
+y <- magick::image_read(here::here("media/Winter_2019_lm_anova.png"))
+
+magick::image_negate(y)
+```
+:::
+
+::: {.content-hidden when-format="revealjs"}
+```{r echo = F, fig.align = "center"}
+#| fig-cap: "Image source: @winter_statistics_2019 (all rights reserved)"
+#| fig-cap-location: bottom
+magick::image_read(here::here("media/Winter_2019_lm_anova.png"))
+```
+:::
+
+# Summary
+
+-   we saw that the equation for a straight line boils down to its intercept and slope
+
+-   we fit our first linear model with a categorical predictor
+
+## Important terms {.unnumbered .smaller}
+
+```{r}
+#| echo: false
+tribble(
+ ~"term", ~"description/other terms",
+ "dependent variable (DV)", "outcome, measure, y",
+ "independent variable (IV)", "predictor, fixed effect, y",
+ "equation for a straight line", "y = intercept + slope*x",
+ "simple regression", "predicting outcome of a DV from a single IV",
+ "slope", "change in y (DV) associated with a 1-unit change in x (IV)",
+ "intercept", "value of y (DV) when x (IV) = 0",
+ "residuals", "difference between observed values and fitted/predicted values",
+ "regression coefficients", "estimates of the unknown population parameters; intercept and slope",
+ "least squares", "the method by which the line of best fit is determined; the line with the smallest sum of squared residuals"
+) %>% kable() %>% kable_styling()
+```
+
+# Task
+
+Now it's your turn. Try to run the following `lm()` models:
+
+1. total reading time at the *verb* region
+2. total reading time at the *verb+1* region.
+
+# Session Info {.unlisted .unnumbered visibility="uncounted"}
+
+```{r}
+#| code-fold: true
+sessionInfo()
+```
+
+
+# References {.unlisted .unnumbered visibility="uncounted"}
+
+::: {#refs custom-style="Bibliography"}
+:::

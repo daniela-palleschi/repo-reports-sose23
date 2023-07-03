@@ -1,0 +1,693 @@
+---
+title: "Linear mixed models"
+subtitle: "Fitting fixed and random effects"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+footer: "LMMs"
+lang: en
+date: 2023-04-13
+format:
+  revealjs: 
+    output-file: slides-mixed_models.html
+    theme: [dark]
+    width: 1600
+    height: 900
+    progress: true
+    # smaller: true
+    scrollable: true
+    slide-number: c/t
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    code-annotations: below
+    # logo: logos/hu_logo.png
+    # css: logo.css
+    incremental: true
+    # number-sections: true
+    toc: true
+    toc-depth: 1
+    toc-title: 'Topics'
+    navigation-mode: linear
+    controls-layout: bottom-right
+    fig-cap-location: top
+    font-size: 0.6em
+    slide-level: 4
+    chalkboard: true
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+  html:
+    self-contained: true
+    output-file: sheet-mixed_models.html
+    theme: [dark]
+    number-sections: true
+    toc: true
+    code-overflow: wrap
+    code-tools: true
+  pdf:
+    output-file: pdf-mixed_models.pdf
+    toc: true
+    number-sections: false
+    colorlinks: true
+    code-overflow: wrap
+editor_options: 
+  chunk_output_type: console
+bibliography: references/references.json
+csl: references/apa.csl
+---
+
+```{r}
+#| echo: false
+knitr::opts_chunk$set(eval = T, # change this to 'eval = T' to reproduce the analyses; make sure to comment out
+                      echo = T, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F,
+                      warning = F)
+```
+
+```{r}
+#| echo: false
+## play sound if error encountered
+### from: https://sejohnston.com/2015/02/24/make-r-beep-when-r-markdown-finishes-or-when-it-fails/
+options(error = function(){    # Beep on error
+  beepr::beep(sound = "wilhelm")
+  Sys.sleep(2) # 
+  }
+ )
+## and when knitting is complete
+.Last <- function() {          # Beep on exiting session
+  beepr::beep(sound = "ping")
+  Sys.sleep(6) # allow to play for 6 seconds
+  }
+```
+
+```{r, eval = T, cache = F}
+#| echo: false
+# Create references.json file based on the citations in this script
+# make sure you have 'bibliography: references.json' in the YAML
+# rbbt::bbt_update_bib("_mixed_models.qmd")
+```
+
+# Learning objectives {.unnumbered}
+
+Today we will learn...
+
+- how to add random effects to our models
+- how to interpret random-effects models
+
+# Resources {.unnumbered}
+
+Ch. 14 in @winter_very_2014
+
+# Set-up {.unnumbered}
+
+```{r}
+# suppress scientific notation
+options(scipen=999)
+```
+
+## Packages
+
+```{r}
+pacman::p_load(
+  tidyverse,
+  here,
+  broom,
+  broom.mixed,
+  lme4,
+  lmerTest,
+  knitr,
+  kableExtra,
+  gt,
+  patchwork,
+  afex,
+  ggbeeswarm,
+  emmeans
+)
+```
+
+## Data
+
+```{r}
+# load in dataset
+df_crit_verb <-
+  readr::read_csv(
+    here::here("data/tidy_data_lifetime_pilot.csv"),
+    # for special characters
+    locale = readr::locale(encoding = "latin1")
+  ) |>
+  mutate_if(is.character, as.factor) |> # all character variables as factor
+  mutate(lifetime = fct_relevel(lifetime, "living", "dead"), # order fixed factors
+         tense = fct_relevel(tense, "PP", "SF")) |>
+  filter(type == "critical", # only critical trials
+         px != "px3", # px3 had a lot of missing values
+         fp > 0, # only values of fp above 0
+         region == "verb") %>% # critical region only
+  droplevels() # remove any factor levels with no observations
+```
+
+## Functions
+
+`format_pval()` to create nicely formatted p-values
+
+```{r}
+# source: https://stackoverflow.com/questions/37470202/in-line-code-for-reporting-p-values-001-in-r-markdown
+
+pacman::p_load(broman) # for myround() function
+
+format_pval <- function(x){
+  if (x < .001) return(paste('<', '.001'))
+  if (x < .01) return(paste('<', '.01'))
+  if (x < .05) return(paste('<', '.05'))
+  paste('=', myround(x, 3))  # if above .05, print p-value to 3 decimalp points
+}
+```
+
+`make_stars()` to add p-value indications
+
+```{r}
+make_stars <- function(pval) {
+  stars = ""
+  if(pval <= 0.001)
+    stars = "***"
+  if(pval > 0.001 & pval <= 0.01)
+    stars = "**"
+  if(pval > 0.01 & pval <= 0.05)
+    stars = "*"
+  if(pval > 0.05 & pval <= 0.1)
+     stars = "."
+  stars
+}
+```
+
+## Contrasts
+
+Sum contrast coding: `+/-0.5`
+
+```{r}
+contrasts(df_crit_verb$lifetime) <- c(-0.5,+0.5)
+contrasts(df_crit_verb$tense) <- c(-0.5,+0.5)
+```
+
+```{r}
+df_crit_verb %>% pull(lifetime) %>% contrasts()
+df_crit_verb %>% pull(tense) %>% contrasts()
+```
+
+# (Linear) Mixed models
+
+- linear mixed-effects models (LMEMs)
+- linear mixed models (LMMs)
+- hierarchical models
+- hierarchical linear regression
+- etc., etc...
+
+## When to use LMMs
+
+- when data are not independent
+  + i.e., when you have *grouping* factors
+  + i.e., in repeated measures design
+  + i.e., when you have multiple data points per e.g., participant and/or item
+- since groups constitute *categories*, random effects have to be categorical
+
+- the power of the mixed model is that it allows us to take into account grouping factors when calculating residuals
+
+## What is 'mixed'?
+
+- fixed effects and random effects
+
+- Fixed effects
+  - independent variables
+  - systematic variability
+  - what we can explain/have specific predictions for
+
+- Random effects
+  - random variability
+  - grouping variables
+  - what we cannot explain/have specific predictions for
+
+# `lme4`
+
+- the function `lmer()` specifies mixed models
+  + fixed effects (our predictors)
+  + random effects
+
+```{r}
+#| output-location: fragment
+#| error: true
+df_crit_verb %>% 
+  lmer(log(fp) ~ lifetime*tense,
+       data = .)
+```
+
+- if we try to run `lmer()` without specifying any random effects, we get a helpful warning
+
+## Random effects
+
+- what are random effects?
+  + intercept
+  + slope
+  + their interaction
+
+- imagine we collect reaction times to some task across trials, and we have three participants
+  + each participant will have their own average reaction time (intercept)
+  + and will differ in regards to whether/how much they speed up or slow down across trials (slopes)
+
+
+::: {.content-visible when-format="revealjs"}
+```{r echo = F, fig.align = "center"}
+#| fig-cap: "Image source: @winter_statistics_2019 (all rights reserved)"
+#| fig-cap-location: bottom
+
+# invert colours for dark mode in slides
+library(magick)
+y <- magick::image_read(here::here("media/Winter_2019_random_slopes.png"))
+
+magick::image_negate(y)
+```
+:::
+
+::: {.content-hidden when-format="revealjs"}
+```{r echo = F, fig.align = "center"}
+#| fig-cap: "Image source: @winter_statistics_2019 (all rights reserved)"
+#| fig-cap-location: bottom
+magick::image_read(here::here("media/Winter_2019_random_slopes.png"))
+```
+:::
+
+---
+
+::: {.content-visible when-format="revealjs"}
+```{r echo = F, fig.align = "center"}
+#| fig-cap: "Image source: @winter_statistics_2019 (all rights reserved)"
+#| fig-cap-location: bottom
+
+# invert colours for dark mode in slides
+library(magick)
+y <- magick::image_read(here::here("media/Winter_2019_random_slopes_2.png"))
+
+magick::image_negate(y)
+```
+:::
+
+::: {.content-hidden when-format="revealjs"}
+```{r echo = F, fig.align = "center"}
+#| fig-cap: "Image source: @winter_statistics_2019 (all rights reserved)"
+#| fig-cap-location: bottom
+magick::image_read(here::here("media/Winter_2019_random_slopes_2.png"))
+```
+:::
+  
+## Specifying random effects
+
+- we say *by-participant and by-item varying intercepts and slopes*
+  + how do we write this?
+
+```{r}
+#| echo: false
+tribble(
+  ~"term", ~"interpretation",
+  "(1|participant)", "by-participant varying intercepts (1 = intercept)",
+  "(1 + lifetime | participant)", "by-participant varying intercepts and lifetime slopes, and their correlation (|)",
+  "(1 + lifetime + tense | participant)", "by-participant varying intercepts and slopes for lifetime and tense, and the correlation between slopes and intercepts (|)",
+  "(1 + lifetime + tense || participant)", "by-participant varying intercepts and slopes for lifetime and tense, with no correlation (||)"
+) %>% kable() %>% kable_styling()
+```
+
+# Fitting random intercepts
+
+```{r}
+fit_fp_mixed <-
+  df_crit_verb %>%
+  lmer(log(fp) ~ lifetime*tense +
+         (1|px),
+       data = .,
+       REML = F)
+```
+
+```{r}
+#| output-location: slide
+summary(fit_fp_mixed)
+```
+
+## Compare to MLM {.smaller}
+
+```{r}
+fit_fp <-
+  df_crit_verb %>%
+  lm(log(fp) ~ lifetime*tense,
+       data = .)
+```
+
+:::: columns
+
+::: {.column width="50%"}
+```{r}
+summary(fit_fp)
+```
+:::
+
+::: {.column width="50%"}
+```{r}
+summary(fit_fp_mixed)
+```
+:::
+
+::::
+
+## Interpreting model output {.smaller}
+
+```{r}
+#| eval: false
+#| code-annotations: select
+
+Linear mixed model fit by maximum likelihood . t-tests use Satterthwaite's method ['lmerModLmerTest']               #<1>
+Formula: log(fp) ~ lifetime * tense + (1 | px)              #<2>
+   Data: .
+
+     AIC      BIC   logLik deviance df.resid               #<3>
+   580.3    606.0   -284.1    568.3      537 
+
+Scaled residuals: 
+     Min       1Q   Median       3Q      Max               #<4>
+-3.12608 -0.73428  0.01785  0.69800  2.83360 
+
+Random effects:                                           #<5>
+ Groups   Name        Variance Std.Dev.
+ px       (Intercept) 0.02883  0.1698  
+ Residual             0.16103  0.4013  
+Number of obs: 543, groups:  px, 7
+
+Fixed effects:                                               #<6>
+                  Estimate Std. Error        df t value         Pr(>|t|)    
+(Intercept)        5.63218    0.06644   7.00093  84.767 0.00000000000835 ***
+lifetime1          0.10224    0.03445 536.01289   2.968          0.00313 ** 
+tense1            -0.03603    0.03445 536.04118  -1.046          0.29619    
+lifetime1:tense1  -0.09211    0.06891 536.04409  -1.337          0.18186    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Correlation of Fixed Effects:                         #<7>
+            (Intr) liftm1 tense1
+lifetime1    0.000              
+tense1       0.001  0.013       
+liftm1:tns1  0.003  0.002 -0.002
+```
+
+1) reminder that fitted a model with maximum likelihood with `REML = F` (restricted maximum likelihood = F)
+2) formula repetition
+3) general measures of model fit (Aikaike's Information Criterion, Bayesian Information Criterion, log likelihood, degrees of freedom)
+residuals: differences between observed values and those predicted by the model
+
+4) Intercept ($b_0$), i.e., value of $y$ (first-pass) with a move of one unit of $x$ (lifetime)
+5) Significance codes
+6)  R$^2$, a measure of model fit (squared residuals); percentage of variance in the data shared with the predictor (higher numbers are better...this is pretty low)
+7) X
+
+# Exploring `lme4`
+
+```{r}
+# extract fixed effects
+fixef(fit_fp_mixed)
+```
+
+```{r}
+# extract lifetime slope
+fixef(fit_fp_mixed)['lifetime1']
+```
+
+## Extract coefficients table
+
+```{r}
+summary(fit_fp_mixed)$coefficients %>% 
+  kable() %>% 
+  kable_styling()
+```
+
+- and format the p-values
+
+```{r}
+summary(fit_fp_mixed)$coefficients %>% 
+  as_tibble() %>% 
+  mutate(p.value = sapply(`Pr(>|t|)`, function(x) format_pval(x))) %>% 
+  mutate(signif = sapply(`Pr(>|t|)`, function(x) make_stars(x))) %>%
+  select(-`Pr(>|t|)`) %>% 
+  kable(digits = 2) %>% 
+  kable_styling()
+```
+
+## `coef()`
+
+- `coef()` behaves different for LMMs
+  + it outputs a list with coefficients for each level of the grouping factor(s)
+  + `(Intercept)` gives us each participant's intercept
+  + why are the slopes for `lifetime`, `tense`, and their interaction the same across participants?
+    + what do these slopes correspond to? why?
+
+```{r}
+#| output-location: fragment
+coef(fit_fp_mixed)
+```
+
+## `ranef()`
+
+- what does this output give us?
+  + the deviance from each participant's intercept and the overall intercept
+
+```{r}
+#| output-location: fragment
+ranef(fit_fp_mixed)
+```
+
+---
+
+
+```{r}
+#| echo: false
+fig_coef <- 
+  coef(fit_fp_mixed)$px %>% 
+  rownames_to_column("px") %>% 
+  as_tibble()%>%
+  dplyr::rename(intercept = `(Intercept)`) %>% 
+  arrange(intercept) %>% 
+  ggplot(aes(x = reorder(px,intercept), y = intercept)) +
+  labs(title = "coef(fit_fp_mixed)$px") +
+  geom_point() +
+  geom_hline(aes(yintercept = fixef(fit_fp_mixed)['(Intercept)'])) +
+  theme_bw()
+```
+
+```{r}
+#| echo: false
+fig_ranef <-
+  ranef(fit_fp_mixed)$px %>%
+  rownames_to_column("px") %>%
+  as_tibble() %>%
+  dplyr::rename(intercept = `(Intercept)`) %>%
+  arrange(intercept) %>%
+  ggplot(aes(x = reorder(px, intercept), y = intercept)) +
+  labs(title = "ranef(fit_fp_mixed)$px") +
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  theme_bw()
+```
+
+```{r}
+fig_coef + fig_ranef
+```
+
+## Variance-Covariance matrix
+
+- a.k.a., your random effects structure (RES)
+
+:::: columns
+:::{.column width="50%"}
+```{r}
+VarCorr(fit_fp_mixed)
+```
+:::
+
+:::{.column width="50%"}
+```{r}
+summary(fit_fp_mixed)$varcor
+```
+:::
+::::
+
+# Exercise
+
+1. Add by-item random intercept to our model. Call this model `fit_fp_1`.
+2. Explore the model. What differences do you see compared to `fit_fp_mixed`?
+
+---
+
+```{r}
+#| code-fold: true
+fit_fp_1 <-
+  df_crit_verb %>% 
+  lmer(log(fp) ~ lifetime*tense +
+         (1|px) +
+         (1|item_id),
+       data = .,
+       REML = F)
+```
+
+```{r}
+VarCorr(fit_fp_1) %>% 
+  as_tibble() %>% 
+  select(-var2) %>% 
+  dplyr::rename(Group = grp,
+         Name = var1,
+         Variance = vcov,
+         StdDev = sdcor) %>% 
+  kable(digits = 2) %>% 
+  kable_styling()
+```
+
+```{r}
+ranef(fit_fp_1)$px %>% 
+  left_join(ranef(fit_fp_mixed)$px)
+```
+
+```{r}
+ranef(fit_fp_1)$px
+```
+
+
+```{r}
+#| echo: false
+fig_coef_1 <- 
+  coef(fit_fp_1)$px %>% 
+  rownames_to_column("px") %>% 
+  as_tibble()%>%
+  dplyr::rename(intercept = `(Intercept)`) %>% 
+  arrange(intercept) %>% 
+  ggplot(aes(x = reorder(px,intercept), y = intercept)) +
+  labs(title = "coef(fit_fp_1)$px") +
+  geom_point() +
+  geom_hline(aes(yintercept = fixef(fit_fp_1)['(Intercept)'])) +
+  theme_bw()
+
+#| echo: false
+fig_coef_1_item <-
+  coef(fit_fp_1)$item_id %>% 
+  rownames_to_column("item_id") %>% 
+  as_tibble() %>%
+  dplyr::rename(intercept = `(Intercept)`) %>% 
+  arrange(intercept) %>% 
+  ggplot(aes(x = reorder(item_id,intercept), y = intercept)) +
+  labs(title = "coef(fit_fp_1)$item_id") +
+  geom_point() +
+  geom_hline(aes(yintercept = fixef(fit_fp_1)['(Intercept)'])) +
+  theme_bw()
+```
+
+```{r}
+(fig_coef + fig_coef_1 + fig_coef_1_item)
+```
+
+
+# Random slopes
+
+- so far we've fit *intercepts-only* model
+  + there's a lot of discussion about the dangers of fitting such models
+  + they've been shown to dramatically increase Type I error
+
+## Keep It Maximal
+
+- since @barr_random_2013-1, many psycholinguists blindly fit the most maximal model plausible
+  + 'maximal' in that it includes all random slopes
+
+```{r}
+#| warning: true
+#| output-location: fragment
+fit_fp_mm <-
+  df_crit_verb %>% 
+  lmer(log(fp) ~ lifetime*tense +
+         (1 + lifetime*tense|px) +
+         (1 + lifetime*tense|item_id),
+       data = ., REML = F)
+```
+
+- we get a warning: `boundary (singular) fit: see help('isSingular')`
+  + this means our model is overparameterised/overfit
+- this is an invitation to take a deeper look into the variance-covariance matrix
+
+## VarCorr
+
+- what are we looking for?
+  + `Corr` refers to correlation between Intercept and Slopes (and between slopes)
+  + `Std.Dev.` gives us the amount of variance explained by each random effect
+- Step 1: run zero-correlation parameter ()
+- Step 1: remove any correlation terms near 0 or near 1
+  + re-run the model; if still getting convergence warnings, proceed to Step 2
+- Step 2: remove terms that explain the least variance
+
+```{r}
+#| eval: false
+VarCorr(fit_fp_mm)
+```
+
+```{r}
+#| eval: false
+> VarCorr(fit_fp_mm)
+ Groups   Name             Std.Dev. Corr                
+ item_id  (Intercept)      0.089969                     
+          lifetime1        0.090608 0.915               
+          tense1           0.101374 0.981  0.976        
+          lifetime1:tense1 0.047890 0.837  0.546  0.717 
+ px       (Intercept)      0.170479                     
+          lifetime1        0.047298 -0.382              
+          tense1           0.047038 -0.405  1.000       
+          lifetime1:tense1 0.101182  0.030 -0.935 -0.926
+ Residual                  0.382558   
+```
+
+### Pilot data
+
+- pilot data will tend to only converge with intercepts-only models
+  + this is because we don't have many data points per cell
+- in other words, for each level of participant or item, we don't have enough data to fit a slope
+  + item: each of the 8 participants contribute 1 data point to each item
+    + but only in one condition
+  + so item 1 will have 8 data points: two for each condition (but we even dropped 1 participant!)
+    + difficult to fit a `lifetime` slope for participants when you only have 4 observations for each level
+
+```{r}
+class(fit_fp_mm) <- "lmerMod"
+random_params <- broom.mixed::tidy(fit_fp_mm, effect = "ran_pars")
+```
+
+```{r}
+afex_plot(fit_fp_mm, "lifetime", "tense", id = "px",
+          data_geom = ggbeeswarm::geom_quasirandom, 
+          data_arg = list(
+            dodge.width = 0.5,  ## needs to be same as dodge
+            cex = 0.8,
+            color = "darkgrey"))
+```
+
+```{r}
+augment(fit_fp_1, data = df_crit_verb[df_crit_verb$fp > 0,]) %>% 
+  ggplot(aes(x = log(fp), y = .fitted, colour = tense)) +
+  geom_point() 
+```
+
+
+
+
+
+
+
+
+
+
+# References {.unlisted .unnumbered visibility="uncounted"}
+
+::: {#refs custom-style="Bibliography"}
+:::
+
+
+
+

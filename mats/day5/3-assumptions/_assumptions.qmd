@@ -1,0 +1,773 @@
+---
+title: "Model assumptions"
+subtitle: "assumptions"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+footer: "Model assumptions"
+lang: en
+date: 2023-04-13
+format:
+  revealjs: 
+    output-file: slides-assumptions.html
+    theme: [dark]
+    width: 1600
+    height: 900
+    progress: true
+    # smaller: true
+    scrollable: true
+    slide-number: c/t
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    code-annotations: below
+    # logo: logos/hu_logo.png
+    # css: logo.css
+    incremental: true
+    # number-sections: true
+    toc: true
+    toc-depth: 1
+    toc-title: 'Topics'
+    navigation-mode: linear
+    controls-layout: bottom-right
+    fig-cap-location: top
+    font-size: 0.6em
+    slide-level: 4
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+    self-contained: true
+  html:
+    self-contained: true
+    output-file: sheet-assumptions.html
+    theme: [dark]
+    number-sections: true
+    toc: true
+    code-overflow: wrap
+    code-tools: true
+  pdf:
+    output-file: pdf-assumptions.pdf
+    toc: true
+    number-sections: false
+    colorlinks: true
+    code-overflow: wrap
+editor_options: 
+  chunk_output_type: console
+bibliography: references/references.json
+csl: references/apa.csl
+---
+
+```{r, echo = T}
+knitr::opts_chunk$set(eval = T, # change this to 'eval = T' to reproduce the analyses; make sure to comment out
+                      echo = T, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F,
+                      warning = F)
+```
+
+```{r}
+#| echo: false
+## play sound if error encountered
+### from: https://sejohnston.com/2015/02/24/make-r-beep-when-r-markdown-finishes-or-when-it-fails/
+options(error = function(){    # Beep on error
+  beepr::beep(sound = "wilhelm")
+  Sys.sleep(2) # 
+  }
+ )
+## and when knitting is complete
+.Last <- function() {          # Beep on exiting session
+  beepr::beep(sound = "ping")
+  Sys.sleep(6) # allow to play for 6 seconds
+  }
+```
+
+```{r, eval = T, cache = F}
+#| echo: false
+# Create references.json file based on the citations in this script
+# make sure you have 'bibliography: references.json' in the YAML
+# rbbt::bbt_update_bib("_assumptions.qmd")
+```
+
+# Learning objectives {.unnumbered}
+
+Today we will learn...
+
+- how to check model assumptions
+- how to transform our data to meet model assumptions
+
+# Resources {.unnumbered}
+
+Sections 6.3, 6.4 and 7.9  in @winter_statistics_2019
+
+# Set-up {.unnumbered}
+
+1. Start with a clean R Environment (Session > Restart R).
+
+2. Suppress scientific notation (make very small numbers easier to read):
+
+```{r}
+# suppress scientific notation
+options(scipen=999)
+```
+
+
+## Packages {.unnumbered}
+
+```{r}
+pacman::p_load(tidyverse,
+               broom,
+               patchwork,
+               sjPlot,
+               knitr,
+               kableExtra,
+               Rmisc)
+```
+
+## Data {.unnumbered}
+
+  - force character variables to factors
+  - filter for the verb region from critical items only, remove participant 3, and remove values of first-fixtation that are
+
+```{r}
+# load in dataset
+df_crit_verb <-
+  readr::read_csv(
+    here::here("data/tidy_data_lifetime_pilot.csv"),
+    # for special characters
+    locale = readr::locale(encoding = "latin1")
+  ) |>
+  mutate_if(is.character, as.factor) |> # all character variables as factor
+  mutate(lifetime = fct_relevel(lifetime, "living", "dead"),
+         tense = fct_relevel(tense, "PP", "SF")) |>
+  filter(type == "critical", # only critical trials
+         px != "px3", # px3 had a lot of missing values
+         fp > 0, # only values of fp above 0
+         region == "verb") %>% # critical region only
+  droplevels() # remove any factor levels with no observations
+```
+
+# Review: (multiple) linear regression
+
+- when we run a linear model, we are fitting a line (predicted values) to our data (observed values)
+  + the *intercept* is the ***predicted*** value of *y* (our outcome) when *x* (our predictor) is 0
+  + the *slope* is the ***predicted*** change in *y* with an increase of 1-unit of *x*
+  + the *residuals* measure the ***difference*** between our ***predicted values*** of *y* from the ***observed values*** of *y*
+
+$$
+\begin{align}
+observed\;values &= fitted\;values + residuals\\
+residuals &= observed\;values - fitted\;values
+\end{align}
+$$
+  
+## Our model
+
+### Check contrasts
+
+```{r}
+#| output-location: column-fragment
+contrasts(df_crit_verb$lifetime)
+```
+
+```{r}
+#| output-location: column-fragment
+contrasts(df_crit_verb$tense)
+```
+
+### Re-order predictor levels
+
+```{r}
+# set contrasts
+df_crit_verb <- df_crit_verb %>% 
+  mutate(lifetime = fct_relevel(lifetime, "living", "dead"),
+         tense = fct_relevel(tense, "PP", "SF"))
+```
+
+### Set sum coding
+
+Set contrasts
+
+```{r}
+#| output-location: column
+contrasts(df_crit_verb$lifetime) <- c(-0.5, +0.5)
+contrasts(df_crit_verb$tense) <- c(-0.5, +0.5)
+```
+
+Check contrasts
+
+```{r}
+#| output-location: column-fragment
+contrasts(df_crit_verb$lifetime)
+```
+
+
+```{r}
+#| output-location: column-fragment
+contrasts(df_crit_verb$tense)
+```
+
+### Run model
+
+```{r}
+# fit linear model
+fit_fp <- df_crit_verb %>%
+  lm(fp ~ lifetime*tense, data = .)
+```
+
+### Print summary
+
+```{r}
+summary(fit_fp)
+```
+
+# Assumptions
+
+- refer to ***residuals***
+  + i.e., the difference between the observed and the fitted (predicted) values
+
+1.   *normality assumption*
+      -   residuals of the model are (approximately) normally distributed
+2.   *constant variance assumption* (homoscedasticity)
+      -   spread of residuals should be (approximately) equal along the regression line
+3.   absence of *collinearity*
+      -   predictors should not be correlated with each other
+4.   *independence*
+      -   data points should be independent from each other
+
+## Checking assumptions
+
+- we typically assess **normality** and **homoscedasticity** visually with histograms, Q-Q plots, and residual plots
+- we can assess collinearity with VIFs
+- the assumption of independence is dealt with conceptually
+
+::: {.content-visible when-format="revealjs"}
+```{r echo = F, fig.align = "center"}
+#| fig-cap: "Image source: @winter_statistics_2019 (all rights reserved)"
+#| fig-cap-location: bottom
+
+# invert colours for dark mode in slides
+library(magick)
+y <- magick::image_read(here::here("media/Winter_2019_assumptions_plots.png"))
+
+magick::image_negate(y)
+```
+:::
+
+::: {.content-hidden when-format="revealjs"}
+```{r echo = F, fig.align = "center"}
+#| fig-cap: "Image source: @winter_statistics_2019 (all rights reserved)"
+#| fig-cap-location: bottom
+magick::image_read(here::here("media/Winter_2019_assumptions_plots.png"))
+```
+:::
+
+# Constant variance: Residual plot
+
+- doesn't look like a blob with categorical data, but rather stripes
+  + what's important is that the distribution (vertically) is roughly similar across stripes
+  + why are predicted values for categorical data stripey?
+  
+```{r}
+#| echo: false
+#| results: hide
+df_crit_verb$predicted <- predict(fit_fp)   # Save the predicted values
+df_crit_verb$residuals <- residuals(fit_fp) # Save the residual values
+
+# Quick look at the actual, predicted, and residual values
+df_crit_verb %>% select(lifetime, tense, predicted, residuals) %>% head()
+```
+
+```{r}
+#| echo: false
+fit_fp %>% 
+ggplot(aes(x = .fitted, y = .resid)) +
+  labs(title = "Residual plot (fp ~ lifetime*tense)") +
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  theme_bw()  # Add theme for cleaner look
+```
+
+# Normality assumption
+
+- can be inspected e.g., with a histogram or Q-Q plot
+
+```{r}
+df_crit_verb |> 
+  filter(fp > 0) |> 
+  mutate(half = if_else(trial >= 104, "1st","2nd")) |> 
+  ggpubr::ggqqplot(x = "fp")
+```
+
+## Normality assumption {-}
+
+- how about by participant and experimental half?
+
+```{r}
+df_crit_verb |> 
+  filter(fp > 0) |> 
+  mutate(half = if_else(trial >= 104, "1st","2nd")) |> 
+  ggpubr::ggqqplot(x = "fp",
+                    color = "half",
+                    facet.by = "px")
+```
+
+## Normality assumption {-}
+
+- normal distribution is symmetrical, are our residuals normally distributed?   
+
+```{r}
+#| echo: false
+# plot(density(resid(fit_fp)))
+fig_dens <- ggplot(data = df_crit_verb, aes(x = fit_fp$residuals)) +
+    geom_density() +
+    labs(title = 'Density of Residuals', x = 'Residuals', y = 'Frequency')
+fig_hist <- ggplot(data = df_crit_verb, aes(x = fit_fp$residuals)) +
+    geom_histogram() +
+    labs(title = 'Histogram of Residuals', x = 'Residuals', y = 'Frequency')
+```
+
+```{r}
+#| echo: false
+#| label: fig-normality
+#| fig-cap: Visualising normality of residuals
+fig_dens + fig_hist
+```
+
+
+
+
+## Normality assumption {-}
+
+- reading time data tends to be *positively skewed*
+  + so the residuals also tend to be positively skewed
+- data with a skewed distribution do not meet the normality assumption
+- a fix: nonlinear transformations
+  + the most common: the log transformation
+- log-transforming your data makes larger numbers smaller (and small numbers smaller too)
+  + the difference between smaller numbers and larger numbers shrinks
+  + can make skewed data normally distributed
+
+### Log transformation
+
+-   for more see Section 5.4 in @winter_statistics_2019
+
+-   the R funtion `log()` computes the 'natural logarithm' (and is the inverse of the exponential `exp()`)
+  -   `log()` makes large numbers smaller
+  -   `exp()` makes small numbers larger
+
+```{r}
+#| output-location: column-fragment
+log(2)
+```
+```{r}
+#| output-location: column-fragment
+log(1:10)
+```
+```{r}
+#| output-location: column-fragment
+log(c(10,20,30,40,100))
+```
+
+```{r}
+#| output-location: column-fragment
+exp(1:10)
+```
+```{r}
+#| output-location: column-fragment
+exp(log(1:10))
+```
+
+## Fit model (log-transformed)
+
+-   continuous variables truncated at 0 typically have a *positive skew*
+    -   a lot of small values (e.g., `tt` \< 500ms), with some larger values (\> `tt` 1000)
+    -   this usually means our residuals are also positively skewed, i.e., not normally distributed
+-   so we typically log-transform raw reading/reaction times for our linear models
+
+```{r}
+#| output-location: column-fragment
+# fit simple linear model with log
+fit_fp_log <- df_crit_verb %>%
+  filter(fp > 0) %>% # important! you can't log transform 0
+  lm(log(fp) ~ lifetime*tense, data = .)
+summary(fit_fp_log)
+```
+
+### Check assumptions
+
+:::: columns
+::: {.column width="50%"}
+Raw first-pass reading times
+```{r}
+plot(density(resid(fit_fp)))
+```
+:::
+
+::: {.column width="50%"}
+Log first-pass reading times
+```{r}
+plot(density(resid(fit_fp_log)))
+```
+:::
+::::
+
+### Check assumptions {-}
+
+:::: columns
+::: {.column width="50%"}
+Raw first-pass reading times
+```{r}
+qqnorm(residuals(fit_fp))
+qqline(residuals(fit_fp), col="red")
+```
+:::
+
+::: {.column width="50%"}
+Log first-pass reading times
+```{r}
+qqnorm(residuals(fit_fp_log))
+qqline(residuals(fit_fp_log), col="red")
+```
+:::
+::::
+
+### Check assumptions: constant variance {-}
+
+:::: columns
+::: {.column width="50%"}
+Raw first-pass reading times
+```{r}
+fit_fp %>% 
+ggplot(aes(x = .fitted, y = .resid)) +
+  labs(title = "Residual plot (fp ~ lifetime*tense)") +
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  theme_bw()  # Add theme for cleaner look
+```
+:::
+
+::: {.column width="50%"}
+Log first-pass reading times
+```{r}
+fit_fp_log %>% 
+ggplot(aes(x = .fitted, y = .resid)) +
+  labs(title = "Residual plot (log(fp) ~ lifetime*tense)") +
+  geom_point() +
+  geom_hline(yintercept = 0) +
+  theme_bw()  # Add theme for cleaner look
+```
+:::
+::::
+
+### Approaching normality: log
+
+- so it seems like the log-transformed values have made the data more normal
+
+## Interpreting log
+
+```{r}
+augment(fit_fp_log, data = df_crit_verb[df_crit_verb$fp > 0,]) %>% 
+  distinct(lifetime,tense,.fitted) %>% 
+  arrange(lifetime) 
+```
+
+```{r}
+df_crit_verb %>% 
+  mutate(predicted_raw = predict(fit_fp),
+         predicted_log = predict(fit_fp_log)) %>% 
+  distinct(lifetime,tense,predicted_raw, predicted_log) %>% 
+  arrange(lifetime) 
+```
+
+---
+
+```{r}
+exp(coef(fit_fp_log)['(Intercept)'])
+coef(fit_fp)['(Intercept)']
+```
+
+- the exponential (back-transformation) of the log slopes correspond to the change in *percentage*
+```{r}
+(exp(coef(fit_fp_log)['lifetime1'])-1)*100
+```
+
+```{r}
+(exp(coef(fit_fp_log)['tense1'])-1)*100
+```
+
+```{r}
+# living-SF
+coef(fit_fp)['(Intercept)'] + (coef(fit_fp)['lifetime1'] * -0.5)
+
+exp(coef(fit_fp_log)['(Intercept)']) * (exp(coef(fit_fp_log)['lifetime1']* -0.5))
+exp(coef(fit_fp_log)['(Intercept)']) * (exp(coef(fit_fp_log)['lifetime1']* +0.5))
+
+```
+```{r}
+# living-SF
+exp(coef(fit_fp_log)['(Intercept)']) * exp(coef(fit_fp_log)['lifetime1'] * -0.5 + coef(fit_fp_log)['tense1'] * -0.5 )
+```
+```{r}
+# dead-PP
+exp(coef(fit_fp_log)['(Intercept)']) * exp(coef(fit_fp_log)['lifetime1'] * +0.5 + coef(fit_fp_log)['tense1'] * -0.5 )
+```
+```{r}
+# dead-SF
+coef(fit_fp_log)['(Intercept)'] + coef(fit_fp_log)['lifetime1'] * 0.5 + coef(fit_fp_log)['tense1'] * 0.5 
+```
+
+
+# Collinearity
+
+- your predictors should not be correlated
+  - this can be checked using the 'variance inflation factors' (VIFs), which measure the degree to which a predictor can be accounted for by other predictors
+- there are different guidelines for appropriate cut-offs for VIFs, with some considering a VIF >10 indicates colliniearity
+  
+```{r}
+pacman::p_load(car)
+```
+
+```{r}
+vif(fit_fp)
+```
+
+- importantly, sample size interactions with collinearity (the more data you have, the more precisely you can measure even in the face of collinearity)
+  + so, an alternative to dropping a predictor is to collect more data (if possible)
+
+# Independence assumption
+
+- important in *repeated measures* design, where we collect multiple data points across conditions per participant
+- the importance of the indepdence assumption far outweighs that of the other assumptions
+- having data points that are linked, but not telling your model this information, can massively inflate your Type I error (probability of finding a false positive)
+
+## What is (in)dependence of data?
+
+  + e.g., each roll of a die is independent
+    + that is, if you roll a 6, this has no bearing on what you will roll next
+    + if you roll a die 10 times and I roll a die 10 times, the values we get will not be linked to who rolled the die
+  + reading times are dependent
+    + if we collect eye-tracking reading times from two people, the data points from each person will be dependent
+      + this is because each person will have their own reading pace, so their data points will tend to cluster
+    + also true for experimental *item*
+      + some items will likely elicit a stronger effect than others
+
+## Check independence
+
+- independence is a conceptual consideration, it can't be checked visually or numerically
+- it is a question of experimental *design*
+- a way to think about it: can my data be linked/clustered/grouped by some means?
+  + e.g., yes, by *participant*, by *item*, even by *verb*
+- there of course are many ways our data might cluster, contributing random error that would not be expected **to be repeated**
+  + we have specific predictions for the effects of `lifetime` or `tense`, and would expect them to replicate if we were to re-run the study
+  + but we cannot *predict* how certain participants will pattern, nor how certain items will pattern
+  + these are ***random variables***, essentially error that we can try to explain by means of telling the model "check for effects by participant and item"
+
+## Accounting for independence
+
+- there is a very powerful tool that allows us to include dependence in our models: linear mixed models (LMMs)
+- LMMs are *mixed* because they include *fixed effects* (`lifetime`, `tense`), and *random effects* (in eye-tracking experiments, typically `participant`, `item`)
+  - also called linear mixed *effects* models (LMEMs), or multilevel models (or hierarchical models in some cases)
+
+# `performance` package
+
+- the `performance` package has a nice function `check_model()` that produces 6 plots to check model fit
+
+```{r}
+#| label: fig-performance-log
+#| fig-cap: Performance of model with log reading times
+performance::check_model(fit_fp_log)
+```
+
+---
+
+```{r}
+#| label: fig-performance-raw
+#| fig-cap: Performance of model with log reading times
+performance::check_model(fit_fp)
+```
+
+
+# Communicating your results
+
+-   model summaries can be provided via tables and/or figures
+    -   you should always report the t-values and p-values of an effect
+-   this is where the `tidy()` function from `broom` is handy in combination with `knitr::kable(digits = x)` and `kableExtra::kable_styling()`
+
+```{r}
+tidy(fit_fp_log) %>% 
+  kable(digits = 10,
+        col.names = c("Coefficient",
+                      "Estimate (log)",
+                      "SE",
+                      "t-value",
+                      "p-value")) %>% 
+  kable_styling()
+```
+
+
+## P-value formatting
+
+- you can create a function the replaces p-values
+
+```{r}
+# source: https://stackoverflow.com/questions/37470202/in-line-code-for-reporting-p-values-001-in-r-markdown
+# OR USE
+pacman::p_load(broman) 
+format_pval <- function(x){
+  if (x < .001) return(paste('<', '.001'))
+  if (x < .01) return(paste('<', '.01'))
+  if (x < .05) return(paste('<', '.05'))
+  paste('=', myround(x, 3))  # if above .05, print p-value to 3 decimalp points
+}
+```
+
+```{r}
+make_stars <- function(pval) {
+  stars = ""
+  if(pval <= 0.001)
+    stars = "***"
+  if(pval > 0.001 & pval <= 0.01)
+    stars = "**"
+  if(pval > 0.01 & pval <= 0.05)
+    stars = "*"
+  if(pval > 0.05 & pval <= 0.1)
+     stars = "."
+  stars
+}
+```
+
+## Formatted table
+
+```{r}
+tidy(fit_fp_log) %>% 
+  mutate(format = sapply(p.value, function(x) format_pval(x))) %>% 
+  mutate(signif = sapply(p.value, function(x) make_stars(x))) %>%
+  select(-p.value) %>% 
+  kable(digits = 10,
+        col.names = c("Coefficient",
+                      "Estimate (log)",
+                      "SE",
+                      "t-value",
+                      "p-value",
+                      "sign")) %>% 
+  kable_styling()
+```
+
+## Plots
+
+```{r}
+df_crit_verb |> 
+  filter(fp > 0) |> 
+  mutate(log_ff = log(fp)) |> 
+  mutate(half = if_else(trial >= 104, "1st","2nd")) |> 
+  ggpubr::ggqqplot(x = "log_ff")
+```
+
+### sjPlot
+
+```{r}
+#| echo: false
+fig_sjplot_coef <- plot_model(fit_fp_log) +
+  geom_hline(yintercept=0) +
+  theme_bw()
+
+fig_sjplot_int <- plot_model(fit_fp_log, type = "int") +
+  geom_hline(yintercept=0) +
+  geom_line(group=1, position = position_dodge(0.1)) +
+  theme_bw()
+```
+
+```{r}
+#| echo: false
+#| label: fig-sjPlot
+#| fig-label: Model summaries
+fig_sjplot_coef + fig_sjplot_int + plot_annotation(tag_levels = "A")
+```
+
+
+### Distributions
+
+```{r}
+#| echo: false
+fig_scatter <-
+  df_crit_verb %>% 
+  filter(fp > 0) %>% 
+  ggplot(aes(x = tense, y = fp, colour = lifetime, shape = lifetime, fill = lifetime)) + 
+  labs(title = "Distribution of first-pass reading times") +
+  geom_point(position = position_jitterdodge(jitter.width = 0.3), size = 2, alpha = .5) +
+  introdataviz::geom_split_violin(alpha = .4) +
+  theme_bw()+
+  theme(text = element_text(size=8))
+
+fig_scatter_log <-
+  df_crit_verb %>% 
+  filter(fp > 0) %>% 
+  ggplot(aes(x = tense, y = log(fp), colour = lifetime, shape = lifetime, fill = lifetime)) + 
+  labs(title = "Distribution of first-pass reading times") +
+  geom_point(position = position_jitterdodge(jitter.width = 0.3), size = 2, alpha = .5) +
+  introdataviz::geom_split_violin(alpha = .4) +
+  theme_bw()+
+  theme(text = element_text(size=8))
+```
+
+```{r}
+#| echo: false
+#| label: fig-scatter
+#| fig-label: Distribution of raw (A) and log (B) first-pass reading times
+fig_scatter + fig_scatter_log + plot_annotation(tag_levels = "A")
+```
+
+### Errorbar
+
+```{r}
+fig_error <-
+  df_crit_verb %>% 
+  filter(fp > 0) %>% 
+  summarySEwithin(measurevar="fp", withinvars=c("lifetime", "tense"), idvar="px") %>% 
+  mutate(upper = fp+ci,
+         lower = fp-ci) %>% 
+  ggplot(aes(x = lifetime, y = fp, colour = tense, shape = tense)) + 
+  labs(title = "Mean first-pass reading times (with 95% CIs)") +
+  geom_point(position = position_dodge(0.2), size = 2) +
+  geom_line(position = position_dodge(0.2), aes(group=tense)) +
+  geom_errorbar(aes(ymin=lower,ymax=upper), position = position_dodge(0.2), width = .2) +
+  theme_bw() +
+  theme(text = element_text(size=8))
+
+fig_error_log <-
+  df_crit_verb %>% 
+  filter(fp > 0) %>% 
+  mutate(fp_log = log(fp)) %>% 
+  summarySEwithin(measurevar="fp_log", withinvars=c("lifetime", "tense"), idvar="px") %>% 
+  mutate(upper = fp_log+ci,
+         lower = fp_log-ci) %>% 
+  ggplot(aes(x = lifetime, y = fp_log, colour = tense, shape = tense)) + 
+  labs(title = "Mean first-pass reading times (with 95% CIs)") +
+  geom_point(position = position_dodge(0.2), size = 2) +
+  geom_line(position = position_dodge(0.2), aes(group=tense)) +
+  geom_errorbar(aes(ymin=lower,ymax=upper), position = position_dodge(0.2), width = .2) +
+  theme_bw() +
+  theme(text = element_text(size=8))
+```
+
+```{r}
+#| label: fig-error
+#| echo: false
+#| fig-label: Mean raw (A) and log (B) first-pass reading times (95% CIs)
+fig_error + fig_error_log + plot_annotation(tag_levels = "A")
+```
+
+# Summary
+
+-   we looked at some assumptions of linear models and how to check them
+
+-   we saw how to log-transform our data so that our residuals are normally distributed
+
+-   we learned the importance of the independence assumption, which is violated by repeated-measures designs
+
+-   next, we'll learn how to account for lack of independence between the data with mixed models
+
+# References {.unlisted .unnumbered visibility="uncounted"}
+
+::: {#refs custom-style="Bibliography"}
+:::

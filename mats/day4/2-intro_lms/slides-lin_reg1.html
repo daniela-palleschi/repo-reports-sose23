@@ -1,0 +1,2517 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="_lin_reg1_files/libs/clipboard/clipboard.min.js"></script>
+<script src="_lin_reg1_files/libs/quarto-html/tabby.min.js"></script>
+<script src="_lin_reg1_files/libs/quarto-html/popper.min.js"></script>
+<script src="_lin_reg1_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="_lin_reg1_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="_lin_reg1_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="_lin_reg1_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
+<link href="_lin_reg1_files/libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.3.361">
+
+  <meta name="author" content="Daniela Palleschi">
+  <meta name="dcterms.date" content="2023-04-13">
+  <title>Linear Regression 1</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="_lin_reg1_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="_lin_reg1_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+      }
+    pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+    div.sourceCode
+      { color: #f8f8f2;  }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #f8f8f2; } /* Normal */
+    code span.al { color: #f07178; background-color: #2a0f15; font-weight: bold; } /* Alert */
+    code span.an { color: #d4d0ab; } /* Annotation */
+    code span.at { color: #00e0e0; } /* Attribute */
+    code span.bn { color: #d4d0ab; } /* BaseN */
+    code span.bu { color: #abe338; } /* BuiltIn */
+    code span.cf { color: #ffa07a; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #abe338; } /* Char */
+    code span.cn { color: #ffd700; } /* Constant */
+    code span.co { color: #f8f8f2; font-style: italic; } /* Comment */
+    code span.cv { color: #ffd700; } /* CommentVar */
+    code span.do { color: #f8f8f2; } /* Documentation */
+    code span.dt { color: #ffa07a; } /* DataType */
+    code span.dv { color: #d4d0ab; } /* DecVal */
+    code span.er { color: #f07178; text-decoration: underline; } /* Error */
+    code span.ex { color: #00e0e0; font-weight: bold; } /* Extension */
+    code span.fl { color: #d4d0ab; } /* Float */
+    code span.fu { color: #ffa07a; } /* Function */
+    code span.im { color: #abe338; } /* Import */
+    code span.in { color: #d4d0ab; } /* Information */
+    code span.kw { color: #ffa07a; font-weight: bold; } /* Keyword */
+    code span.op { color: #ffa07a; } /* Operator */
+    code span.ot { color: #00e0e0; } /* Other */
+    code span.pp { color: #dcc6e0; } /* Preprocessor */
+    code span.re { color: #00e0e0; background-color: #f8f8f2; } /* RegionMarker */
+    code span.sc { color: #abe338; } /* SpecialChar */
+    code span.ss { color: #abe338; } /* SpecialString */
+    code span.st { color: #abe338; } /* String */
+    code span.va { color: #00e0e0; } /* Variable */
+    code span.vs { color: #abe338; } /* VerbatimString */
+    code span.wa { color: #dcc6e0; } /* Warning */
+    /* CSS for citations */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+    }
+    .hanging-indent div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }  </style>
+  <link rel="stylesheet" href="_lin_reg1_files/libs/revealjs/dist/theme/quarto.css">
+  <link href="_lin_reg1_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="_lin_reg1_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="_lin_reg1_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="_lin_reg1_files/libs/revealjs/plugin/reveal-chalkboard/font-awesome/css/all.css" rel="stylesheet">
+  <link href="_lin_reg1_files/libs/revealjs/plugin/reveal-chalkboard/style.css" rel="stylesheet">
+  <link href="_lin_reg1_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+
+  .callout {
+    margin-top: 1em;
+    margin-bottom: 1em;  
+    border-radius: .25rem;
+  }
+
+  .callout.callout-style-simple { 
+    padding: 0em 0.5em;
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+    display: flex;
+  }
+
+  .callout.callout-style-default {
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+  }
+
+  .callout .callout-body-container {
+    flex-grow: 1;
+  }
+
+  .callout.callout-style-simple .callout-body {
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-style-default .callout-body {
+    font-size: 0.9rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-titled.callout-style-simple .callout-body {
+    margin-top: 0.2em;
+  }
+
+  .callout:not(.callout-titled) .callout-body {
+      display: flex;
+  }
+
+  .callout:not(.no-icon).callout-titled.callout-style-simple .callout-content {
+    padding-left: 1.6em;
+  }
+
+  .callout.callout-titled .callout-header {
+    padding-top: 0.2em;
+    margin-bottom: -0.2em;
+  }
+
+  .callout.callout-titled .callout-title  p {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+    
+  .callout.callout-titled.callout-style-simple .callout-content  p {
+    margin-top: 0;
+  }
+
+  .callout.callout-titled.callout-style-default .callout-content  p {
+    margin-top: 0.7em;
+  }
+
+  .callout.callout-style-simple div.callout-title {
+    border-bottom: none;
+    font-size: .9rem;
+    font-weight: 600;
+    opacity: 75%;
+  }
+
+  .callout.callout-style-default  div.callout-title {
+    border-bottom: none;
+    font-weight: 600;
+    opacity: 85%;
+    font-size: 0.9rem;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-default div.callout-content {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-simple .callout-icon::before {
+    height: 1rem;
+    width: 1rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 1rem 1rem;
+  }
+
+  .callout.callout-style-default .callout-icon::before {
+    height: 0.9rem;
+    width: 0.9rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 0.9rem 0.9rem;
+  }
+
+  .callout-title {
+    display: flex
+  }
+    
+  .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  .callout.no-icon::before {
+    display: none !important;
+  }
+
+  .callout.callout-titled .callout-body > .callout-content > :last-child {
+    margin-bottom: 0.5rem;
+  }
+
+  .callout.callout-titled .callout-icon::before {
+    margin-top: .5rem;
+    padding-right: .5rem;
+  }
+
+  .callout:not(.callout-titled) .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  /* Callout Types */
+
+  div.callout-note {
+    border-left-color: #4582ec !important;
+  }
+
+  div.callout-note .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEU0lEQVRYCcVXTWhcVRQ+586kSUMMxkyaElstCto2SIhitS5Ek8xUKV2poatCcVHtUlFQk8mbaaziwpWgglJwVaquitBOfhQXFlqlzSJpFSpIYyXNjBNiTCck7x2/8/LeNDOZxDuEkgOXe++553zfefee+/OYLOXFk3+1LLrRdiO81yNqZ6K9cG0P3MeFaMIQjXssE8Z1JzLO9ls20MBZX7oG8w9GxB0goaPrW5aNMp1yOZIa7Wv6o2ykpLtmAPs/vrG14Z+6d4jpbSKuhdcSyq9wGMPXjonwmESXrriLzFGOdDBLB8Y6MNYBu0dRokSygMA/mrun8MGFN3behm6VVAwg4WR3i6FvYK1T7MHo9BK7ydH+1uurECoouk5MPRyVSBrBHMYwVobG2aOXM07sWrn5qgB60rc6mcwIDJtQrnrEr44kmy+UO9r0u9O5/YbkS9juQckLed3DyW2XV/qWBBB3ptvI8EUY3I9p/67OW+g967TNr3Sotn3IuVlfMLVnsBwH4fsnebJvyGm5GeIUA3jljERmrv49SizPYuq+z7c2H/jlGC+Ghhupn/hcapqmcudB9jwJ/3jvnvu6vu5lVzF1fXyZuZZ7U8nRmVzytvT+H3kilYvH09mLWrQdwFSsFEsxFVs5fK7A0g8gMZjbif4ACpKbjv7gNGaD8bUrlk8x+KRflttr22JEMRUbTUwwDQScyzPgedQHZT0xnx7ujw2jfVfExwYHwOsDTjLdJ2ebmeQIlJ7neo41s/DrsL3kl+W2lWvAga0tR3zueGr6GL78M3ifH0rGXrBC2aAR8uYcIA5gwV8zIE8onoh8u0Fca/ciF7j1uOzEnqcIm59sEXoGc0+z6+H45V1CvAvHcD7THztu669cnp+L0okAeIc6zjbM/24LgGM1gZk7jnRu1aQWoU9sfUOuhrmtaPIO3YY1KLLWZaEO5TKUbMY5zx8W9UJ6elpLwKXbsaZ4EFl7B4bMtDv0iRipKoDQT2sNQI9b1utXFdYisi+wzZ/ri/1m7QfDgEuvgUUEIJPq3DhX/5DWNqIXDOweC2wvIR90Oq3lDpdMIgD2r0dXvGdsEW5H6x6HLRJYU7C69VefO1x8Gde1ZFSJLfWS1jbCnhtOPxmpfv2LXOA2Xk2tvnwKKPFuZ/oRmwBwqRQDcKNeVQkYcOjtWVBuM/JuYw5b6isojIkYxyYAFn5K7ZBF10fea52y8QltAg6jnMqNHFBmGkQ1j+U43HMi2xMar1Nv0zGsf1s8nUsmUtPOOrbFIR8bHFDMB5zL13Gmr/kGlCkUzedTzzmzsaJXhYawnA3UmARpiYj5ooJZiUoxFRtK3X6pgNPv+IZVPcnwbOl6f+aBaO1CNvPW9n9LmCp01nuSaTRF2YxHqZ8DYQT6WsXT+RD6eUztwYLZ8rM+rcPxamv1VQzFUkzFXvkiVrySGQgJNvXHJAxiU3/NwiC03rSf05VBaPtu/Z7/B8Yn/w7eguloAAAAAElFTkSuQmCC');
+  }
+
+  div.callout-note.callout-style-default .callout-title {
+    background-color: #dae6fb
+  }
+
+  div.callout-important {
+    border-left-color: #d9534f !important;
+  }
+
+  div.callout-important .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEKklEQVRYCcVXTWhcVRS+575MJym48A+hSRFr00ySRQhURRfd2HYjk2SSTokuBCkU2o0LoSKKraKIBTcuFCoidGFD08nkBzdREbpQ1EDNIv8qSGMFUboImMSZd4/f9zJv8ibJMC8xJQfO3HPPPef7zrvvvnvviIkpC9nsw0UttFunbUhpFzFtarSd6WJkStVMw5xyVqYTvkwfzuf/5FgtkVoB0729j1rjXwThS7Vio+Mo6DNnvLfahoZ+i/o32lULuJ3NNiz7q6+pyAUkJaFF6JwaM2lUJlV0MlnQn5aTRbEu0SEqHUa0A4AdiGuB1kFXRfVyg5d87+Dg4DL6m2TLAub60ilj7A1Ec4odSAc8X95sHh7+ZRPCFo6Fnp7HfU/fBng/hi10CjCnWnJjsxvDNxWw0NfV6Rv5GgP3I3jGWXumdTD/3cbEOP2ZbOZp69yniG3FQ9z1jD7bnBu9Fc2tKGC2q+uAJOQHBDRiZX1x36o7fWBs7J9ownbtO+n0/qWkvW7UPIfc37WgT6ZGR++EOJyeQDSb9UB+DZ1G6DdLDzyS+b/kBCYGsYgJbSQHuThGKRcw5xdeQf8YdNHsc6ePXrlSYMBuSIAFTGAtQo+VuALo4BX83N190NWZWbynBjhOHsmNfFWLeL6v+ynsA58zDvvAC8j5PkbOcXCMg2PZFk3q8MjI7WAG/Dp9AwP7jdGBOOQkAvlFUB+irtm16I1Zw9YBcpGTGXYmk3kQIC/Cds55l+iMI3jqhjAuaoe+am2Jw5GT3Nbz3CkE12NavmzN5+erJW7046n/CH1RO/RVa8lBLozXk9uqykkGAyRXLWlLv5jyp4RFsG5vGVzpDLnIjTWgnRy2Rr+tDKvRc7Y8AyZq10jj8DqXdnIRNtFZb+t/ZRtXcDiVnzpqx8mPcDWxgARUqx0W1QB9MeUZiNrV4qP+Ehc+BpNgATsTX8ozYKL2NtFYAHc84fG7ndxUPr+AR/iQSns7uSUufAymwDOb2+NjK27lEFocm/EE2WpyIy/Hi66MWuMKJn8RvxIcj87IM5Vh9663ziW36kR0HNenXuxmfaD8JC7tfKbrhFr7LiZCrMjrzTeGx+PmkosrkNzW94ObzwocJ7A1HokLolY+AvkTiD/q1H0cN48c5EL8Crkttsa/AXQVDmutfyku0E7jShx49XqV3MFK8IryDhYVbj7Sj2P2eBxwcXoe8T8idsKKPRcnZw1b+slFTubwUwhktrfnAt7J++jwQtLZcm3sr9LQrjRzz6cfMv9aLvgmnAGvpoaGLxM4mAEaLV7iAzQ3oU0IvD5x9ix3yF2RAAuYAOO2f7PEFWCXZ4C9Pb2UsgDeVnFSpbFK7/IWu7TPTvBqzbGdCHOJQSxiEjt6IyZmxQyEJHv6xyQsYk//moVFsN2zP6fRImjfq7/n/wFDguUQFNEwugAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-important.callout-style-default .callout-title {
+    background-color: #f7dddc
+  }
+
+  div.callout-warning {
+    border-left-color: #f0ad4e !important;
+  }
+
+  div.callout-warning .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAETklEQVRYCeVWW2gcVRg+58yaTUnizqbipZeX4uWhBEniBaoUX1Ioze52t7sRq6APio9V9MEaoWlVsFasRq0gltaAPuxms8lu0gcviE/FFOstVbSIxgcv6SU7EZqmdc7v9+9mJtNks51NTUH84ed889/PP+cmxP+d5FIbMJmNbpREu4WUkiTtCicKny0l1pIKmBzovF2S+hIJHX8iEu3hZJ5lNZGqyRrGSIQpq15AzF28jgpeY6yk6GVdrfFqdrD6Iw+QlB8g0YS2g7dyQmXM/IDhBhT0UCiRf59lfqmmDvzRt6kByV/m4JjtzuaujMUM2c5Z2d6JdKrRb3K2q6mA+oYVz8JnDdKPmmNthzkAk/lN63sYPgevrguc72aZX/L9C6x09GYyxBgCX4NlvyGUHOKELlm5rXeR1kchuChJt4SSwyddZRXgvwMGvYo4QSlk3/zkHD8UHxwVJA6zjZZqP8v8kK8OWLnIZtLyCAJagYC4rTGW/9Pqj92N/c+LUaAj27movwbi19tk/whRCIE7Q9vyI6yvRpftAKVTdUjOW40X3h5OXsKCdmFcx0xlLJoSuQngnrJe7Kcjm4OMq9FlC7CMmScQANuNvjfP3PjGXDBaUQmbp296S5L4DrpbrHN1T87ZVEZVCzg1FF0Ft+dKrlLukI+/c9ENo+TvlTDbYFvuKPtQ9+l052rXrgKoWkDAFnvh0wTOmYn8R5f4k/jN/fZiCM1tQx9jQQ4ANhqG4hiL0qIFTGViG9DKB7GYzgubnpofgYRwO+DFjh0Zin2m4b/97EDkXkc+f6xYAPX0KK2I/7fUQuwzuwo/L3AkcjugPNixC8cHf0FyPjWlItmLxWw4Ou9YsQCr5fijMGoD/zpdRy95HRysyXA74MWOnscpO4j2y3HAVisw85hX5+AFBRSHt4ShfLFkIMXTqyKFc46xdzQM6XbAi702a7sy04J0+feReMFKp5q9esYLCqAZYw/k14E/xcLLsFElaornTuJB0svMuJINy8xkIYuL+xPAlWRceH6+HX7THJ0djLUom46zREu7tTkxwmf/FdOZ/sh6Q8qvEAiHpm4PJ4a/doJe0gH1t+aHRgCzOvBvJedEK5OFE5jpm4AGP2a8Dxe3gGJ/pAutug9Gp6he92CsSsWBaEcxGx0FHytmIpuqGkOpldqNYQK8cSoXvd+xLxXADw0kf6UkJNFtdo5MOgaLjiQOQHcn+A6h5NuL2s0qsC2LOM75PcF3yr5STuBSAcGG+meA14K/CI21HcS4LBT6tv0QAh8Dr5l93AhZzG5ZJ4VxAqdZUEl9z7WJ4aN+svMvwHHL21UKTd1mqvChH7/Za5xzXBBKrUcB0TQ+Ulgkfbi/H/YT5EptrGzsEK7tR1B7ln9BBwckYfMiuSqklSznIuoIIOM42MQO+QnduCoFCI0bpkzjCjddHPN/F+2Yu+sd9bKNpVwHhbS3LluK/0zgfwD0xYI5dXuzlQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-warning.callout-style-default .callout-title {
+    background-color: #fcefdc
+  }
+
+  div.callout-tip {
+    border-left-color: #02b875 !important;
+  }
+
+  div.callout-tip .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAADr0lEQVRYCe1XTWgTQRj9ZjZV8a9SPIkKgj8I1bMHsUWrqYLVg4Ue6v9BwZOxSYsIerFao7UiUryIqJcqgtpimhbBXoSCVxUFe9CTiogUrUp2Pt+3aUI2u5vdNh4dmMzOzHvvezuz8xNFM0mjnbXaNu1MvFWRXkXEyE6aYOYJpdW4IXuA4r0fo8qqSMDBU0v1HJUgVieAXxzCsdE/YJTdFcVIZQNMyhruOMJKXYFoLfIfIvVIMWdsrd+Rpd86ZmyzzjJmLStqRn0v8lzkb4rVIXvnpScOJuAn2ACC65FkPzEdEy4TPWRLJ2h7z4cArXzzaOdKlbOvKKX25Wl00jSnrwVxAg3o4dRxhO13RBSdNvH0xSARv3adTXbBdTf64IWO2vH0LT+cv4GR1DJt+DUItaQogeBX/chhbTBxEiZ6gftlDNXTrvT7co4ub5A6gp9HIcHvzTa46OS5fBeP87Qm0fQkr4FsYgVQ7Qg+ZayaDg9jhg1GkWj8RG6lkeSacrrHgDaxdoBiZPg+NXV/KifMuB6//JmYH4CntVEHy/keA6x4h4CU5oFy8GzrBS18cLJMXcljAKB6INjWsRcuZBWVaS3GDrqB7rdapVIeA+isQ57Eev9eCqzqOa81CY05VLd6SamW2wA2H3SiTbnbSxmzfp7WtKZkqy4mdyAlGx7ennghYf8voqp9cLSgKdqNfa6RdRsAAkPwRuJZNbpByn+RrJi1RXTwdi8RQF6ymDwGMAtZ6TVE+4uoKh+MYkcLsT0Hk8eAienbiGdjJHZTpmNjlbFJNKDVAp2fJlYju6IreQxQ08UJDNYdoLSl6AadO+fFuCQqVMB1NJwPm69T04Wv5WhfcWyfXQB+wXRs1pt+nCknRa0LVzSA/2B+a9+zQJadb7IyyV24YAxKp2Jqs3emZTuNnKxsah+uabKbMk7CbTgJx/zIgQYErIeTKRQ9yD9wxVof5YolPHqaWo7TD6tJlh7jQnK5z2n3+fGdggIOx2kaa2YI9QWarc5Ce1ipNWMKeSG4DysFF52KBmTNMmn5HqCFkwy34rDg05gDwgH3bBi+sgFhN/e8QvRn8kbamCOhgrZ9GJhFDgfcMHzFb6BAtjKpFhzTjwv1KCVuxHvCbsSiEz4CANnj84cwHdFXAbAOJ4LTSAawGWFn5tDhLMYz6nWeU2wJfIhmIJBefcd/A5FWQWGgrWzyORZ3Q6HuV+Jf0Bj+BTX69fm1zWgK7By1YTXchFDORywnfQ7GpzOo6S+qECrsx2ifVQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-tip.callout-style-default .callout-title {
+    background-color: #ccf1e3
+  }
+
+  div.callout-caution {
+    border-left-color: #fd7e14 !important;
+  }
+
+  div.callout-caution .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAACV0lEQVRYCdVWzWoUQRCuqp2ICBLJXgITZL1EfQDBW/bkzUMUD7klD+ATSHBEfAIfQO+iXsWDxJsHL96EHAwhgzlkg8nBg25XWb0zIb0zs9muYYWkoKeru+vn664fBqElyZNuyh167NXJ8Ut8McjbmEraKHkd7uAnAFku+VWdb3reSmRV8PKSLfZ0Gjn3a6Xlcq9YGb6tADjn+lUfTXtVmaZ1KwBIvFI11rRXlWlatwIAAv2asaa9mlB9wwygiDX26qaw1yYPzFXg2N1GgG0FMF8Oj+VIx7E/03lHx8UhvYyNZLN7BwSPgekXXLribw7w5/c8EF+DBK5idvDVYtEEwMeYefjjLAdEyQ3M9nfOkgnPTEkYU+sxMq0BxNR6jExrAI31H1rzvLEfRIdgcv1XEdj6QTQAS2wtstEALLG1yEZ3QhH6oDX7ExBSFEkFINXH98NTrme5IOaaA7kIfiu2L8A3qhH9zRbukdCqdsA98TdElyeMe5BI8Rs2xHRIsoTSSVFfCFCWGPn9XHb4cdobRIWABNf0add9jakDjQJpJ1bTXOJXnnRXHRf+dNL1ZV1MBRCXhMbaHqGI1JkKIL7+i8uffuP6wVQAzO7+qVEbF6NbS0LJureYcWXUUhH66nLR5rYmva+2tjRFtojkM2aD76HEGAD3tPtKM309FJg5j/K682ywcWJ3PASCcycH/22u+Bh7Aa0ehM2Fu4z0SAE81HF9RkB21c5bEn4Dzw+/qNOyXr3DCTQDMBOdhi4nAgiFDGCinIa2owCEChUwD8qzd03PG+qdW/4fDzjUMcE1ZpIAAAAASUVORK5CYII=');
+  }
+
+  div.callout-caution.callout-style-default .callout-title {
+    background-color: #ffe5d0
+  }
+
+  </style>
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  
+  <script src="_lin_reg1_files/libs/kePrint-0.0.1/kePrint.js"></script>
+  <link href="_lin_reg1_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+</head>
+<body class="quarto-dark">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" data-background-image="logos/logos.tif" data-background-position="50% 92%" data-background-size="15%" class="quarto-title-block center">
+  <h1 class="title">Linear Regression 1</h1>
+  <p class="subtitle">Simple Linear Regression</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Daniela Palleschi 
+</div>
+        <p class="quarto-title-affiliation">
+            Humboldt-Universität zu Berlin
+          </p>
+    </div>
+</div>
+
+  <p class="date">2023-04-13</p>
+</section><section id="TOC">
+<nav role="doc-toc"> 
+<h2 id="toc-title">Topics</h2>
+<ul>
+<li class="fragment"><a href="#/learning-objectives" id="/toc-learning-objectives">Learning Objectives</a></li>
+<li class="fragment"><a href="#/set-up-environment" id="/toc-set-up-environment">Set-up environment</a></li>
+<li class="fragment"><a href="#/resources" id="/toc-resources">Resources</a></li>
+<li class="fragment"><a href="#/exploratory-data-analysis-eda" id="/toc-exploratory-data-analysis-eda">Exploratory data analysis (EDA)</a></li>
+<li class="fragment"><a href="#/linear-regression" id="/toc-linear-regression">(Linear) Regression</a></li>
+<li class="fragment"><a href="#/simple-linear-model-first-pass-reading-time-lifetime" id="/toc-simple-linear-model-first-pass-reading-time-lifetime">Simple linear model: first-pass reading time ~ lifetime</a></li>
+<li class="fragment"><a href="#/contrast-coding" id="/toc-contrast-coding">Contrast coding</a></li>
+<li class="fragment"><a href="#/exploring-our-model" id="/toc-exploring-our-model">Exploring our model</a></li>
+<li class="fragment"><a href="#/simple-linear-regression-vs.-t-test" id="/toc-simple-linear-regression-vs.-t-test">Simple linear regression vs.&nbsp;t-test</a></li>
+<li class="fragment"><a href="#/summary" id="/toc-summary">Summary</a></li>
+<li class="fragment"><a href="#/task" id="/toc-task">Task</a></li>
+</ul>
+</nav>
+</section>
+<section id="learning-objectives" class="title-slide slide level1 unnumbered center">
+<h1>Learning Objectives</h1>
+<p>Today we will learn…</p>
+<ul>
+<li class="fragment">the equation of a line</li>
+<li class="fragment">about intercepts, slopes, and residuals</li>
+<li class="fragment">how to run our first linear model</li>
+<li class="fragment">how to interpret model output</li>
+</ul>
+</section>
+
+<section>
+<section id="set-up-environment" class="title-slide slide level1 unnumbered center">
+<h1>Set-up environment</h1>
+<p>Make sure you start with a clean R Environment (Session &gt; Restart R).</p>
+</section>
+<section id="load-packages" class="title-slide slide level2 unnumbered center">
+<h2>Load packages</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="co"># suppress scientific notation</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">options</span>(<span class="at">scipen=</span><span class="dv">999</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># load libraries</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>pacman<span class="sc">::</span><span class="fu">p_load</span>(tidyverse,</span>
+<span id="cb2-3"><a href="#cb2-3"></a>               broom,</span>
+<span id="cb2-4"><a href="#cb2-4"></a>               patchwork,</span>
+<span id="cb2-5"><a href="#cb2-5"></a>               knitr,</span>
+<span id="cb2-6"><a href="#cb2-6"></a>               kableExtra)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+
+<section id="load-in-data" class="title-slide slide level2 unnumbered center">
+<h2>Load in data</h2>
+<ul>
+<li class="fragment">force character variables to factors</li>
+<li class="fragment">filter for the verb region from critical items only, remove participant 3, and remove values of first-fixtation that are 0</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># load in dataset</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>df_crit_verb <span class="ot">&lt;-</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a>  readr<span class="sc">::</span><span class="fu">read_csv</span>(</span>
+<span id="cb3-4"><a href="#cb3-4"></a>    here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"data/tidy_data_lifetime_pilot.csv"</span>),</span>
+<span id="cb3-5"><a href="#cb3-5"></a>    <span class="co"># for special characters</span></span>
+<span id="cb3-6"><a href="#cb3-6"></a>    <span class="at">locale =</span> readr<span class="sc">::</span><span class="fu">locale</span>(<span class="at">encoding =</span> <span class="st">"latin1"</span>)</span>
+<span id="cb3-7"><a href="#cb3-7"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb3-8"><a href="#cb3-8"></a>  <span class="fu">mutate_if</span>(is.character, as.factor) <span class="sc">|&gt;</span> <span class="co"># all character variables as factor</span></span>
+<span id="cb3-9"><a href="#cb3-9"></a>  <span class="co"># mutate(lifetime = fct_relevel(lifetime, "living", "dead"),</span></span>
+<span id="cb3-10"><a href="#cb3-10"></a>  <span class="co">#        tense = fct_relevel(tense, "PP", "SF")) |&gt;</span></span>
+<span id="cb3-11"><a href="#cb3-11"></a>  <span class="fu">filter</span>(type <span class="sc">==</span> <span class="st">"critical"</span>, <span class="co"># only critical trials</span></span>
+<span id="cb3-12"><a href="#cb3-12"></a>         px <span class="sc">!=</span> <span class="st">"px3"</span>, <span class="co"># px3 had a lot of missing values</span></span>
+<span id="cb3-13"><a href="#cb3-13"></a>         fp <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="co"># only values of fp above 0</span></span>
+<span id="cb3-14"><a href="#cb3-14"></a>         region <span class="sc">==</span> <span class="st">"verb"</span>) <span class="sc">%&gt;%</span> <span class="co"># critical region only</span></span>
+<span id="cb3-15"><a href="#cb3-15"></a>  <span class="fu">droplevels</span>() <span class="co"># remove any factor levels with no observations</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="resources" class="title-slide slide level1 unnumbered center">
+<h1>Resources</h1>
+<ul>
+<li class="fragment">these slides are based on a mix of the following resources</li>
+</ul>
+<p><span class="citation" data-cites="debruine_understanding_2021">DeBruine &amp; Barr (<a href="#/references" role="doc-biblioref" onclick="">2021</a>)</span>; <span class="citation" data-cites="winter_linear_2013">Winter (<a href="#/references" role="doc-biblioref" onclick="">2013</a>)</span>; <span class="citation" data-cites="winter_very_2014">Winter (<a href="#/references" role="doc-biblioref" onclick="">2014</a>)</span>; <span class="citation" data-cites="winter_statistics_2019">Winter (<a href="#/references" role="doc-biblioref" onclick="">2019</a>)</span></p>
+<ul>
+<li class="fragment">and on slides that were originally based on <span class="citation" data-cites="field_discovering_2013">Field et al. (<a href="#/references" role="doc-biblioref" onclick="">2013</a>)</span>, but if you’re looking for a textbook I’d recommend <span class="citation" data-cites="winter_statistics_2019">Winter (<a href="#/references" role="doc-biblioref" onclick="">2019</a>)</span></li>
+</ul>
+</section>
+
+<section id="exploratory-data-analysis-eda" class="title-slide slide level1 center">
+<h1>Exploratory data analysis (EDA)</h1>
+<ul>
+<li class="fragment">what we’ve learned so far is essentially Exploratory Data Analysis (EDA)
+<ul>
+<li class="fragment">visualise your data</li>
+<li class="fragment">generate summary (i.e., descriptive) statistics</li>
+<li class="fragment">overall getting to know your data, without making any claims beyond your data</li>
+</ul></li>
+<li class="fragment">the next step after conducting an EDA is to <em>model</em> your data, i.e., run <strong>inferential statistics</strong>
+<ul>
+<li class="fragment">this is where we try to generalise beyond our data</li>
+</ul></li>
+</ul>
+</section>
+
+<section>
+<section id="linear-regression" class="title-slide slide level1 center">
+<h1>(Linear) Regression</h1>
+<ul>
+<li class="fragment">our data exploration has given us an idea about what our data look like</li>
+<li class="fragment">but now we want to be able to make predictions about hypothetical observations, i.e., to <em>predict</em> values of our DV based on one (or more) IV(s)
+<ul>
+<li class="fragment">so we fit a model to our data, and use it to <em>predict</em> values of our DV based on one (or more) IV(s)</li>
+<li class="fragment">i.e., <em>predicting</em> an outcome variable (dependent variable, DV) from one or more predictors (independent variable, IV)</li>
+</ul></li>
+<li class="fragment">because we’re making predictions, we need to take into account the variability (i.e., <em>error</em>) in our data</li>
+</ul>
+</section>
+<section id="types-of-regression" class="title-slide slide level2 center">
+<h2>Types of regression</h2>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table" data-quarto-postprocess="true" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">regression type</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">predictor</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">outcome</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">simple regression</td>
+<td style="text-align: left;">Single predictor</td>
+<td style="text-align: left;">continuous (numerical)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">multiple regression</td>
+<td style="text-align: left;">multiple predictor</td>
+<td style="text-align: left;">continuous (numerical)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">hierarchical/linear mixed models/linear mixed effect models</td>
+<td style="text-align: left;">include random effect</td>
+<td style="text-align: left;">continuous (numerical)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">generalised linear (mixed) models/logistic regression</td>
+<td style="text-align: left;">as above</td>
+<td style="text-align: left;">binary/binomial data or count data</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</section>
+
+<section id="straight-lines" class="title-slide slide level2 center">
+<h2>Straight lines</h2>
+<ul>
+<li class="fragment"><em>linear regression</em> summarises the data with a straight line
+<ul>
+<li class="fragment">we <em>model</em> our data as/fit our data to a straight line</li>
+</ul></li>
+<li class="fragment"><em>straight lines</em> can be defined by
+<ul>
+<li class="fragment">Intercept (<span class="math inline">\(b_0\)</span>)
+<ul>
+<li class="fragment">value of <span class="math inline">\(Y\)</span> when <span class="math inline">\(X = 0\)</span></li>
+</ul></li>
+<li class="fragment">Slope (<span class="math inline">\(b_1\)</span>)
+<ul>
+<li class="fragment">gradient (slope) of the regression line</li>
+<li class="fragment">direction/strength of relationship between <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span></li>
+<li class="fragment">regression coefficient for the predictor</li>
+</ul></li>
+</ul></li>
+<li class="fragment">so we need to define an intercept and a slope</li>
+</ul>
+</section>
+<section id="a-line-intercept-and-slope" class="title-slide slide level3 center">
+<h3>A line = intercept and slope</h3>
+<ul>
+<li class="fragment">a line is defined by its intercept and slope
+<ul>
+<li class="fragment">in a regression model, these two are called <code>coefficients</code></li>
+</ul></li>
+</ul>
+
+<img data-src="_lin_reg1_files/figure-revealjs/unnamed-chunk-8-1.png" width="679" class="r-stretch quarto-figure-center"><p class="caption">Image source: <span class="citation" data-cites="winter_statistics_2019">Winter (<a href="#/references" role="doc-biblioref" onclick="">2019</a>)</span> (all rights reserved)</p></section>
+
+<section id="intercept-b_0" class="title-slide slide level3 center">
+<h3>Intercept (<span class="math inline">\(b_0\)</span>)</h3>
+<ul>
+<li class="fragment">the value of <span class="math inline">\(y\)</span> when <span class="math inline">\(x = 0\)</span></li>
+</ul>
+
+<img data-src="_lin_reg1_files/figure-revealjs/unnamed-chunk-11-1.png" width="960" class="r-stretch"></section>
+
+<section id="slopes-b_1" class="title-slide slide level3 center">
+<h3>Slopes (<span class="math inline">\(b_1\)</span>)</h3>
+<div class="columns">
+<div class="column" style="width:70%;">
+<ul>
+<li class="fragment">slopes describe a change in <span class="math inline">\(x\)</span> (<span class="math inline">\(\Delta x\)</span>) over a change in <span class="math inline">\(y\)</span> (<span class="math inline">\(\Delta y\)</span>)
+<ul>
+<li class="fragment">positive slope: as <span class="math inline">\(x\)</span> increases, <span class="math inline">\(y\)</span> increases</li>
+<li class="fragment">negative slope: as <span class="math inline">\(x\)</span> increases, <span class="math inline">\(y\)</span> decreases</li>
+<li class="fragment">if the slope is 0, there is no change in <span class="math inline">\(y\)</span> as a function of <span class="math inline">\(x\)</span></li>
+</ul></li>
+<li class="fragment">or: the change in <span class="math inline">\(y\)</span> when <span class="math inline">\(x\)</span> increase by 1 unit
+<ul>
+<li class="fragment">sometimes referred to as “rise over run”: how do you ‘rise’ in <span class="math inline">\(y\)</span> for a given ‘run’ in <span class="math inline">\(x\)</span>?</li>
+</ul></li>
+</ul>
+</div><div class="column" style="width:30%;">
+<p><span class="math display">\[
+slope = \frac{\Delta x}{\Delta y}
+\]</span></p>
+</div>
+</div>
+</section>
+<section class="slide level4">
+
+<div class="column" style="width:40%;">
+<ul>
+<li class="fragment">what is the intercept of this line?</li>
+<li class="fragment">what is the slope of this line?</li>
+</ul>
+</div>
+<div class="column" style="width:60%;">
+<div class="cell">
+<div class="cell-output-display">
+<p><img data-src="_lin_reg1_files/figure-revealjs/unnamed-chunk-12-1.png" width="960"></p>
+</div>
+</div>
+</div>
+</section>
+
+<section id="error-and-residuals" class="title-slide slide level3 center">
+<h3>Error and residuals</h3>
+<ul>
+<li class="fragment"><em>fixed effects</em> (IV/predictors): things we can understand/measure</li>
+<li class="fragment"><em>error</em> (random effects): things we cannot understand/measure
+<ul>
+<li class="fragment">in biology, social sciences (and linguistic research), there will always sources of random error that we cannot account for</li>
+<li class="fragment">random error is less an issue in e.g., physics (e.g., measuring gravitational pull)</li>
+</ul></li>
+<li class="fragment"><em>residuals</em>: the difference (vertical difference) between <strong>observed data</strong> and the <strong>fitted values</strong> (predicted values)</li>
+</ul>
+</section>
+
+<section id="section" class="title-slide slide level3 unlisted unnumbered center">
+<h3></h3>
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Equation of a line</strong></p>
+</div>
+<div class="callout-content">
+<p><span class="math display">\[
+\begin{align}
+y &amp; = mx + c\\
+Y_i &amp;= (b_0 + b_1X_i) + \epsilon_i\\
+outcome_i &amp; = (model) + error_i\\
+y_i &amp; = (intercept + slope*x_i) + error_i
+\end{align}
+\]</span></p>
+</div>
+</div>
+</div>
+</section>
+<section class="slide level4">
+
+
+<img data-src="_lin_reg1_files/figure-revealjs/unnamed-chunk-13-1.png" width="960" class="r-stretch"></section>
+<section class="slide level4">
+
+
+<img data-src="_lin_reg1_files/figure-revealjs/unnamed-chunk-14-1.png" width="960" class="r-stretch"></section>
+<section class="slide level4">
+
+
+<img data-src="_lin_reg1_files/figure-revealjs/unnamed-chunk-15-1.png" width="960" class="r-stretch"></section>
+<section class="slide level4">
+
+
+<img data-src="_lin_reg1_files/figure-revealjs/unnamed-chunk-16-1.png" width="960" class="r-stretch"></section>
+
+
+<section id="method-of-least-squares" class="title-slide slide level2 center">
+<h2>Method of least squares</h2>
+<ul>
+<li class="fragment">so how is any given line chosen to fit any given data?</li>
+<li class="fragment">the <strong><em>method of least squares</em></strong>
+<ul>
+<li class="fragment">take a given line, and square all the residuals (i.e., <span class="math inline">\(residual^2\)</span>)</li>
+<li class="fragment">the line with the lowest <strong><em>sum of squares</em></strong> is the line with the best fit to the given data</li>
+<li class="fragment">why do we square the residuals before summing them up?
+<ul>
+<li class="fragment">so all values are positive (i.e., so that negative values don’t cancel out positive values)</li>
+</ul></li>
+</ul></li>
+<li class="fragment">this is how we find the <strong><em>line of best fit</em></strong>
+<ul>
+<li class="fragment">R fits many lines to find the one with the best fit</li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level4">
+
+
+<img data-src="_lin_reg1_files/figure-revealjs/fig-least-squares-1.png" style="width:100.0%" class="r-stretch quarto-figure-center"><p class="caption">Figure&nbsp;1: Observed values (A), Residuals for line of best fit (B), A line of worse fit with larger residuals (C)</p></section>
+</section>
+<section>
+<section id="simple-linear-model-first-pass-reading-time-lifetime" class="title-slide slide level1 smaller center">
+<h1>Simple linear model: first-pass reading time ~ lifetime</h1>
+<ul>
+<li class="fragment"><span class="math inline">\(y \sim x\)</span> can be read as “y as a function of x”, or “y predicted by x”</li>
+<li class="fragment">our first model will be:</li>
+</ul>
+<p><span class="math display">\[
+fp \sim lifetime
+\]</span></p>
+<ul>
+<li class="fragment">recall that in our experiment, participants read sentences about <code>dead</code> and <code>living</code> people in either the English <code>Simple Future</code> or <code>Present Perfect</code> (2 x2 design)
+<ul>
+<li class="fragment">referents (typically) need to exist (i.e., be alive) at reference time (RT)
+<ul>
+<li class="fragment">so people who are <code>dead</code> are incongruent with the <code>Present Perfect</code> (RT = present) and the <code>Simple Future</code> (RT = future)</li>
+</ul></li>
+</ul></li>
+<li class="fragment">recall that linking hypotheses take longer reading times to reflect processing costs
+<ul>
+<li class="fragment">so, if we’re looking at the <code>living</code> versus the <code>dead</code> overall, which condition would you hypothesise would attract longer reading times?</li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level4">
+
+<ul>
+<li class="fragment">first, let’s plot the data
+<ul>
+<li class="fragment">I’m using <code>position_jitter()</code> so that all the observations don’t lie on top of each other</li>
+</ul></li>
+</ul>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># position_jitter</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>pj <span class="ot">&lt;-</span> <span class="fu">position_jitter</span>(<span class="fl">0.2</span>)</span>
+<span id="cb4-3"><a href="#cb4-3"></a></span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="co"># plot</span></span>
+<span id="cb4-5"><a href="#cb4-5"></a>df_crit_verb <span class="sc">%&gt;%</span> </span>
+<span id="cb4-6"><a href="#cb4-6"></a>  <span class="fu">filter</span>(region<span class="sc">==</span><span class="st">"verb"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-7"><a href="#cb4-7"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> lifetime, <span class="at">y =</span> fp, <span class="at">colour =</span> lifetime)) <span class="sc">+</span></span>
+<span id="cb4-8"><a href="#cb4-8"></a>  <span class="fu">geom_point</span>(<span class="at">position =</span> pj) <span class="sc">+</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a>  <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb4-10"><a href="#cb4-10"></a>  <span class="fu">theme_bw</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+
+</div>
+<img data-src="_lin_reg1_files/figure-revealjs/unnamed-chunk-19-1.png" width="960" class="r-stretch"></section>
+<section id="lm" class="title-slide slide level2 center">
+<h2><code>lm()</code></h2>
+<ul>
+<li class="fragment">the <code>lm()</code> function fits simple linear models
+<ul>
+<li class="fragment">as arguments it takes a formula and a dataset, at minimum</li>
+</ul></li>
+</ul>
+<p><span class="math display">\[
+lm(outcome \sim 1 + predictor,\;data\;=\;df\_name)
+\]</span></p>
+<ul>
+<li class="fragment"><code>lm()</code> function formula syntax can be read as: <code>fp</code> predicted by the intercept (<code>1</code> is a placeholder for the intercept)
+<ul>
+<li class="fragment">the intercept is included by default</li>
+<li class="fragment">if you omit the <code>1</code>, the intercept is still included in the formula</li>
+<li class="fragment">if you wanted to remove the intercept (which you often don’t), you could replace <code>1</code> with <code>0</code></li>
+</ul></li>
+</ul>
+</section>
+<section id="running-a-model" class="title-slide slide level3 center">
+<h3>Running a model</h3>
+<ul>
+<li class="fragment">before we add our predictor <code>lifetime</code>, let’s see what our model looks like without it</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>fit_fp_1 <span class="ot">&lt;-</span> <span class="fu">lm</span>(fp <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> df_crit_verb) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+
+<section id="model-ouput" class="title-slide slide level3 center">
+<h3>Model ouput</h3>
+<ul>
+<li class="fragment">printing just the model gives us the formula and the coefficients</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>fit_fp_1</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = fp ~ 1, data = df_crit_verb)
+
+Coefficients:
+(Intercept)  
+      309.2  </code></pre>
+</div>
+</div>
+<ul>
+<li class="fragment">recall that the <code>intercept</code> and <code>slope</code> are called <code>coefficients</code>
+<ul>
+<li class="fragment">why do we only see <code>Intercept</code>?</li>
+</ul></li>
+</ul>
+</section>
+<section class="slide level4">
+
+<ul>
+<li class="fragment">we typically use the <code>summary()</code> function to print full model outputs</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">summary</span>(fit_fp_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = fp ~ 1, data = df_crit_verb)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-227.17 -106.17  -26.17   65.83  761.83 
+
+Coefficients:
+            Estimate Std. Error t value            Pr(&gt;|t|)    
+(Intercept)   309.17       6.29   49.15 &lt;0.0000000000000002 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 146.6 on 542 degrees of freedom</code></pre>
+</div>
+</div>
+</section>
+<section class="slide level4">
+
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong><code>broom</code> package</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li class="fragment">the <code>broom</code> package has some useful functions for printing model outputs
+<ul>
+<li class="fragment"><code>tidy()</code> produces a <code>tibble</code> (type of dataframe) of the <code>coefficients</code></li>
+<li class="fragment"><code>glance()</code> produces goodness of fit measures (which we won’t discuss)</li>
+</ul></li>
+<li class="fragment">the outputs from <code>tidy()</code> and <code>glance()</code> can be fed into <code>kable</code> and/or <code>kable_styling()</code> to create formatted tables</li>
+</ul>
+<div class="cell columns column-output-location">
+<div class="column">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">tidy</span>(fit_fp_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 5
+  term        estimate std.error statistic   p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;
+1 (Intercept)     309.      6.29      49.2 7.03e-202</code></pre>
+</div>
+</div>
+</div>
+<div class="cell columns column-output-location">
+<div class="column">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="fu">glance</span>(fit_fp_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 12
+  r.squared adj.r.squared sigma statistic p.value    df logLik   AIC   BIC
+      &lt;dbl&gt;         &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+1         0             0  147.        NA      NA    NA -3478. 6960. 6969.
+# ℹ 3 more variables: deviance &lt;dbl&gt;, df.residual &lt;int&gt;, nobs &lt;int&gt;</code></pre>
+</div>
+</div>
+</div>
+<ul>
+<li class="fragment"><code>augment()</code> adds model values as columns to your dataframe (e.g., useful for plotting observed vs.&nbsp;fitted values)</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">augment</span>(fit_fp_1, <span class="at">data =</span> df_crit_verb) <span class="sc">%&gt;%</span> <span class="fu">summary</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="interpreting-model-output" class="title-slide slide level3 center">
+<h3>Interpreting model output</h3>
+<ul>
+<li class="fragment">let’s take a closer look at our model summary</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">summary</span>(fit_fp_1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="annotated-cell-9"><pre class="sourceCode numberSource r code-annotation-code number-lines code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-9-1"><a href="#annotated-cell-9-1"></a>Call<span class="sc">:</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="1" onclick="event.preventDefault();" href="">1</a><span id="annotated-cell-9-2" class="code-annotation-target"><a href="#annotated-cell-9-2"></a><span class="fu">lm</span>(<span class="at">formula =</span> fp <span class="sc">~</span> <span class="dv">1</span>, <span class="at">data =</span> .)</span>
+<span id="annotated-cell-9-3"><a href="#annotated-cell-9-3"></a></span>
+<span id="annotated-cell-9-4"><a href="#annotated-cell-9-4"></a>Residuals<span class="sc">:</span></span>
+<span id="annotated-cell-9-5"><a href="#annotated-cell-9-5"></a>    Min      1Q  Median      3Q     Max </span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="2" onclick="event.preventDefault();" href="">2</a><span id="annotated-cell-9-6" class="code-annotation-target"><a href="#annotated-cell-9-6"></a><span class="sc">-</span><span class="fl">227.17</span> <span class="sc">-</span><span class="fl">106.17</span>  <span class="sc">-</span><span class="fl">26.17</span>   <span class="fl">65.83</span>  <span class="fl">761.83</span></span>
+<span id="annotated-cell-9-7"><a href="#annotated-cell-9-7"></a></span>
+<span id="annotated-cell-9-8"><a href="#annotated-cell-9-8"></a>Coefficients<span class="sc">:</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="3" onclick="event.preventDefault();" href="">3</a><span id="annotated-cell-9-9" class="code-annotation-target"><a href="#annotated-cell-9-9"></a>            Estimate Std. Error t value            <span class="fu">Pr</span>(<span class="sc">&gt;</span><span class="er">|</span>t<span class="sc">|</span>)</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="4" onclick="event.preventDefault();" href="">4</a><span id="annotated-cell-9-10" class="code-annotation-target"><a href="#annotated-cell-9-10"></a>(Intercept)   <span class="fl">309.17</span>       <span class="fl">6.29</span>   <span class="fl">49.15</span> <span class="sc">&lt;</span><span class="fl">0.0000000000000002</span> <span class="sc">**</span><span class="er">*</span></span>
+<span id="annotated-cell-9-11"><a href="#annotated-cell-9-11"></a><span class="sc">---</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="5" onclick="event.preventDefault();" href="">5</a><span id="annotated-cell-9-12" class="code-annotation-target"><a href="#annotated-cell-9-12"></a>Signif. codes<span class="sc">:</span>  <span class="dv">0</span> ‘<span class="sc">**</span><span class="er">*</span>’ <span class="fl">0.001</span> ‘<span class="sc">**</span>’ <span class="fl">0.01</span> ‘<span class="sc">*</span>’ <span class="fl">0.05</span> ‘.’ <span class="fl">0.1</span> ‘ ’ <span class="dv">1</span></span>
+<span id="annotated-cell-9-13"><a href="#annotated-cell-9-13"></a></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-9" data-target-annotation="6" onclick="event.preventDefault();" href="">6</a><span id="annotated-cell-9-14" class="code-annotation-target"><a href="#annotated-cell-9-14"></a>Residual standard error<span class="sc">:</span> <span class="fl">146.6</span> on <span class="dv">542</span> degrees of freedom</span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt class="fragment" data-target-cell="annotated-cell-9" data-target-annotation="1">1</dt>
+<dd class="fragment">
+<span data-code-lines="2" data-code-cell="annotated-cell-9" data-code-annotation="1">formula repetition</span>
+</dd>
+<dt class="fragment" data-target-cell="annotated-cell-9" data-target-annotation="2">2</dt>
+<dd class="fragment">
+<span data-code-lines="6" data-code-cell="annotated-cell-9" data-code-annotation="2">residuals: differences between observed values and those predicted by the model</span>
+</dd>
+<dt class="fragment" data-target-cell="annotated-cell-9" data-target-annotation="3">3</dt>
+<dd class="fragment">
+<span data-code-lines="9" data-code-cell="annotated-cell-9" data-code-annotation="3">names for columns <code>Estimates</code>, <code>standard error</code>, <code>t-value</code>, <code>p-value</code> (<code>Pr(&gt;|t|)</code>)</span>
+</dd>
+<dt class="fragment" data-target-cell="annotated-cell-9" data-target-annotation="4">4</dt>
+<dd class="fragment">
+<span data-code-lines="10" data-code-cell="annotated-cell-9" data-code-annotation="4">Intercept (<span class="math inline">\(b_0\)</span>), i.e., value of <span class="math inline">\(y\)</span> (first-pass) with a move of one unit of <span class="math inline">\(x\)</span> (lifetime)</span>
+</dd>
+<dt class="fragment" data-target-cell="annotated-cell-9" data-target-annotation="5">5</dt>
+<dd class="fragment">
+<span data-code-lines="12" data-code-cell="annotated-cell-9" data-code-annotation="5">Significance codes</span>
+</dd>
+<dt class="fragment" data-target-cell="annotated-cell-9" data-target-annotation="6">6</dt>
+<dd class="fragment">
+<span data-code-lines="14" data-code-cell="annotated-cell-9" data-code-annotation="6">R<span class="math inline">\(^2\)</span>, a measure of model fit (squared residuals); percentage of variance in the data shared with the predictor (higher numbers are better…this is pretty low)</span>
+</dd>
+</dl>
+</div>
+</div>
+</section>
+
+<section id="intercept" class="title-slide slide level3 center">
+<h3>Intercept</h3>
+<ul>
+<li class="fragment">our intercept is roughly 309.2 milliseconds; what does this number represent?
+<ul>
+<li class="fragment">the intercept is essentially the <em>mean</em></li>
+</ul></li>
+</ul>
+<div class="cell columns column-output-location">
+<div class="column">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a><span class="co"># print model intercept?</span></span>
+<span id="cb16-2"><a href="#cb16-2"></a><span class="fu">coef</span>(fit_fp_1)[<span class="st">'(Intercept)'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>(Intercept) 
+   309.1713 </code></pre>
+</div>
+</div>
+</div>
+<div class="cell columns column-output-location">
+<div class="column">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="co"># print data mean</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a><span class="fu">mean</span>(df_crit_verb<span class="sc">$</span>fp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 309.1713</code></pre>
+</div>
+</div>
+</div>
+</section>
+<section id="intercept-significance" class="slide level4">
+<h4>Intercept significance</h4>
+<ul>
+<li class="fragment">in the output, the intercept seems to be significant (indicated with a low p-value, and ***)
+<ul>
+<li class="fragment">what does this <em>mean</em>?</li>
+</ul></li>
+<li class="fragment">significance pretty much tells us if a number is equal to (or not statistically significantly different from) 0
+<ul>
+<li class="fragment">so this tells us that the intercept (i.e., the mean first-pass reading time at the verb region) is different from 0</li>
+<li class="fragment">most of the time, this isn’t interesting or even theoretically relevant</li>
+</ul></li>
+<li class="fragment">the larger your t-value, the smaller your p-value</li>
+</ul>
+</section>
+<section class="slide level4">
+
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>A word on t-values and p-values</strong></p>
+</div>
+<div class="callout-content">
+<p><em>t</em>-values quantify the <em>difference</em> between population means.</p>
+<p><em>p</em>-values quantify the probability of obtaining a result equal to or greater than what was observed, given the assumption of no effect (the null hypothesis).</p>
+<p>If the null hypothesis were true, we would expect no effect (a flat line). If we have a lot of evidence/are confidence that there is an effect (the line (slope) is in fact <em>not</em> flat), then it would be unlikely that we would find such a result under the assumption that there is no effect (the line actually <em>is</em> flat) i.e., the null hypothesis. This is reflected in a small p-value.</p>
+</div>
+</div>
+</div>
+</section>
+
+<section id="plotting-fp-1" class="title-slide slide level3 center">
+<h3>Plotting <code>fp ~ 1</code></h3>
+<ul>
+<li class="fragment"><a href="#/fig-fp1">Figure&nbsp;2</a> shows the intercept (red dot) amongst the observed data (black dots)
+<ul>
+<li class="fragment">along the x-axis we have abstract numerical units (the values don’t mean anything)</li>
+<li class="fragment">what would the values of the intercept be?</li>
+</ul></li>
+</ul>
+
+<img data-src="_lin_reg1_files/figure-revealjs/fig-fp1-1.png" style="width:100.0%" class="r-stretch quarto-figure-center"><p class="caption">Figure&nbsp;2: Visualisation of ‘fp ~ 1’: observed values (black) and mean (intercept; red). Residuals would be the distance from each black dot to the y-value of the read dot</p></section>
+
+
+<section id="adding-a-fixed-effect-slope" class="title-slide slide level2 center">
+<h2>Adding a fixed effect (slope)</h2>
+<ul>
+<li class="fragment">now let’s include a <em>slope</em></li>
+<li class="fragment">the slope represents the change in <span class="math inline">\(y\)</span> (DV: <code>fp</code>) when we move 1-unit along <span class="math inline">\(y\)</span> (IV: <code>lifetime</code>)</li>
+<li class="fragment">in other words, it tells us the <em>effect</em> our IV has on the DV
+<ul>
+<li class="fragment">what is the change in first-pass reading times when we move from dead to living referents?</li>
+</ul></li>
+<li class="fragment"><code>lifetime</code> is categorical, how can we move 1 unit?
+<ul>
+<li class="fragment">a linear model requires <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> to be numerical, so it simply codes factor levels as <code>0</code> and <code>1</code> by default (in alphabetical order)</li>
+<li class="fragment">so the slope represents the <em>difference</em> between categorical conditions</li>
+</ul></li>
+</ul>
+</section>
+
+<section id="fit-model-treatment-contrasts" class="title-slide slide level2 center">
+<h2>Fit model (treatment contrasts)</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="co"># fit simple linear model</span></span>
+<span id="cb20-2"><a href="#cb20-2"></a>fit_fp_lifetime_treat <span class="ot">&lt;-</span> df_crit_verb <span class="sc">%&gt;%</span></span>
+<span id="cb20-3"><a href="#cb20-3"></a>  <span class="fu">filter</span>(fp <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb20-4"><a href="#cb20-4"></a>  <span class="fu">lm</span>(fp <span class="sc">~</span> lifetime, <span class="at">data =</span> .)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a><span class="co"># alternatively</span></span>
+<span id="cb21-2"><a href="#cb21-2"></a>fit_fp_lifetime_treat <span class="ot">&lt;-</span> <span class="fu">lm</span>(fp <span class="sc">~</span> lifetime, </span>
+<span id="cb21-3"><a href="#cb21-3"></a>            <span class="at">data =</span> df_crit_verb, <span class="at">subset =</span> fp <span class="sc">&gt;</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="model-summary" class="title-slide slide level3 center">
+<h3>Model summary</h3>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="fu">summary</span>(fit_fp_lifetime_treat)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = fp ~ lifetime, data = df_crit_verb, subset = fp &gt; 
+    0)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-228.99 -109.29  -26.99   58.86  777.71 
+
+Coefficients:
+               Estimate Std. Error t value            Pr(&gt;|t|)    
+(Intercept)     324.993      8.843  36.752 &lt;0.0000000000000002 ***
+lifetimeliving  -31.701     12.517  -2.533              0.0116 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 145.8 on 541 degrees of freedom
+Multiple R-squared:  0.01172,   Adjusted R-squared:  0.00989 
+F-statistic: 6.414 on 1 and 541 DF,  p-value: 0.0116</code></pre>
+</div>
+</div>
+</section>
+
+<section id="intercept-1" class="title-slide slide level3 center">
+<h3>Intercept</h3>
+<div class="cell columns column-output-location">
+<div class="column">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="co"># print model intercept?</span></span>
+<span id="cb24-2"><a href="#cb24-2"></a><span class="fu">coef</span>(fit_fp_lifetime_treat)[<span class="st">'(Intercept)'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>(Intercept) 
+   324.9926 </code></pre>
+</div>
+</div>
+</div>
+<div class="cell columns column-output-location">
+<div class="column">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a><span class="co"># print data mean</span></span>
+<span id="cb26-2"><a href="#cb26-2"></a><span class="fu">mean</span>(df_crit_verb<span class="sc">$</span>fp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 309.1713</code></pre>
+</div>
+</div>
+</div>
+<ul>
+<li class="fragment">our intercept is no longer the grand mean of first-pass reading times…what is it?</li>
+</ul>
+</section>
+
+<section id="intercept-for-treatment-contrasts" class="title-slide slide level3 center">
+<h3>Intercept for treatment contrasts</h3>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li class="fragment">what are the means of our two factor levels?</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a><span class="co"># print model intercept?</span></span>
+<span id="cb28-2"><a href="#cb28-2"></a><span class="fu">coef</span>(fit_fp_lifetime_treat)[<span class="st">'(Intercept)'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>(Intercept) 
+   324.9926 </code></pre>
+</div>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a><span class="co"># compute summary </span></span>
+<span id="cb30-2"><a href="#cb30-2"></a>summary_ff_life <span class="ot">&lt;-</span> df_crit_verb <span class="sc">|&gt;</span> </span>
+<span id="cb30-3"><a href="#cb30-3"></a>  <span class="fu">filter</span>(region<span class="sc">==</span><span class="st">"verb"</span>,</span>
+<span id="cb30-4"><a href="#cb30-4"></a>         fp <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb30-5"><a href="#cb30-5"></a>  <span class="fu">group_by</span>(lifetime) <span class="sc">%&gt;%</span></span>
+<span id="cb30-6"><a href="#cb30-6"></a>  <span class="fu">summarise</span>(<span class="at">N =</span> <span class="fu">n</span>(),</span>
+<span id="cb30-7"><a href="#cb30-7"></a>            <span class="at">mean =</span> <span class="fu">mean</span>(fp, <span class="at">na.rm =</span> T),</span>
+<span id="cb30-8"><a href="#cb30-8"></a>            <span class="at">sd =</span> <span class="fu">sd</span>(fp, <span class="at">na.rm =</span> T))</span>
+<span id="cb30-9"><a href="#cb30-9"></a></span>
+<span id="cb30-10"><a href="#cb30-10"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(summary_ff_life, <span class="at">digits=</span><span class="dv">3</span>,</span>
+<span id="cb30-11"><a href="#cb30-11"></a>             <span class="at">caption =</span> <span class="st">"Summmary statistics for first-pass reading times at the verb region"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-12"><a href="#cb30-12"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">font_size =</span> <span class="dv">30</span>,</span>
+<span id="cb30-13"><a href="#cb30-13"></a>                            <span class="at">position =</span> <span class="st">"left"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell fragment">
+<div class="cell-output-display">
+<table class="table" data-quarto-postprocess="true" style="font-size: 30px; ">
+<caption>Summmary statistics for first-pass reading times at the verb region</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">lifetime</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">N</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mean</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">sd</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">dead</td>
+<td style="text-align: right;">272</td>
+<td style="text-align: right;">324.993</td>
+<td style="text-align: right;">151.005</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">living</td>
+<td style="text-align: right;">271</td>
+<td style="text-align: right;">293.292</td>
+<td style="text-align: right;">140.468</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section id="slope" class="title-slide slide level3 center">
+<h3>Slope</h3>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li class="fragment">what was our slope?</li>
+<li class="fragment">what does this correspond to?</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1"></a><span class="co"># print model intercept?</span></span>
+<span id="cb31-2"><a href="#cb31-2"></a><span class="fu">coef</span>(fit_fp_lifetime_treat)[<span class="st">'lifetimeliving'</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>lifetimeliving 
+     -31.70113 </code></pre>
+</div>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1"></a><span class="co"># compute summary </span></span>
+<span id="cb33-2"><a href="#cb33-2"></a>summary_ff_life <span class="ot">&lt;-</span> df_crit_verb <span class="sc">|&gt;</span> </span>
+<span id="cb33-3"><a href="#cb33-3"></a>  <span class="fu">filter</span>(region<span class="sc">==</span><span class="st">"verb"</span>,</span>
+<span id="cb33-4"><a href="#cb33-4"></a>         fp <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb33-5"><a href="#cb33-5"></a>  <span class="fu">group_by</span>(lifetime) <span class="sc">%&gt;%</span></span>
+<span id="cb33-6"><a href="#cb33-6"></a>  <span class="fu">summarise</span>(<span class="at">N =</span> <span class="fu">n</span>(),</span>
+<span id="cb33-7"><a href="#cb33-7"></a>            <span class="at">mean =</span> <span class="fu">mean</span>(fp, <span class="at">na.rm =</span> T),</span>
+<span id="cb33-8"><a href="#cb33-8"></a>            <span class="at">sd =</span> <span class="fu">sd</span>(fp, <span class="at">na.rm =</span> T))</span>
+<span id="cb33-9"><a href="#cb33-9"></a></span>
+<span id="cb33-10"><a href="#cb33-10"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(summary_ff_life, <span class="at">digits=</span><span class="dv">3</span>,</span>
+<span id="cb33-11"><a href="#cb33-11"></a>             <span class="at">caption =</span> <span class="st">"Summmary statistics for first-pass reading time at the verb region"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-12"><a href="#cb33-12"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">font_size =</span> <span class="dv">30</span>,</span>
+<span id="cb33-13"><a href="#cb33-13"></a>                            <span class="at">position =</span> <span class="st">"left"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell fragment">
+<div class="cell-output-display">
+<table class="table" data-quarto-postprocess="true" style="font-size: 30px; ">
+<caption>Summmary statistics for first-pass reading time at the verb region</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">lifetime</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">N</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mean</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">sd</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">dead</td>
+<td style="text-align: right;">272</td>
+<td style="text-align: right;">324.993</td>
+<td style="text-align: right;">151.005</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">living</td>
+<td style="text-align: right;">271</td>
+<td style="text-align: right;">293.292</td>
+<td style="text-align: right;">140.468</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="slide level4">
+
+<div class="columns">
+<div class="column" style="width:50%;">
+<div>
+<ul>
+<li>what was our slope?</li>
+<li>what does this correspond to?</li>
+</ul>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table" data-quarto-postprocess="true" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: right;" data-quarto-table-cell-role="th">living</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">dead</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">diff</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">293.2915</td>
+<td style="text-align: right;">324.9926</td>
+<td style="text-align: right;">-31.70113</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1"></a><span class="co"># compute summary </span></span>
+<span id="cb34-2"><a href="#cb34-2"></a>summary_ff_life <span class="ot">&lt;-</span> df_crit_verb <span class="sc">|&gt;</span> </span>
+<span id="cb34-3"><a href="#cb34-3"></a>  <span class="fu">filter</span>(region<span class="sc">==</span><span class="st">"verb"</span>,</span>
+<span id="cb34-4"><a href="#cb34-4"></a>         fp <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb34-5"><a href="#cb34-5"></a>  <span class="fu">group_by</span>(lifetime) <span class="sc">%&gt;%</span></span>
+<span id="cb34-6"><a href="#cb34-6"></a>  <span class="fu">summarise</span>(<span class="at">N =</span> <span class="fu">n</span>(),</span>
+<span id="cb34-7"><a href="#cb34-7"></a>            <span class="at">mean =</span> <span class="fu">mean</span>(fp, <span class="at">na.rm =</span> T),</span>
+<span id="cb34-8"><a href="#cb34-8"></a>            <span class="at">sd =</span> <span class="fu">sd</span>(fp, <span class="at">na.rm =</span> T))</span>
+<span id="cb34-9"><a href="#cb34-9"></a></span>
+<span id="cb34-10"><a href="#cb34-10"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(summary_ff_life, <span class="at">digits=</span><span class="dv">3</span>,</span>
+<span id="cb34-11"><a href="#cb34-11"></a>             <span class="at">caption =</span> <span class="st">"Summmary statistics for first-pass reading time at the verb region"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb34-12"><a href="#cb34-12"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">font_size =</span> <span class="dv">30</span>,</span>
+<span id="cb34-13"><a href="#cb34-13"></a>                            <span class="at">position =</span> <span class="st">"left"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<table class="table" data-quarto-postprocess="true" style="font-size: 30px; ">
+<caption>Summmary statistics for first-pass reading time at the verb region</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">lifetime</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">N</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mean</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">sd</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">dead</td>
+<td style="text-align: right;">272</td>
+<td style="text-align: right;">324.993</td>
+<td style="text-align: right;">151.005</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">living</td>
+<td style="text-align: right;">271</td>
+<td style="text-align: right;">293.292</td>
+<td style="text-align: right;">140.468</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</div>
+</div>
+</section>
+
+</section>
+<section>
+<section id="contrast-coding" class="title-slide slide level1 center">
+<h1>Contrast coding</h1>
+<ul>
+<li class="fragment"><p>intercept: value of <span class="math inline">\(y\)</span> when <span class="math inline">\(x\)</span> = 0</p></li>
+<li class="fragment"><p>slope: difference in <span class="math inline">\(y\)</span> with a 1-unit change of <span class="math inline">\(x\)</span></p></li>
+<li class="fragment"><p>why is the intercept now the mean of the <code>dead</code> condition?</p>
+<ul>
+<li class="fragment">when we have a categorical predictor, we cannot calculate a slope because our <span class="math inline">\(x\)</span> is not numerical</li>
+<li class="fragment">we need to code factor levels numerically</li>
+<li class="fragment">these are called <code>contrasts</code></li>
+</ul></li>
+</ul>
+</section>
+<section id="treatment-contrasts" class="title-slide slide level3 center">
+<h3>Treatment contrasts</h3>
+<ul>
+<li class="fragment">treatment contrasts (default), aka dummy coding: factor levels are coded as <code>0</code> and <code>1</code> (alphabetically)
+<ul>
+<li class="fragment">all levels are compared to a reference level, coded as <code>0</code></li>
+<li class="fragment">so when our predictor (<span class="math inline">\(x\)</span>) = 0, this is the first alphabetical level of our factor</li>
+<li class="fragment">so our intercept will be the mean <code>fp</code> for the lifetime level <code>dead</code></li>
+</ul></li>
+<li class="fragment">to check you contrasts:</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a><span class="fu">contrasts</span>(df_crit_verb<span class="sc">$</span>lifetime)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>       living
+dead        0
+living      1</code></pre>
+</div>
+</div>
+
+<img data-src="_lin_reg1_files/figure-revealjs/unnamed-chunk-45-1.png" width="960" class="r-stretch quarto-figure-center"></section>
+
+<section id="ordering-our-contrasts" class="title-slide slide level2 smaller center">
+<h2>Ordering our contrasts</h2>
+<ul>
+<li class="fragment">but recall that we expected to find <em>longer</em> reading times for the <code>dead</code> condition</li>
+<li class="fragment">so the <code>living</code> condition is conceptually a baseline, to which we are comparing a violation condition</li>
+<li class="fragment">it typically makes sense to order your factors in an order that makes the slope easy to interpret
+<ul>
+<li class="fragment">we would like a <em>positive</em> slope to indicate <em>longer</em> reading times for our violation condition</li>
+<li class="fragment">so we should have <code>living</code> coded as 0, rather than <code>dead</code></li>
+</ul></li>
+<li class="fragment">let’s order our predictor
+<ul>
+<li class="fragment">we predict longer reading times for dead versus living, so order living-dead</li>
+</ul></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1"></a><span class="co"># order factor levels</span></span>
+<span id="cb37-2"><a href="#cb37-2"></a>df_crit_verb<span class="sc">$</span>lifetime <span class="ot">&lt;-</span> <span class="fu">factor</span>(df_crit_verb<span class="sc">$</span>lifetime, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"living"</span>,<span class="st">"dead"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<ul>
+<li class="fragment">now what will our contrasts be?</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1"></a><span class="fu">contrasts</span>(df_crit_verb<span class="sc">$</span>lifetime)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>       dead
+living    0
+dead      1</code></pre>
+</div>
+</div>
+</section>
+
+<section id="changing-our-contrasts-sum-coding" class="title-slide slide level2 unlisted center">
+<h2>Changing our contrasts: sum coding</h2>
+<ul>
+<li class="fragment">now that we know the order of our contrasts, we can also <strong>centre</strong> our predictor
+<ul>
+<li class="fragment"><p>we do this because it sometimes makes more sense for the intercept to represent the <em>grand mean</em> rather than the mean of one condition (this is especially true when interpreting interactions)</p></li>
+<li class="fragment"><p>to do this, we want 0 to be between our two factor levels</p></li>
+<li class="fragment"><p>e.g., change the contrasts to <code>-0.5</code> and <code>+0.5</code></p></li>
+<li class="fragment"><p>for categorical variables, this is called <em>sum coding</em></p></li>
+</ul></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1"></a><span class="co"># set contrasts</span></span>
+<span id="cb40-2"><a href="#cb40-2"></a><span class="fu">contrasts</span>(df_crit_verb<span class="sc">$</span>lifetime) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="sc">-</span><span class="fl">0.5</span>,<span class="sc">+</span><span class="fl">0.5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1"></a><span class="co"># print contrasts</span></span>
+<span id="cb41-2"><a href="#cb41-2"></a><span class="fu">contrasts</span>(df_crit_verb<span class="sc">$</span>lifetime)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>       [,1]
+living -0.5
+dead    0.5</code></pre>
+</div>
+</div>
+</section>
+<section class="slide level4">
+
+<div class="callout callout-tip callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<p><strong>Centring continuous predictors</strong></p>
+</div>
+<div class="callout-content">
+<p>N.B., you would usually also centre <em>numeric</em> predictors. This is done by subtracting some constant from every value (usually by subtracting the mean of the predictor from each value and saving this as a new variable:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1"></a>df_example <span class="sc">%&gt;%</span> </span>
+<span id="cb43-2"><a href="#cb43-2"></a>  <span class="fu">mutate</span>(predictor_c <span class="ot">&lt;-</span> predictor<span class="sc">-</span><span class="fu">mean</span>(predictor)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>If you have interval data with a specific upper and lower bound, you could alternatively subtract the median value.</p>
+</div>
+</div>
+</div>
+</section>
+
+<section id="fit-model-sum-contrasts" class="title-slide slide level2 center">
+<h2>Fit model (sum contrasts)</h2>
+<ul>
+<li class="fragment">now let’s fit our model with sum contrasts
+<ul>
+<li class="fragment">the syntax is exactly the same (as long as you didn’t create a new variable to store the sum coding, as some people do)</li>
+</ul></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1"></a><span class="co"># fit simple linear model</span></span>
+<span id="cb44-2"><a href="#cb44-2"></a>fit_fp_lifetime_sum <span class="ot">&lt;-</span> df_crit_verb <span class="sc">%&gt;%</span></span>
+<span id="cb44-3"><a href="#cb44-3"></a>  <span class="fu">filter</span>(fp <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb44-4"><a href="#cb44-4"></a>  <span class="fu">lm</span>(fp <span class="sc">~</span> lifetime, <span class="at">data =</span> .)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="coefficients-table-with-summary" class="title-slide slide level3 smaller center">
+<h3>Coefficients table with <code>summary()</code></h3>
+<div class="column" style="width:50%;">
+<div class="cell" data-highlight-style="false">
+<div class="sourceCode cell-code" id="annotated-cell-1" data-code-line-numbers="false"><pre class="sourceCode r code-annotation-code code-with-copy code-annotated"><code class="sourceCode r"><span id="annotated-cell-1-1"><a href="#annotated-cell-1-1" aria-hidden="true" tabindex="-1"></a><span class="sc">&gt;</span> <span class="fu">summary</span>(fit_fp_lifetime_sum)</span>
+<span id="annotated-cell-1-2"><a href="#annotated-cell-1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-1-3"><a href="#annotated-cell-1-3" aria-hidden="true" tabindex="-1"></a>Call<span class="sc">:</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="1" onclick="event.preventDefault();" href="">1</a><span id="annotated-cell-1-4" class="code-annotation-target"><a href="#annotated-cell-1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">lm</span>(<span class="at">formula =</span> fp <span class="sc">~</span> lifetime, <span class="at">data =</span> df_crit_verb, <span class="at">subset =</span> fp <span class="sc">&gt;</span> <span class="dv">0</span>)</span>
+<span id="annotated-cell-1-5"><a href="#annotated-cell-1-5" aria-hidden="true" tabindex="-1"></a></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="2" onclick="event.preventDefault();" href="">2</a><span id="annotated-cell-1-6" class="code-annotation-target"><a href="#annotated-cell-1-6" aria-hidden="true" tabindex="-1"></a>Residuals<span class="sc">:</span></span>
+<span id="annotated-cell-1-7"><a href="#annotated-cell-1-7" aria-hidden="true" tabindex="-1"></a>    Min      1Q  Median      3Q     Max </span>
+<span id="annotated-cell-1-8"><a href="#annotated-cell-1-8" aria-hidden="true" tabindex="-1"></a><span class="sc">-</span><span class="fl">228.99</span> <span class="sc">-</span><span class="fl">109.29</span>  <span class="sc">-</span><span class="fl">26.99</span>   <span class="fl">58.86</span>  <span class="fl">777.71</span> </span>
+<span id="annotated-cell-1-9"><a href="#annotated-cell-1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-1-10"><a href="#annotated-cell-1-10" aria-hidden="true" tabindex="-1"></a>Coefficients<span class="sc">:</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="3" onclick="event.preventDefault();" href="">3</a><span id="annotated-cell-1-11" class="code-annotation-target"><a href="#annotated-cell-1-11" aria-hidden="true" tabindex="-1"></a>             Estimate Std. Error t value <span class="fu">Pr</span>(<span class="sc">&gt;</span><span class="er">|</span>t<span class="sc">|</span>)</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="4" onclick="event.preventDefault();" href="">4</a><span id="annotated-cell-1-12" class="code-annotation-target"><a href="#annotated-cell-1-12" aria-hidden="true" tabindex="-1"></a>(Intercept)  <span class="fl">309.142</span>      <span class="fl">6.259</span>  <span class="fl">49.394</span> <span class="sc">&lt;</span><span class="fl">0.0000000000000002</span> <span class="sc">**</span><span class="er">*</span></span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="5" onclick="event.preventDefault();" href="">5</a><span id="annotated-cell-1-13" class="code-annotation-target"><a href="#annotated-cell-1-13" aria-hidden="true" tabindex="-1"></a>lifetime1     <span class="fl">31.701</span>     <span class="fl">12.517</span>   <span class="fl">2.533</span>              <span class="fl">0.0116</span> <span class="sc">*</span></span>
+<span id="annotated-cell-1-14"><a href="#annotated-cell-1-14" aria-hidden="true" tabindex="-1"></a><span class="sc">---</span></span>
+<span id="annotated-cell-1-15"><a href="#annotated-cell-1-15" aria-hidden="true" tabindex="-1"></a>Signif. codes<span class="sc">:</span>  <span class="dv">0</span> ‘<span class="sc">**</span><span class="er">*</span>’ <span class="fl">0.001</span> ‘<span class="sc">**</span>’ <span class="fl">0.01</span> ‘<span class="sc">*</span>’ <span class="fl">0.05</span> ‘.’ <span class="fl">0.1</span> ‘ ’ <span class="dv">1</span></span>
+<span id="annotated-cell-1-16"><a href="#annotated-cell-1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="annotated-cell-1-17"><a href="#annotated-cell-1-17" aria-hidden="true" tabindex="-1"></a>Residual standard error<span class="sc">:</span> <span class="fl">57.46</span> on <span class="dv">541</span> degrees of freedom</span>
+<a class="code-annotation-anchor" data-target-cell="annotated-cell-1" data-target-annotation="6" onclick="event.preventDefault();" href="">6</a><span id="annotated-cell-1-18" class="code-annotation-target"><a href="#annotated-cell-1-18" aria-hidden="true" tabindex="-1"></a>Multiple R<span class="sc">-</span>squared<span class="sc">:</span>  <span class="fl">0.01172</span>,   Adjusted R<span class="sc">-</span>squared<span class="sc">:</span>  <span class="fl">0.00989</span></span>
+<span id="annotated-cell-1-19"><a href="#annotated-cell-1-19" aria-hidden="true" tabindex="-1"></a>F<span class="sc">-</span>statistic<span class="sc">:</span> <span class="fl">6.414</span> on <span class="dv">1</span> and <span class="dv">541</span> DF,  p<span class="sc">-</span>value<span class="sc">:</span> <span class="fl">0.0116</span></span><div class="code-annotation-gutter-bg"></div><div class="code-annotation-gutter"></div></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-annotation">
+<dl class="code-annotation-container-grid">
+<dt class="fragment" data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
+<dd class="fragment">
+<span data-code-lines="4" data-code-cell="annotated-cell-1" data-code-annotation="1">formula</span>
+</dd>
+<dt class="fragment" data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
+<dd class="fragment">
+<span data-code-lines="6" data-code-cell="annotated-cell-1" data-code-annotation="2">Residuals: differences between observed values and those predicted by the model</span>
+</dd>
+<dt class="fragment" data-target-cell="annotated-cell-1" data-target-annotation="3">3</dt>
+<dd class="fragment">
+<span data-code-lines="11" data-code-cell="annotated-cell-1" data-code-annotation="3">Names for columns Estimates, SE, t-value, p-value</span>
+</dd>
+<dt class="fragment" data-target-cell="annotated-cell-1" data-target-annotation="4">4</dt>
+<dd class="fragment">
+<span data-code-lines="12" data-code-cell="annotated-cell-1" data-code-annotation="4">Intercept (<span class="math inline">\(b_0\)</span>), i.e., value of <span class="math inline">\(y\)</span> (first-pass) with a move of one unit of <span class="math inline">\(x\)</span> (lifetime)</span>
+</dd>
+<dt class="fragment" data-target-cell="annotated-cell-1" data-target-annotation="5">5</dt>
+<dd class="fragment">
+<span data-code-lines="13" data-code-cell="annotated-cell-1" data-code-annotation="5">Slope (<span class="math inline">\(b_1\)</span>), i.e., change in first fixation going from <code>dead</code> to <code>living</code></span>
+</dd>
+<dt class="fragment" data-target-cell="annotated-cell-1" data-target-annotation="6">6</dt>
+<dd class="fragment">
+<span data-code-lines="18" data-code-cell="annotated-cell-1" data-code-annotation="6">Output from an ANOVA</span>
+</dd>
+</dl>
+</div>
+</div>
+</div>
+<div class="column" style="width:30%;">
+<ul>
+<li class="fragment">what is the <strong>intercept</strong>?</li>
+<li class="fragment">is the <strong>slope</strong> positive or negative?
+<ul>
+<li class="fragment">what is it’s value?</li>
+</ul></li>
+<li class="fragment">this is what the slope would look like:</li>
+</ul>
+</div>
+</section>
+
+<section id="understanding-the-summary" class="title-slide slide level3 smaller center">
+<h3>Understanding the summary</h3>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li class="fragment">let’s compute summary statistics based on <em>lifetime</em>
+<ul>
+<li class="fragment">then compare this to the model output</li>
+</ul></li>
+</ul>
+<p><u>Exercises</u></p>
+<ol type="1">
+<li class="fragment">Subtract the mean first-pass reading time of <code>dead</code> from that of <code>living</code>
+<ul>
+<li class="fragment">what does this correspond to in the model summary?</li>
+</ul></li>
+<li class="fragment">Compute the mean of <code>dead</code>+<code>living</code>
+<ul>
+<li class="fragment">what does this correspond to in the model summary?</li>
+</ul></li>
+<li class="fragment">Divide the slope in 2. Subtract this from the mean of <code>dead</code>.
+<ul>
+<li class="fragment">what does this correspond to?</li>
+</ul></li>
+</ol>
+</div><div class="column" style="width:50%;">
+<p><u>Summary statistics</u></p>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1"></a><span class="co"># compute summary </span></span>
+<span id="cb45-2"><a href="#cb45-2"></a>summary_fp_life <span class="ot">&lt;-</span> df_crit_verb <span class="sc">|&gt;</span> </span>
+<span id="cb45-3"><a href="#cb45-3"></a>  <span class="fu">filter</span>(region<span class="sc">==</span><span class="st">"verb"</span>,</span>
+<span id="cb45-4"><a href="#cb45-4"></a>         fp <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb45-5"><a href="#cb45-5"></a>  <span class="fu">group_by</span>(lifetime) <span class="sc">%&gt;%</span></span>
+<span id="cb45-6"><a href="#cb45-6"></a>  <span class="fu">summarise</span>(<span class="at">N =</span> <span class="fu">n</span>(),</span>
+<span id="cb45-7"><a href="#cb45-7"></a>            <span class="at">mean =</span> <span class="fu">mean</span>(fp, <span class="at">na.rm =</span> T),</span>
+<span id="cb45-8"><a href="#cb45-8"></a>            <span class="at">sd =</span> <span class="fu">sd</span>(fp, <span class="at">na.rm =</span> T)) <span class="sc">%&gt;%</span></span>
+<span id="cb45-9"><a href="#cb45-9"></a>  <span class="co"># compute standard error, confidence intervals, and lower/upper ci bounds</span></span>
+<span id="cb45-10"><a href="#cb45-10"></a>  <span class="fu">mutate</span>(<span class="at">se =</span> sd <span class="sc">/</span> <span class="fu">sqrt</span>(N),</span>
+<span id="cb45-11"><a href="#cb45-11"></a>         <span class="at">ci =</span> <span class="fu">qt</span>(<span class="dv">1</span> <span class="sc">-</span> (<span class="fl">0.05</span> <span class="sc">/</span> <span class="dv">2</span>), N <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> se,</span>
+<span id="cb45-12"><a href="#cb45-12"></a>         <span class="at">lower.ci =</span> mean <span class="sc">-</span> <span class="fu">qt</span>(<span class="dv">1</span> <span class="sc">-</span> (<span class="fl">0.05</span> <span class="sc">/</span> <span class="dv">2</span>), N <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> se,</span>
+<span id="cb45-13"><a href="#cb45-13"></a>         <span class="at">upper.ci =</span> mean <span class="sc">+</span> <span class="fu">qt</span>(<span class="dv">1</span> <span class="sc">-</span> (<span class="fl">0.05</span> <span class="sc">/</span> <span class="dv">2</span>), N <span class="sc">-</span> <span class="dv">1</span>) <span class="sc">*</span> se)</span>
+<span id="cb45-14"><a href="#cb45-14"></a></span>
+<span id="cb45-15"><a href="#cb45-15"></a>knitr<span class="sc">::</span><span class="fu">kable</span>(summary_ff_life, <span class="at">digits=</span><span class="dv">3</span>,</span>
+<span id="cb45-16"><a href="#cb45-16"></a>             <span class="at">caption =</span> <span class="st">"Summmary statistics for first-pass reading time at the verb region"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb45-17"><a href="#cb45-17"></a>  kableExtra<span class="sc">::</span><span class="fu">kable_styling</span>(<span class="at">font_size =</span> <span class="dv">24</span>,</span>
+<span id="cb45-18"><a href="#cb45-18"></a>                            <span class="at">position =</span> <span class="st">"left"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<table class="table" data-quarto-postprocess="true" style="font-size: 24px; ">
+<caption>Summmary statistics for first-pass reading time at the verb region</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">lifetime</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">N</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">mean</th>
+<th style="text-align: right;" data-quarto-table-cell-role="th">sd</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">dead</td>
+<td style="text-align: right;">272</td>
+<td style="text-align: right;">324.993</td>
+<td style="text-align: right;">151.005</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">living</td>
+<td style="text-align: right;">271</td>
+<td style="text-align: right;">293.292</td>
+<td style="text-align: right;">140.468</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+<p><u>Model summary</u></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1"></a><span class="fu">summary</span>(fit_fp_lifetime_sum)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = fp ~ lifetime, data = .)
+
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-228.99 -109.29  -26.99   58.86  777.71 
+
+Coefficients:
+            Estimate Std. Error t value            Pr(&gt;|t|)    
+(Intercept)  309.142      6.259  49.394 &lt;0.0000000000000002 ***
+lifetime1     31.701     12.517   2.533              0.0116 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 145.8 on 541 degrees of freedom
+Multiple R-squared:  0.01172,   Adjusted R-squared:  0.00989 
+F-statistic: 6.414 on 1 and 541 DF,  p-value: 0.0116</code></pre>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+
+<section id="comparing-contrasts" class="title-slide slide level2 center">
+<h2>Comparing contrasts</h2>
+<ul>
+<li class="fragment"><p>intercept = value of <span class="math inline">\(y\)</span> when <span class="math inline">\(x = 0\)</span></p></li>
+<li class="fragment"><p>treatment contrasts: factor levels are coded as <code>0</code> and <code>1</code></p>
+<ul>
+<li class="fragment">intercept is mean of level that is coded as <code>0</code></li>
+</ul></li>
+<li class="fragment"><p>sum contrast coding: factor levels are coded as <code>+</code>/<code>-0.5</code> (or <code>1</code>)</p>
+<ul>
+<li class="fragment">when <span class="math inline">\(x = 0\)</span>, this is the mid-way point between our two predictor levels</li>
+<li class="fragment">so the intercept will be the <em>grand mean</em> of our two levels</li>
+</ul></li>
+<li class="fragment"><p>our slope is unchanged, however (unless we set our sum contrasts to +/- 1, which some people do)</p></li>
+</ul>
+</section>
+<section class="slide level4">
+
+
+<img data-src="_lin_reg1_files/figure-revealjs/fig-contrasts-1.png" width="960" class="r-stretch quarto-figure-center"><p class="caption">Figure&nbsp;3: Comparison of contrast types</p></section>
+</section>
+<section>
+<section id="exploring-our-model" class="title-slide slide level1 center">
+<h1>Exploring our model</h1>
+<ul>
+<li class="fragment">the linear model contains <em>fitted</em> values corresponding to our <em>observed</em> values
+<ul>
+<li class="fragment">these <em>fitted</em> values are fit to a straight line</li>
+<li class="fragment">our <em>observed</em> values are not fit to a straight line</li>
+<li class="fragment">the <em>residuals</em> are the differences along the <span class="math inline">\(y\)</span> axis from the fitted to the observed values</li>
+</ul></li>
+</ul>
+</section>
+<section id="exploring-the-model" class="title-slide slide level2 unnumbered center">
+<h2>Exploring the model</h2>
+<div class="cell columns column-output-location">
+<div class="column">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1"></a><span class="co"># how many observed values did we enter into the model?</span></span>
+<span id="cb48-2"><a href="#cb48-2"></a>df_crit_verb <span class="sc">|&gt;</span> </span>
+<span id="cb48-3"><a href="#cb48-3"></a>  <span class="fu">filter</span>(fp <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb48-4"><a href="#cb48-4"></a>  <span class="fu">nrow</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 543</code></pre>
+</div>
+</div>
+</div>
+<div class="cell columns column-output-location">
+<div class="column">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1"></a><span class="co"># how many observed values did we enter into the model?</span></span>
+<span id="cb50-2"><a href="#cb50-2"></a><span class="fu">length</span>(<span class="fu">fitted</span>(fit_fp_lifetime_sum))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div><div class="column fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 543</code></pre>
+</div>
+</div>
+</div>
+</section>
+
+<section id="exploring-the-model-residuals" class="title-slide slide level2 unnumbered center">
+<h2>Exploring the model: residuals</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1"></a><span class="co"># what do our FITTED values look like?</span></span>
+<span id="cb52-2"><a href="#cb52-2"></a><span class="fu">head</span>(<span class="fu">fitted</span>(fit_fp_lifetime_sum))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>       1        2        3        4        5        6 
+293.2915 293.2915 324.9926 293.2915 324.9926 293.2915 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1"></a><span class="co"># what do our OBSERVED values look like?</span></span>
+<span id="cb54-2"><a href="#cb54-2"></a><span class="fu">head</span>(df_crit_verb<span class="sc">$</span>fp)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 175 413 960 231 407 319</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1"></a><span class="co"># what is the difference between the FITTED and OBSERVED values?</span></span>
+<span id="cb56-2"><a href="#cb56-2"></a><span class="fu">head</span>(df_crit_verb<span class="sc">$</span>fp) <span class="sc">-</span> <span class="fu">head</span>(<span class="fu">fitted</span>(fit_fp_lifetime_sum))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>         1          2          3          4          5          6 
+-118.29151  119.70849  635.00735  -62.29151   82.00735   25.70849 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1"></a><span class="co"># what are our RESIDUALS?</span></span>
+<span id="cb58-2"><a href="#cb58-2"></a><span class="fu">head</span>(<span class="fu">residuals</span>(fit_fp_lifetime_sum))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>         1          2          3          4          5          6 
+-118.29151  119.70849  635.00735  -62.29151   82.00735   25.70849 </code></pre>
+</div>
+</div>
+</section>
+
+<section id="exploring-the-model-1" class="title-slide slide level2 unnumbered center">
+<h2>Exploring the model</h2>
+<ul>
+<li class="fragment">what were our coefficients?</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1"></a><span class="fu">coef</span>(fit_fp_lifetime_sum)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>(Intercept)   lifetime1 
+  309.14208    31.70113 </code></pre>
+</div>
+</div>
+<ul>
+<li class="fragment">what is the mean of our predictor coded as <code>-0.5</code>?</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1"></a><span class="fu">coef</span>(fit_fp_lifetime_sum)[<span class="st">'(Intercept)'</span>] <span class="sc">+</span> <span class="fu">coef</span>(fit_fp_lifetime_sum)[<span class="st">'lifetime1'</span>] <span class="sc">*</span> <span class="sc">-</span><span class="fl">0.5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>(Intercept) 
+   293.2915 </code></pre>
+</div>
+</div>
+<ul>
+<li class="fragment"><p>ignore the <code>(Intercept)</code> label here, <code>R</code> just takes the first label when performing an operation on 2 vectors</p></li>
+<li class="fragment"><p>what is the mean of our predictor coded as <code>+0.5</code>?</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1"></a><span class="fu">coef</span>(fit_fp_lifetime_sum)[<span class="st">'(Intercept)'</span>] <span class="sc">+</span> <span class="fu">coef</span>(fit_fp_lifetime_sum)[<span class="st">'lifetime1'</span>] <span class="sc">*</span> <span class="fl">0.5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell fragment">
+<div class="cell-output cell-output-stdout">
+<pre><code>(Intercept) 
+   324.9926 </code></pre>
+</div>
+</div>
+</section>
+<section class="slide level4">
+
+</section>
+</section>
+<section>
+<section id="simple-linear-regression-vs.-t-test" class="title-slide slide level1 center">
+<h1>Simple linear regression vs.&nbsp;t-test</h1>
+<ul>
+<li class="fragment">simple linear regression is equivalent to a t-test
+<ul>
+<li class="fragment">the <em>real</em> power of linear regression is coming up…multiple regression and mixed models</li>
+</ul></li>
+</ul>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1"></a>df_crit_verb <span class="sc">%&gt;%</span> </span>
+<span id="cb66-2"><a href="#cb66-2"></a><span class="fu">t.test</span>(fp <span class="sc">~</span> lifetime, <span class="at">data =</span> .)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+    Welch Two Sample t-test
+
+data:  fp by lifetime
+t = -2.5329, df = 538.47, p-value = 0.01159
+alternative hypothesis: true difference in means between group living and group dead is not equal to 0
+95 percent confidence interval:
+ -56.286642  -7.115626
+sample estimates:
+mean in group living   mean in group dead 
+            293.2915             324.9926 </code></pre>
+</div>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1"></a>df_crit_verb <span class="sc">%&gt;%</span> </span>
+<span id="cb68-2"><a href="#cb68-2"></a><span class="fu">lm</span>(fp <span class="sc">~</span> lifetime, <span class="at">data =</span> .) <span class="sc">%&gt;%</span> </span>
+<span id="cb68-3"><a href="#cb68-3"></a>  <span class="fu">tidy</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb68-4"><a href="#cb68-4"></a>  <span class="fu">mutate_if</span>(is.numeric, round, <span class="dv">7</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;   &lt;dbl&gt;
+1 (Intercept)    309.       6.26     49.4   0     
+2 lifetime1       31.7     12.5       2.53  0.0116</code></pre>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section class="slide level4">
+
+
+<img data-src="_lin_reg1_files/figure-revealjs/unnamed-chunk-68-1.png" width="670" class="r-stretch quarto-figure-center"><p class="caption">Image source: <span class="citation" data-cites="winter_statistics_2019">Winter (<a href="#/references" role="doc-biblioref" onclick="">2019</a>)</span> (all rights reserved)</p></section></section>
+<section>
+<section id="summary" class="title-slide slide level1 center">
+<h1>Summary</h1>
+<ul>
+<li class="fragment"><p>we saw that the equation for a straight line boils down to its intercept and slope</p></li>
+<li class="fragment"><p>we fit our first linear model with a categorical predictor</p></li>
+</ul>
+</section>
+<section id="important-terms" class="title-slide slide level2 unnumbered smaller center">
+<h2>Important terms</h2>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table" data-quarto-postprocess="true" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr class="header">
+<th style="text-align: left;" data-quarto-table-cell-role="th">term</th>
+<th style="text-align: left;" data-quarto-table-cell-role="th">description/other terms</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">dependent variable (DV)</td>
+<td style="text-align: left;">outcome, measure, y</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">independent variable (IV)</td>
+<td style="text-align: left;">predictor, fixed effect, y</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">equation for a straight line</td>
+<td style="text-align: left;">y = intercept + slope*x</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">simple regression</td>
+<td style="text-align: left;">predicting outcome of a DV from a single IV</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">slope</td>
+<td style="text-align: left;">change in y (DV) associated with a 1-unit change in x (IV)</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">intercept</td>
+<td style="text-align: left;">value of y (DV) when x (IV) = 0</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">residuals</td>
+<td style="text-align: left;">difference between observed values and fitted/predicted values</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">regression coefficients</td>
+<td style="text-align: left;">estimates of the unknown population parameters; intercept and slope</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">least squares</td>
+<td style="text-align: left;">the method by which the line of best fit is determined; the line with the smallest sum of squared residuals</td>
+</tr>
+</tbody>
+</table>
+
+
+</div>
+</div>
+</section>
+</section>
+<section id="task" class="title-slide slide level1 center">
+<h1>Task</h1>
+<p>Now it’s your turn. Try to run the following <code>lm()</code> models:</p>
+<ol type="1">
+<li class="fragment">total reading time at the <em>verb</em> region</li>
+<li class="fragment">total reading time at the <em>verb+1</em> region.</li>
+</ol>
+</section>
+
+<section id="session-info" class="title-slide slide level1 unlisted unnumbered center" data-visibility="uncounted">
+<h1>Session Info</h1>
+<div class="cell">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1"></a><span class="fu">sessionInfo</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>R version 4.3.0 (2023-04-21)
+Platform: aarch64-apple-darwin20 (64-bit)
+Running under: macOS Ventura 13.2.1
+
+Matrix products: default
+BLAS:   /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRblas.0.dylib 
+LAPACK: /Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/lib/libRlapack.dylib;  LAPACK version 3.11.0
+
+locale:
+[1] en_US.UTF-8/en_US.UTF-8/en_US.UTF-8/C/en_US.UTF-8/en_US.UTF-8
+
+time zone: Europe/Berlin
+tzcode source: internal
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+ [1] magick_2.7.4     kableExtra_1.3.4 knitr_1.43       patchwork_1.1.2 
+ [5] broom_1.0.5      lubridate_1.9.2  forcats_1.0.0    stringr_1.5.0   
+ [9] dplyr_1.1.2      purrr_1.0.1      readr_2.1.4      tidyr_1.3.0     
+[13] tibble_3.2.1     ggplot2_3.4.2    tidyverse_2.0.0 
+
+loaded via a namespace (and not attached):
+ [1] gtable_0.3.3      xfun_0.39         rstatix_0.7.2     lattice_0.21-8   
+ [5] tzdb_0.4.0        vctrs_0.6.3       tools_4.3.0       generics_0.1.3   
+ [9] parallel_4.3.0    fansi_1.0.4       highr_0.10        pacman_0.5.1     
+[13] pkgconfig_2.0.3   Matrix_1.5-4      webshot_0.5.5     lifecycle_1.0.3  
+[17] farver_2.1.1      compiler_4.3.0    munsell_0.5.0     carData_3.0-5    
+[21] htmltools_0.5.5   yaml_2.3.7        car_3.1-2         ggpubr_0.6.0     
+[25] pillar_1.9.0      crayon_1.5.2      abind_1.4-5       nlme_3.1-162     
+[29] tidyselect_1.2.0  rvest_1.0.3       digest_0.6.31     stringi_1.7.12   
+[33] splines_4.3.0     labeling_0.4.2    cowplot_1.1.1     rprojroot_2.0.3  
+[37] fastmap_1.1.1     grid_4.3.0        here_1.0.1        colorspace_2.1-0 
+[41] cli_3.6.1         magrittr_2.0.3    utf8_1.2.3        withr_2.5.0      
+[45] scales_1.2.1      backports_1.4.1   bit64_4.0.5       timechange_0.2.0 
+[49] rmarkdown_2.22    httr_1.4.6        bit_4.0.5         ggsignif_0.6.4   
+[53] png_0.1-8         hms_1.1.3         evaluate_0.21     viridisLite_0.4.2
+[57] mgcv_1.8-42       rlang_1.1.1       Rcpp_1.0.10       glue_1.6.2       
+[61] xml2_1.3.4        svglite_2.1.1     rstudioapi_0.14   vroom_1.6.3      
+[65] jsonlite_1.8.7    R6_2.5.1          systemfonts_1.0.4</code></pre>
+</div>
+</div>
+</section>
+
+<section id="references" class="title-slide slide level1 unlisted unnumbered smaller scrollable" data-visibility="uncounted">
+<h1>References</h1>
+<div id="refs" class="references csl-bib-body hanging-indent" data-custom-style="Bibliography" data-line-spacing="2" role="list">
+<div id="ref-debruine_understanding_2021" class="csl-entry" role="listitem">
+DeBruine, L. M., &amp; Barr, D. J. (2021). Understanding Mixed-Effects Models Through Data Simulation. <em>Advances in Methods and Practices in Psychological Science</em>, <em>4</em>(1), 251524592096511. <a href="https://doi.org/10.1177/2515245920965119">https://doi.org/10.1177/2515245920965119</a>
+</div>
+<div id="ref-field_discovering_2013" class="csl-entry" role="listitem">
+Field, A., Miles, J., &amp; Field, Z. (2013). <em>Discovering statistics using R</em> (Vol. 50, Issue 04, pp. 2114-50-2114). <a href="https://doi.org/10.5860/choice.50-2114">https://doi.org/10.5860/choice.50-2114</a>
+</div>
+<div id="ref-winter_linear_2013" class="csl-entry" role="listitem">
+Winter, B. (2013). <em>Linear models and linear mixed effects models in R: Tutorial 1</em>. <a href="https://bodowinter.com/tutorial/bw_LME_tutorial1.pdf">https://bodowinter.com/tutorial/bw_LME_tutorial1.pdf</a>
+</div>
+<div id="ref-winter_very_2014" class="csl-entry" role="listitem">
+Winter, B. (2014). <em>A very basic tutorial for performing linear mixed effects analyses (Tutorial 2)</em>. <a href="https://bodowinter.com/tutorial/bw_LME_tutorial2.pdf">https://bodowinter.com/tutorial/bw_LME_tutorial2.pdf</a>
+</div>
+<div id="ref-winter_statistics_2019" class="csl-entry" role="listitem">
+Winter, B. (2019). <em>Statistics for Linguists: An Introduction Using R</em>. Routledge. <a href="https://doi.org/10.4324/9781315165547">https://doi.org/10.4324/9781315165547</a>
+</div>
+</div>
+<div class="footer footer-default">
+<p>Simple Linear Regression</p>
+</div>
+</section>
+    </div>
+  </div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="_lin_reg1_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="_lin_reg1_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="_lin_reg1_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="_lin_reg1_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="_lin_reg1_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="_lin_reg1_files/libs/revealjs/plugin/reveal-chalkboard/plugin.js"></script>
+  <script src="_lin_reg1_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="_lin_reg1_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="_lin_reg1_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="_lin_reg1_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="_lin_reg1_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'smaller': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleChalkboard(event)\"><kbd>b</kbd> Toggle Chalkboard</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleNotesCanvas(event)\"><kbd>c</kbd> Toggle Notes Canvas</a></li>\n<li class=\"slide-tool-item\" data-item=\"6\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.downloadDrawings(event)\"><kbd>d</kbd> Download Drawings</a></li>\n<li class=\"slide-tool-item\" data-item=\"7\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'chalkboard': {"buttons":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'bottom-right',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1600,
+
+        height: 900,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, RevealChalkboard, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
+    <script id="quarto-html-after-body" type="application/javascript">
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+      const toggleBodyColorMode = (bsSheetEl) => {
+        const mode = bsSheetEl.getAttribute("data-mode");
+        const bodyEl = window.document.querySelector("body");
+        if (mode === "dark") {
+          bodyEl.classList.add("quarto-dark");
+          bodyEl.classList.remove("quarto-light");
+        } else {
+          bodyEl.classList.add("quarto-light");
+          bodyEl.classList.remove("quarto-dark");
+        }
+      }
+      const toggleBodyColorPrimary = () => {
+        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+        if (bsSheetEl) {
+          toggleBodyColorMode(bsSheetEl);
+        }
+      }
+      toggleBodyColorPrimary();  
+      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+      tabsets.forEach(function(tabset) {
+        const tabby = new Tabby('#' + tabset.id);
+      });
+      const isCodeAnnotation = (el) => {
+        for (const clz of el.classList) {
+          if (clz.startsWith('code-annotation-')) {                     
+            return true;
+          }
+        }
+        return false;
+      }
+      const clipboard = new window.ClipboardJS('.code-copy-button', {
+        text: function(trigger) {
+          const codeEl = trigger.previousElementSibling.cloneNode(true);
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+      });
+      clipboard.on('success', function(e) {
+        // button target
+        const button = e.trigger;
+        // don't keep focus
+        button.blur();
+        // flash "checked"
+        button.classList.add('code-copy-button-checked');
+        var currentTitle = button.getAttribute("title");
+        button.setAttribute("title", "Copied!");
+        let tooltip;
+        if (window.bootstrap) {
+          button.setAttribute("data-bs-toggle", "tooltip");
+          button.setAttribute("data-bs-placement", "left");
+          button.setAttribute("data-bs-title", "Copied!");
+          tooltip = new bootstrap.Tooltip(button, 
+            { trigger: "manual", 
+              customClass: "code-copy-button-tooltip",
+              offset: [0, -8]});
+          tooltip.show();    
+        }
+        setTimeout(function() {
+          if (tooltip) {
+            tooltip.hide();
+            button.removeAttribute("data-bs-title");
+            button.removeAttribute("data-bs-toggle");
+            button.removeAttribute("data-bs-placement");
+          }
+          button.setAttribute("title", currentTitle);
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        // clear code selection
+        e.clearSelection();
+      });
+      function tippyHover(el, contentFn) {
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          maxWidth: 500,
+          delay: 100,
+          arrow: false,
+          appendTo: function(el) {
+              return el.closest('section.slide') || el.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start'
+        };
+          config['offset'] = [0,0];
+          config['maxWidth'] = 700;
+        window.tippy(el, config); 
+      }
+      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+      for (var i=0; i<noterefs.length; i++) {
+        const ref = noterefs[i];
+        tippyHover(ref, function() {
+          // use id or data attribute instead here
+          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+          try { href = new URL(href).hash; } catch {}
+          const id = href.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          return note.innerHTML;
+        });
+      }
+          let selectedAnnoteEl;
+          const selectorForAnnotation = ( cell, annotation) => {
+            let cellAttr = 'data-code-cell="' + cell + '"';
+            let lineAttr = 'data-code-annotation="' +  annotation + '"';
+            const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+            return selector;
+          }
+          const selectCodeLines = (annoteEl) => {
+            const doc = window.document;
+            const targetCell = annoteEl.getAttribute("data-target-cell");
+            const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+            const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+            const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+            const lineIds = lines.map((line) => {
+              return targetCell + "-" + line;
+            })
+            let top = null;
+            let height = null;
+            let parent = null;
+            if (lineIds.length > 0) {
+                //compute the position of the single el (top and bottom and make a div)
+                const el = window.document.getElementById(lineIds[0]);
+                top = el.offsetTop;
+                height = el.offsetHeight;
+                parent = el.parentElement.parentElement;
+              if (lineIds.length > 1) {
+                const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+                const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+                height = bottom - top;
+              }
+              if (top !== null && height !== null && parent !== null) {
+                // cook up a div (if necessary) and position it 
+                let div = window.document.getElementById("code-annotation-line-highlight");
+                if (div === null) {
+                  div = window.document.createElement("div");
+                  div.setAttribute("id", "code-annotation-line-highlight");
+                  div.style.position = 'absolute';
+                  parent.appendChild(div);
+                }
+                div.style.top = top - 2 + "px";
+                div.style.height = height + 4 + "px";
+                let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+                if (gutterDiv === null) {
+                  gutterDiv = window.document.createElement("div");
+                  gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                  gutterDiv.style.position = 'absolute';
+                  const codeCell = window.document.getElementById(targetCell);
+                  const gutter = codeCell.querySelector('.code-annotation-gutter');
+                  gutter.appendChild(gutterDiv);
+                }
+                gutterDiv.style.top = top - 2 + "px";
+                gutterDiv.style.height = height + 4 + "px";
+              }
+              selectedAnnoteEl = annoteEl;
+            }
+          };
+          const unselectCodeLines = () => {
+            const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+            elementsIds.forEach((elId) => {
+              const div = window.document.getElementById(elId);
+              if (div) {
+                div.remove();
+              }
+            });
+            selectedAnnoteEl = undefined;
+          };
+          // Attach click handler to the DT
+          const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+          for (const annoteDlNode of annoteDls) {
+            annoteDlNode.addEventListener('click', (event) => {
+              const clickedEl = event.target;
+              if (clickedEl !== selectedAnnoteEl) {
+                unselectCodeLines();
+                const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+                if (activeEl) {
+                  activeEl.classList.remove('code-annotation-active');
+                }
+                selectCodeLines(clickedEl);
+                clickedEl.classList.add('code-annotation-active');
+              } else {
+                // Unselect the line
+                unselectCodeLines();
+                clickedEl.classList.remove('code-annotation-active');
+              }
+            });
+          }
+      const findCites = (el) => {
+        const parentEl = el.parentElement;
+        if (parentEl) {
+          const cites = parentEl.dataset.cites;
+          if (cites) {
+            return {
+              el,
+              cites: cites.split(' ')
+            };
+          } else {
+            return findCites(el.parentElement)
+          }
+        } else {
+          return undefined;
+        }
+      };
+      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+      for (var i=0; i<bibliorefs.length; i++) {
+        const ref = bibliorefs[i];
+        const citeInfo = findCites(ref);
+        if (citeInfo) {
+          tippyHover(citeInfo.el, function() {
+            var popup = window.document.createElement('div');
+            citeInfo.cites.forEach(function(cite) {
+              var citeDiv = window.document.createElement('div');
+              citeDiv.classList.add('hanging-indent');
+              citeDiv.classList.add('csl-entry');
+              var biblioDiv = window.document.getElementById('ref-' + cite);
+              if (biblioDiv) {
+                citeDiv.innerHTML = biblioDiv.innerHTML;
+              }
+              popup.appendChild(citeDiv);
+            });
+            return popup.innerHTML;
+          });
+        }
+      }
+    });
+    </script>
+    
+
+</body></html>

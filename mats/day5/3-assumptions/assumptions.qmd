@@ -1,0 +1,412 @@
+---
+title: "Model assumptions"
+subtitle: "Refresher"
+author: "Daniela Palleschi"
+institute: Humboldt-Universität zu Berlin
+footer: "Model assumptions"
+lang: en
+date: 2023-04-13
+format:
+  revealjs: 
+    output-file: slides-refresher.html
+    theme: [dark]
+    width: 1600
+    height: 900
+    progress: true
+    # smaller: true
+    scrollable: true
+    slide-number: c/t
+    code-link: true
+    code-overflow: wrap
+    code-tools: true
+    code-annotations: below
+    # logo: logos/hu_logo.png
+    # css: logo.css
+    incremental: true
+    # number-sections: true
+    toc: true
+    toc-depth: 1
+    toc-title: 'Topics'
+    navigation-mode: linear
+    controls-layout: bottom-right
+    fig-cap-location: top
+    font-size: 0.6em
+    slide-level: 4
+    chalkboard: true
+    title-slide-attributes: 
+      data-background-image: logos/logos.tif
+      data-background-size: 15%
+      data-background-position: 50% 92%
+  html:
+    self-contained: true
+    output-file: sheet-refresher.html
+    theme: [dark]
+    number-sections: true
+    toc: true
+    code-overflow: wrap
+    code-tools: true
+  pdf:
+    output-file: pdf-refresher.pdf
+    toc: true
+    number-sections: false
+    colorlinks: true
+    code-overflow: wrap
+editor_options: 
+  chunk_output_type: console
+bibliography: references/references.json
+csl: references/apa.csl
+---
+
+```{r, echo = T}
+knitr::opts_chunk$set(eval = T, # change this to 'eval = T' to reproduce the analyses; make sure to comment out
+                      echo = T, # 'print code chunk?'
+                      message = F, # 'print messages (e.g., warnings)?'
+                      error = F,
+                      warning = F)
+```
+
+```{r}
+#| echo: false
+## play sound if error encountered
+### from: https://sejohnston.com/2015/02/24/make-r-beep-when-r-markdown-finishes-or-when-it-fails/
+options(error = function(){    # Beep on error
+  beepr::beep(sound = "wilhelm")
+  Sys.sleep(2) # 
+  }
+ )
+## and when knitting is complete
+.Last <- function() {          # Beep on exiting session
+  beepr::beep(sound = "ping")
+  Sys.sleep(6) # allow to play for 6 seconds
+  }
+```
+
+```{r, eval = T, cache = F}
+#| echo: false
+# Create references.json file based on the citations in this script
+# make sure you have 'bibliography: references.json' in the YAML
+rbbt::bbt_update_bib("_assumptions.qmd")
+```
+
+# Learning objectives
+
+# Set-up
+
+1. Start with a clean R Environment (Session > Restart R).
+
+2. Suppress scientific notation (make very small numbers easier to read):
+
+```{r}
+# suppress scientific notation
+options(scipen=999)
+```
+
+## Packages
+
+```{r}
+pacman::p_load(tidyverse,
+               broom,
+               patchwork,
+               knitr,
+               kableExtra)
+```
+
+## Set seed
+
+- the `set.seed()` function is useful when generating random numbers in R
+- it allws us to set a seed and generator for random number generation
+- otherwise, every time I ran this code (and every time you ran code), I would get different random numbers
+  - it therefore allows us to ensure full reproducibility
+
+```{r}
+set.seed(1954)
+```
+
+## Data
+
+  - force character variables to factors
+  - filter for the verb region from critical items only, remove participant 3, and remove values of first-fixtation that are
+
+```{r}
+# load in dataset
+df_crit_verb <-
+  readr::read_csv(
+    here::here("data/tidy_data_lifetime_pilot.csv"),
+    # for special characters
+    locale = readr::locale(encoding = "latin1")
+  ) |>
+  mutate_if(is.character, as.factor) |> # all character variables as factor
+  mutate(lifetime = fct_relevel(lifetime, "living", "dead"),
+         tense = fct_relevel(tense, "PP", "SF")) |>
+  filter(type == "critical", # only critical trials
+         px != "px3", # px3 had a lot of missing values
+         fp > 0, # only values of fp above 0
+         region == "verb") %>% # critical region only
+  droplevels() # remove any factor levels with no observations
+```
+
+# Review: linear regression
+
+- when we run a linear model, we are fitting a line (predicted values) to our data (observed values)
+  + the *intercept* is the ***predicted*** value of *y* (our outcome) when *x* (our predictor) is 0
+  + the *slope* is the ***predicted*** change in *y* with an increase of 1-unit of *x*
+  + the *residuals* measure the ***difference*** between our ***predicted values*** of *y* from the ***observed values*** of *y*
+  
+## Our model
+
+1. Set contrasts
+
+```{r}
+#| output-location: column-fragment
+contrasts(df_crit_verb$lifetime)
+```
+
+```{r}
+# set contrasts
+df_crit_verb <- df_crit_verb %>% 
+  mutate(lifetime = fct_relevel(lifetime, "living", "dead"))
+```
+
+```{r}
+contrasts(df_crit_verb$lifetime) <- c(-0.5, +0.5)
+```
+
+```{r}
+#| output-location: column-fragment
+contrasts(df_crit_verb$lifetime)
+```
+
+
+---
+
+2. Run model
+
+```{r}
+# fit simple linear model
+fit_fp_lifetime <- df_crit_verb %>%
+  filter(fp > 0) %>%
+  lm(fp ~ lifetime, data = .)
+```
+
+```{r}
+summary(fit_fp_lifetime)
+```
+
+# Assumptions
+
+- refer to ***residuals***
+  + i.e., the difference between the observed and the fitted (predicted) values
+
+-   *normality assumption*
+    -   residuals of the model are (approximately) normally distributed
+-   *constant variance assumption* (homoscedasticity)
+    -   spread of residuals should be (approximately) equal along the regression line
+-   absence of collinearity
+-   independence
+
+## Normality assumption
+
+- can be inspected e.g., with a histogram or Q-Q plot
+
+```{r}
+df_crit_verb |> 
+  filter(fp > 0) |> 
+  mutate(half = if_else(trial >= 104, "1st","2nd")) |> 
+  ggpubr::ggqqplot(x = "fp")
+```
+
+## Normality assumption {-}
+
+- how about by participant and experimental half?
+
+```{r}
+df_crit_verb |> 
+  filter(fp > 0) |> 
+  mutate(half = if_else(trial >= 104, "1st","2nd")) |> 
+  ggpubr::ggqqplot(x = "fp",
+                    color = "half",
+                    facet.by = "px")
+```
+
+## Normality assumption {-}
+
+- density plot (of residuatls)
+
+```{r}
+plot(density(resid(fit_fp_lifetime)))
+```
+
+## Normality assumption {-}
+
+- residual plot: not very helpful for binomial data!
+
+```{r}
+plot(fitted(fit_fp_lifetime),residuals(fit_fp_lifetime))
+```
+
+```{r}
+par(mfrow = c(2, 2))  # Split the plotting panel into a 2 x 2 grid
+plot(fit_fp_lifetime)
+```
+
+## Obtain predicted values
+
+```{r}
+df_crit_verb$predicted <- predict(fit_fp_lifetime)   # Save the predicted values
+df_crit_verb$residuals <- residuals(fit_fp_lifetime) # Save the residual values
+
+# Quick look at the actual, predicted, and residual values
+df_crit_verb %>% select(lifetime, predicted, residuals) %>% head()
+```
+
+```{r}
+pj = position_jitter(0.2)
+
+df_crit_verb %>% 
+ggplot(aes(x = lifetime, y = fp)) +
+  geom_smooth(method = "lm", se = FALSE, color = "lightgrey", aes(group=1)) +  # Plot regression slope
+  # geom_segment(aes(xend = lifetime, yend = predicted), alpha = .2) +  # alpha to fade lines
+  geom_point() +
+  geom_point(aes(y = predicted), shape = 17, colour = "red", size = 4) +
+  theme_bw()  # Add theme for cleaner look
+```
+
+
+
+
+## Normality assumption {-}
+
+- reading time data tends to be *positively skewed*
+  + so the residuals also tend to be positively skewed
+- data with a skewed distribution is does not meet the normality assumption
+- a fix: nonlinear transformations
+  + the most common: the log transformation
+- log-transforming your data makes larger numbers smaller (and small numbers smaller too)
+  + the difference between smaller numbers and larger numbers shrinks
+  + can make skewed data normally distributed
+
+### Log transformation
+
+-   for more see Section 5.4 in @winter_statistics_2019
+
+-   the R funtion `log()` computes the 'natural logarithm' (and is the inverse of the exponential `exp()`)
+  -   `log()` makes large numbers smaller
+  -   `exp()` makes small numbers larger
+
+```{r}
+#| output-location: column-fragment
+log(0)
+```
+```{r}
+#| output-location: column-fragment
+log(1:10)
+```
+```{r}
+#| output-location: column-fragment
+log(c(10,20,30,40,100))
+```
+
+```{r}
+#| output-location: column-fragment
+exp(1:10)
+```
+```{r}
+#| output-location: column-fragment
+exp(log(1:10))
+```
+
+## Fit model (log-transformed)
+
+-   continuous variables truncated at 0 typically have a *positive skew*
+    -   a lot of small values (e.g., `tt` \< 500ms), with some larger values (\> `tt` 1000)
+    -   this usually means our residuals are also positively skewed, i.e., not normally distributed
+-   so we typically log-transform raw reading/reaction times for our linear models
+
+```{r}
+#| output-location: column-fragment
+# fit simple linear model with log
+fit_fp_lifetime_log <- df_crit_verb %>%
+  filter(fp > 0) %>% # important! you can't log transform 0
+  lm(log(fp) ~ lifetime, data = .)
+summary(fit_fp_lifetime_log)
+```
+
+### Check assumptions
+
+:::: columns
+::: {.column width="50%"}
+Raw first-pass reading times
+```{r}
+plot(density(resid(fit_fp_lifetime)))
+```
+:::
+
+::: {.column width="50%"}
+Log first-pass reading times
+```{r}
+plot(density(resid(fit_fp_lifetime_log)))
+```
+:::
+::::
+
+### Check assumptions {-}
+
+:::: columns
+::: {.column width="50%"}
+Raw first-pass reading times
+```{r}
+qqnorm(residuals(fit_fp_lifetime))
+qqline(residuals(fit_fp_lifetime), col="red")
+```
+:::
+
+::: {.column width="50%"}
+Log first-pass reading times
+```{r}
+qqnorm(residuals(fit_fp_lifetime_log))
+qqline(residuals(fit_fp_lifetime_log), col="red")
+```
+:::
+::::
+
+# Communicating your results
+
+-   model summaries can be provided via tables and/or figures
+    -   you should always report the t-values and p-values of an effect
+
+```{r}
+df_crit_verb |> 
+  filter(fp > 0) |> 
+  mutate(log_ff = log(fp)) |> 
+  mutate(half = if_else(trial >= 104, "1st","2nd")) |> 
+  ggpubr::ggqqplot(x = "log_ff")
+```
+
+```{r}
+df_crit_verb |> 
+  filter(fp > 0) |> 
+  mutate(log_ff = log(fp)) |> 
+  mutate(half = if_else(trial >= 104, "1st","2nd")) |> 
+  ggpubr::ggqqplot( x = "log_ff",
+                    color = "half")
+```
+
+```{r}
+df_crit_verb |> 
+  filter(fp > 0) |> 
+  mutate(log_ff = log(fp)) |> 
+  mutate(half = if_else(trial >= 104, "1st","2nd")) |> 
+  ggpubr::ggqqplot( x = "log_ff",
+                    color = "half",
+                    facet.by = "px")
+```
+
+```{r}
+plot(density(resid(fit_fp_lifetime)))
+```
+
+# Summary
+
+-   we looked at some assumptions of linear models and how to check them
+
+-   next, we'll look at a case with more than one predictor: **multiple** regression
