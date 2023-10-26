@@ -229,6 +229,7 @@ knitr::include_graphics(here::here("media/Kathawalla_research_cycle.png"))
 ::: {.notes}
 Students: open R, then RStudio, then create an RProject
 Me: show them each on my computer
+
 - R can run code and save a script
 - RStudio has so many more options (cheatsheet)
 - RProjects keep everything tidy and together

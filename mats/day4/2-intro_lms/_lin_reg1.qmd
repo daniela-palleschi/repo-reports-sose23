@@ -104,6 +104,7 @@ Today we will learn...
 
 Make sure you start with a clean R Environment (Session > Restart R).
 
+
 ## Load packages  {.unnumbered}
 
 ```{r}

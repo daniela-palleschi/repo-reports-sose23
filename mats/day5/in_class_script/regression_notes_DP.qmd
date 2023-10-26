@@ -3,7 +3,13 @@ title: "Simple linear regression model"
 format: 
   html:
     toc: true
+    number-sections: true
     code-tools: true
+    self-contained: true
+execute:
+  echo: false
+  warning: false
+  message: false
 editor_options: 
   chunk_output_type: console
 ---
@@ -11,6 +17,7 @@ editor_options:
 # Set-up
 
 ```{r}
+#| eval: true
 # suppress scientific notation
 options(scipen=999)
 ```
@@ -18,18 +25,28 @@ options(scipen=999)
 ## packages
 
 ```{r}
+# devtools::install_github("sjPlot/sjmisc")
+```
+
+
+```{r}
+#| eval: true
 pacman::p_load(tidyverse,
                broom,
                knitr,
                kableExtra,
                lme4,
                lmerTest,
-               patchwork)
+               patchwork,
+               sjPlot,
+               glmmTMB,
+               sjmisc)
 ```
 
 ## data
 
 ```{r}
+#| eval: true
 # load in dataset
 df_crit_verb <-
   readr::read_csv(
@@ -42,24 +59,10 @@ df_crit_verb <-
   #        tense = fct_relevel(tense, "PP", "SF")) |>
   filter(type == "critical", # only critical trials
          px != "px3", # px3 had a lot of missing values
-         region == "verb") %>%  # critical region only
-  mutate(fp = case_when(fp == 0 ~ 0.01, TRUE ~ fp),
-         tt = case_when(tt == 0 ~ 0.01, TRUE ~ tt)) %>% 
+         region == "verb",
+         tt > 0) %>% 
   droplevels() # remove any factor levels with no observations
 ```
-
-```{r}
-df_crit_verb %>% 
-  # summarise(mean_fp = mean(fp),
-  #           mean_tt = mean(tt))
-  filter(fp > 0.01) %>% 
-  pull(fp) %>% 
-  mean()
-
-df_crit_verb %>% 
-  filter(fp == 0.1)
-```
-
 
 ## Functions
 
@@ -143,6 +146,7 @@ Good. Let's move on to our model.
 We fit a simple linear model with the fixed effect lifetime using sum contrast coding (living: -0.5, dead: +0.5).
 
 ```{r}
+#| eval: true
 fit_tt_lifetime <- df_crit_verb %>% 
   lm(tt ~ lifetime, data = .)
 ```
@@ -180,16 +184,28 @@ summary(fit_fp_inter)
 
 ## Total reading time
 
+### Set `tense` contrasts
+
 ```{r}
 df_crit_verb <- df_crit_verb %>% 
   mutate(tense = fct_relevel(tense, "PP", "SF"))
+```
 
+```{r}
 contrasts(df_crit_verb$tense) <- c(-0.5,+0.5)
 ```
 
 ```{r}
+contrasts(df_crit_verb$tense)
+```
+
+
+### Model
+
+```{r}
+#| eval: true
 fit_tt_inter <- df_crit_verb %>% 
-  # filter(tt > 0) %>% 
+  filter(tt > 0) %>%
   lm(log(tt) ~ lifetime*tense, data = .)
 ```
 
@@ -201,7 +217,7 @@ summary(fit_tt_inter)
 
 ## First-pass reading time
 
-Model summaries are provided in @tbl-
+Model summaries are provided in @tbl-fp-inter.
 
 ***Main effect of lifetime*** A main effect of lifetime was found in first-pass reading time at the verb region (*t* = `r round(coef(summary(fit_fp_inter))["lifetime1","t value"],1)`, *p* `r format_pval(coef(summary(fit_fp_inter))["lifetime1","Pr(>|t|)"])`), with the *dead* condition eliciting longer reading times than the *living* condition.
 
@@ -261,6 +277,7 @@ tidy(fit_tt_inter) %>% # take tidy coefficients table (broom package)
 # Mixed model
 
 ```{r}
+#| echo: true
 fit_tt_mixed <-
 df_crit_verb %>% 
   lmer(log(tt) ~ lifetime*tense +
@@ -281,7 +298,7 @@ broom.mixed::tidy(fit_tt_mixed, effects = "fixed") %>% # take tidy coefficients 
   mutate(signif = sapply(p.value, function(x) make_stars(x))) %>%
   mutate(format = str_remove(format, "= ")) %>% # remove '=' with p's > .05
   select(-p.value, -effect) %>% 
-  kable(digits = 10,
+  kable(digits = 1,
         col.names = c("Coefficient",
                       "Estimate (log)",
                       "SE",
@@ -291,5 +308,42 @@ broom.mixed::tidy(fit_tt_mixed, effects = "fixed") %>% # take tidy coefficients 
                       "sign")) %>% 
   kable_styling()
 ```
+
+```{r}
+broom.mixed::tidy(fit_tt_mixed, effects = "ran_pars") %>% 
+  kable() %>% 
+  kable_styling()
+```
+
+```{r}
+broom.mixed::tidy(fit_tt_mixed, effects = "ran_vals") %>% 
+  filter(group == "px") %>% 
+  arrange(desc(estimate)) %>% 
+  kable() %>% 
+  kable_styling()
+```
+
+# Plot model coefficients (`sjPlot` package)
+
+## Fixed effects
+
+```{r}
+sjPlot::plot_model(fit_tt_mixed) +
+  geom_hline(yintercept=0, linetype = "dashed", color = "grey") +
+  labs(title = "Slope estimates for log(tt)") +
+  theme_bw()
+```
+
+
+```{r}
+sjPlot::plot_model(fit_tt_mixed, type = "int") +
+  labs(title = "Fitted values per condition") +
+  geom_hline(yintercept=0, linetype = "dashed", color = "grey") +
+  geom_line(position = position_dodge(0.1)) +
+  theme_bw()
+```
+
+
+
 
 
